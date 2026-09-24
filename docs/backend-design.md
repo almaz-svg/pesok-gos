@@ -1,6 +1,6 @@
 # Django/DRF: схема и интеграция v0.1
 
-Это план реализации. Репозиторий пока содержит только контракт. Bot-процесс и его диалог реализует отдельный участник; Django владеет данными, проверкой переходов, tracking и фото-прокси.
+Контракт v0.1 согласован и реализован в Django/DRF. Bot-процесс и его диалог реализует отдельный участник; Django владеет данными, проверкой переходов, tracking и фото-прокси. Запуск — в README, deployment и smoke-сценарий — в running.md.
 
 ## Схема БД
 
@@ -9,6 +9,7 @@
 | User | UUID PK, username unique, password hash, is_active, роль inspector; custom user до первой миграции |
 | LandPlot | UUID PK, cadastral_number unique, area_ha decimal >0, purpose, address nullable, geometry JSON nullable |
 | TrackingRecord | UUID PK, number unique, owner_telegram_user_id bigint; общий namespace номеров report/application |
+| TrackingSequence | BigAutoField PK — внутренняя PostgreSQL sequence для выдачи общих tracking-номеров |
 | Report | UUID PK, tracking OneToOne PROTECT, category, description, latitude/longitude, plot nullable FK SET_NULL, status, deadline nullable DateField, version positive int, created_at/updated_at |
 | ReportPhoto | UUID PK, report FK CASCADE, telegram_file_id (server only), ordinal, unique(report, ordinal) |
 | StatusHistory | UUID PK, report FK CASCADE, event, before JSON nullable, after JSON, comment nullable, actor_user nullable FK SET_NULL, actor_type, actor_label, created_at |
@@ -91,7 +92,7 @@ Inspector-only. transaction.atomic + select_for_update по Report; провер
 5. Tracking, instructions, statistics, детерминированный seed. Seed: 55 plots, 20 reports, 10 applications; статусы участков выводятся из обращений. Если нужны 12 inspection и 10 violation участков, потребуется минимум 22 активных обращения, а не 15–20: распределение согласовать, не подделывать счётчики.
 6. Deployment: Django API под production WSGI/ASGI сервером, PostgreSQL, frontend, отдельный bot worker/webhook. Бот-разработчик отвечает за Telegram webhook/диалог, Алиш — API, БД, secrets и общий deployment. Запуск миграций перед трафиком; seed идемпотентный, без удаления live-обращений.
 
-Ожидаемые env: DJANGO_SECRET_KEY, DEBUG=false, DATABASE_URL, ALLOWED_HOSTS, CSRF_TRUSTED_ORIGINS, CORS_ALLOWED_ORIGINS, BOT_API_KEY, BOT_TOKEN. Значения задаются при реализации/деплое. README с командами запуска появится вместе с backend. production endpoint и credentials пока не созданы.
+Env: DJANGO_SECRET_KEY, DEBUG=false, DATABASE_URL, ALLOWED_HOSTS, CSRF_TRUSTED_ORIGINS, CORS_ALLOWED_ORIGINS, BOT_API_KEY, BOT_TOKEN. Значения задаются при запуске/деплое, пример — `.env.example`. README содержит команды запуска. Production endpoint и credentials пока не созданы.
 
 ## Проверки до передачи backend
 
