@@ -1,0 +1,515 @@
+{
+  "note": "Mock v0.1: вымышленные данные, не seed и не работающий API. URL фото требует отдельного mock-handler; telegram_file_id — placeholder. beforePatch и afterPatch — два состояния одного набора данных.",
+  "createReportRequest": {
+    "telegram_user_id": "123456789",
+    "location": {
+      "latitude": 43.3,
+      "longitude": 68.3
+    },
+    "photos": [
+      {
+        "telegram_file_id": "TELEGRAM_FILE_ID_FROM_UPDATE"
+      }
+    ],
+    "description": "Обнаружена стихийная свалка возле земельного участка.",
+    "category": "DUMPING"
+  },
+  "createReportResponse": {
+    "id": "22222222-2222-4222-8222-222222222222",
+    "tracking_number": "KZ-2026-000042",
+    "status": "NEW",
+    "created_at": "2026-09-25T08:00:00Z"
+  },
+  "beforePatch": {
+    "reports": {
+      "count": 1,
+      "next": null,
+      "previous": null,
+      "results": [
+        {
+          "id": "22222222-2222-4222-8222-222222222222",
+          "tracking_number": "KZ-2026-000042",
+          "category": "DUMPING",
+          "description": "Обнаружена стихийная свалка возле земельного участка.",
+          "location": {
+            "latitude": 43.3,
+            "longitude": 68.3
+          },
+          "plot": null,
+          "status": "NEW",
+          "deadline": null,
+          "is_overdue": false,
+          "photos": [
+            {
+              "id": "33333333-3333-4333-8333-333333333333",
+              "url": "/api/photos/33333333-3333-4333-8333-333333333333"
+            }
+          ],
+          "version": 1,
+          "created_at": "2026-09-25T08:00:00Z",
+          "updated_at": "2026-09-25T08:00:00Z"
+        }
+      ]
+    },
+    "reportDetail": {
+      "id": "22222222-2222-4222-8222-222222222222",
+      "tracking_number": "KZ-2026-000042",
+      "category": "DUMPING",
+      "description": "Обнаружена стихийная свалка возле земельного участка.",
+      "location": {
+        "latitude": 43.3,
+        "longitude": 68.3
+      },
+      "plot": null,
+      "status": "NEW",
+      "deadline": null,
+      "is_overdue": false,
+      "photos": [
+        {
+          "id": "33333333-3333-4333-8333-333333333333",
+          "url": "/api/photos/33333333-3333-4333-8333-333333333333"
+        }
+      ],
+      "version": 1,
+      "created_at": "2026-09-25T08:00:00Z",
+      "updated_at": "2026-09-25T08:00:00Z",
+      "history": [
+        {
+          "id": "44444444-4444-4444-8444-444444444444",
+          "event": "CREATED",
+          "before": null,
+          "after": {
+            "status": "NEW",
+            "deadline": null,
+            "plot_id": null
+          },
+          "comment": null,
+          "actor": {
+            "type": "BOT",
+            "label": "Telegram-бот"
+          },
+          "created_at": "2026-09-25T08:00:00Z"
+        }
+      ]
+    },
+    "plots": {
+      "count": 1,
+      "next": null,
+      "previous": null,
+      "results": [
+        {
+          "id": "11111111-1111-4111-8111-111111111111",
+          "cadastral_number": "DEMO-19-001-001-001",
+          "area_ha": 3.6,
+          "purpose": "Сельскохозяйственное использование",
+          "address": "Демонстрационный участок",
+          "status": "NORMAL",
+          "active_reports_count": 0,
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  68.299,
+                  43.299
+                ],
+                [
+                  68.301,
+                  43.299
+                ],
+                [
+                  68.301,
+                  43.301
+                ],
+                [
+                  68.299,
+                  43.301
+                ],
+                [
+                  68.299,
+                  43.299
+                ]
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    "map": {
+      "plots": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "id": "11111111-1111-4111-8111-111111111111",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    68.299,
+                    43.299
+                  ],
+                  [
+                    68.301,
+                    43.299
+                  ],
+                  [
+                    68.301,
+                    43.301
+                  ],
+                  [
+                    68.299,
+                    43.301
+                  ],
+                  [
+                    68.299,
+                    43.299
+                  ]
+                ]
+              ]
+            },
+            "properties": {
+              "cadastral_number": "DEMO-19-001-001-001",
+              "status": "NORMAL",
+              "area_ha": 3.6
+            }
+          }
+        ]
+      },
+      "reports": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "id": "22222222-2222-4222-8222-222222222222",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                68.3,
+                43.3
+              ]
+            },
+            "properties": {
+              "tracking_number": "KZ-2026-000042",
+              "status": "NEW",
+              "category": "DUMPING",
+              "plot_id": null,
+              "deadline": null,
+              "is_overdue": false
+            }
+          }
+        ]
+      }
+    },
+    "statistics": {
+      "total_plots": 1,
+      "active_violations": 0,
+      "under_inspection": 1,
+      "resolved": 0,
+      "overdue": 0
+    }
+  },
+  "patchRequest": {
+    "version": 1,
+    "status": "INSPECTION",
+    "deadline": "2026-09-30",
+    "plot_id": "11111111-1111-4111-8111-111111111111",
+    "comment": "Назначена первичная проверка"
+  },
+  "afterPatch": {
+    "reports": {
+      "count": 1,
+      "next": null,
+      "previous": null,
+      "results": [
+        {
+          "id": "22222222-2222-4222-8222-222222222222",
+          "tracking_number": "KZ-2026-000042",
+          "category": "DUMPING",
+          "description": "Обнаружена стихийная свалка возле земельного участка.",
+          "location": {
+            "latitude": 43.3,
+            "longitude": 68.3
+          },
+          "plot": {
+            "id": "11111111-1111-4111-8111-111111111111",
+            "cadastral_number": "DEMO-19-001-001-001"
+          },
+          "status": "INSPECTION",
+          "deadline": "2026-09-30",
+          "is_overdue": false,
+          "photos": [
+            {
+              "id": "33333333-3333-4333-8333-333333333333",
+              "url": "/api/photos/33333333-3333-4333-8333-333333333333"
+            }
+          ],
+          "version": 2,
+          "created_at": "2026-09-25T08:00:00Z",
+          "updated_at": "2026-09-25T08:10:00Z"
+        }
+      ]
+    },
+    "reportDetail": {
+      "id": "22222222-2222-4222-8222-222222222222",
+      "tracking_number": "KZ-2026-000042",
+      "category": "DUMPING",
+      "description": "Обнаружена стихийная свалка возле земельного участка.",
+      "location": {
+        "latitude": 43.3,
+        "longitude": 68.3
+      },
+      "plot": {
+        "id": "11111111-1111-4111-8111-111111111111",
+        "cadastral_number": "DEMO-19-001-001-001"
+      },
+      "status": "INSPECTION",
+      "deadline": "2026-09-30",
+      "is_overdue": false,
+      "photos": [
+        {
+          "id": "33333333-3333-4333-8333-333333333333",
+          "url": "/api/photos/33333333-3333-4333-8333-333333333333"
+        }
+      ],
+      "version": 2,
+      "created_at": "2026-09-25T08:00:00Z",
+      "updated_at": "2026-09-25T08:10:00Z",
+      "history": [
+        {
+          "id": "44444444-4444-4444-8444-444444444444",
+          "event": "CREATED",
+          "before": null,
+          "after": {
+            "status": "NEW",
+            "deadline": null,
+            "plot_id": null
+          },
+          "comment": null,
+          "actor": {
+            "type": "BOT",
+            "label": "Telegram-бот"
+          },
+          "created_at": "2026-09-25T08:00:00Z"
+        },
+        {
+          "id": "55555555-5555-4555-8555-555555555555",
+          "event": "UPDATED",
+          "before": {
+            "status": "NEW",
+            "deadline": null,
+            "plot_id": null
+          },
+          "after": {
+            "status": "INSPECTION",
+            "deadline": "2026-09-30",
+            "plot_id": "11111111-1111-4111-8111-111111111111"
+          },
+          "comment": "Назначена первичная проверка",
+          "actor": {
+            "type": "INSPECTOR",
+            "label": "Инспектор"
+          },
+          "created_at": "2026-09-25T08:10:00Z"
+        }
+      ]
+    },
+    "plots": {
+      "count": 1,
+      "next": null,
+      "previous": null,
+      "results": [
+        {
+          "id": "11111111-1111-4111-8111-111111111111",
+          "cadastral_number": "DEMO-19-001-001-001",
+          "area_ha": 3.6,
+          "purpose": "Сельскохозяйственное использование",
+          "address": "Демонстрационный участок",
+          "status": "INSPECTION",
+          "active_reports_count": 1,
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  68.299,
+                  43.299
+                ],
+                [
+                  68.301,
+                  43.299
+                ],
+                [
+                  68.301,
+                  43.301
+                ],
+                [
+                  68.299,
+                  43.301
+                ],
+                [
+                  68.299,
+                  43.299
+                ]
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    "map": {
+      "plots": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "id": "11111111-1111-4111-8111-111111111111",
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    68.299,
+                    43.299
+                  ],
+                  [
+                    68.301,
+                    43.299
+                  ],
+                  [
+                    68.301,
+                    43.301
+                  ],
+                  [
+                    68.299,
+                    43.301
+                  ],
+                  [
+                    68.299,
+                    43.299
+                  ]
+                ]
+              ]
+            },
+            "properties": {
+              "cadastral_number": "DEMO-19-001-001-001",
+              "status": "INSPECTION",
+              "area_ha": 3.6
+            }
+          }
+        ]
+      },
+      "reports": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "id": "22222222-2222-4222-8222-222222222222",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                68.3,
+                43.3
+              ]
+            },
+            "properties": {
+              "tracking_number": "KZ-2026-000042",
+              "status": "INSPECTION",
+              "category": "DUMPING",
+              "plot_id": "11111111-1111-4111-8111-111111111111",
+              "deadline": "2026-09-30",
+              "is_overdue": false
+            }
+          }
+        ]
+      }
+    },
+    "statistics": {
+      "total_plots": 1,
+      "active_violations": 0,
+      "under_inspection": 1,
+      "resolved": 0,
+      "overdue": 0
+    }
+  },
+  "trackingReport": {
+    "kind": "REPORT",
+    "tracking_number": "KZ-2026-000042",
+    "status": "INSPECTION",
+    "status_label": "На проверке",
+    "deadline": "2026-09-30",
+    "updated_at": "2026-09-25T08:10:00Z",
+    "history": [
+      {
+        "status": "NEW",
+        "label": "Новое",
+        "created_at": "2026-09-25T08:00:00Z"
+      },
+      {
+        "status": "INSPECTION",
+        "label": "На проверке",
+        "created_at": "2026-09-25T08:10:00Z"
+      }
+    ]
+  },
+  "trackingApplication": {
+    "kind": "APPLICATION",
+    "tracking_number": "KZ-2026-000043",
+    "status": "RECEIVED",
+    "status_label": "Заявление принято",
+    "deadline": null,
+    "updated_at": "2026-09-25T08:00:00Z",
+    "history": [
+      {
+        "status": "RECEIVED",
+        "label": "Заявление принято",
+        "created_at": "2026-09-25T08:00:00Z"
+      }
+    ]
+  },
+  "instructions": [
+    {
+      "id": "report-violation",
+      "title": "Как сообщить о нарушении",
+      "body": "Выберите «Сообщить о нарушении», отправьте геолокацию, фотографию и описание. Сохраните номер обращения.",
+      "updated_at": "2026-09-25T08:00:00Z"
+    }
+  ],
+  "emptyPage": {
+    "count": 0,
+    "next": null,
+    "previous": null,
+    "results": []
+  },
+  "emptyMap": {
+    "plots": {
+      "type": "FeatureCollection",
+      "features": []
+    },
+    "reports": {
+      "type": "FeatureCollection",
+      "features": []
+    }
+  },
+  "validationError": {
+    "error": {
+      "code": "validation_error",
+      "message": "Проверьте поля запроса",
+      "fields": {
+        "location.latitude": [
+          "Значение должно быть от -90 до 90"
+        ]
+      },
+      "request_id": "req-example"
+    }
+  },
+  "conflictError": {
+    "error": {
+      "code": "version_conflict",
+      "message": "Обращение уже изменено. Обновите карточку.",
+      "fields": {},
+      "request_id": "req-conflict"
+    }
+  }
+}
