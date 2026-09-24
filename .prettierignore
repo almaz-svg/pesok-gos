@@ -1,0 +1,6 @@
+node_modules
+dist
+contracts
+docs/backend-design.md
+docs/frontend-api.md
+package-lock.json

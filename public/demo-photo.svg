@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" role="img" aria-labelledby="title desc">
+  <title id="title">Демонстрационная иллюстрация участка</title>
+  <desc id="desc">Схематичный ландшафт. Иллюстрация, не фотография нарушения.</desc>
+  <defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#adc3b6"/><stop offset="1" stop-color="#e5dfb5"/></linearGradient><linearGradient id="land" x2="1" y2="1"><stop stop-color="#798267"/><stop offset="1" stop-color="#394c36"/></linearGradient></defs>
+  <path fill="url(#sky)" d="M0 0h960v600H0z"/>
+  <circle cx="746" cy="119" r="49" fill="#f3e7b4" opacity=".8"/>
+  <path d="M0 315 130 264 284 307 442 251 608 306 773 272 960 314V600H0Z" fill="#a6ac87"/>
+  <path d="M0 370 226 306 490 367 709 313 960 357V600H0Z" fill="url(#land)"/>
+  <path d="m94 421 288-61 276 82-303 128Z" fill="#94a271" stroke="#d5dd9d" stroke-width="3" stroke-dasharray="13 10"/>
+  <path d="m493 350 399 224" stroke="#b0a589" stroke-width="20" opacity=".7"/>
+  <g fill="#d2cdb0" stroke="#938d74" stroke-width="2"><path d="m352 461 24-15 31 12-9 23-38 3Z"/><path d="m399 470 21-16 29 15-8 20-36-2Z"/><path d="m375 438 22-8 18 15-8 17-30-7Z"/></g>
+  <rect x="28" y="27" width="335" height="45" rx="22" fill="#162e21" opacity=".9"/>
+  <text x="51" y="56" font-family="Arial,sans-serif" font-size="18" fill="#ddedce" letter-spacing="2">DEMO · ИЛЛЮСТРАЦИЯ</text>
+  <rect x="0" y="540" width="960" height="60" fill="#11261a" opacity=".8"/>
+  <text x="28" y="577" font-family="Arial,sans-serif" font-size="18" fill="#e4ecdb">Учебный материал. Не является фотографией реального нарушения.</text>
+</svg>

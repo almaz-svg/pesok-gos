@@ -1,0 +1,25 @@
+{
+  "name": "pesok-gos",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host localhost",
+    "build": "vite build",
+    "preview": "vite preview --host localhost",
+    "test": "node --test test/*.test.js",
+    "format": "prettier --write src test public index.html vite.config.js package.json README.md docs/frontend.md",
+    "format:check": "prettier --check src test public index.html vite.config.js package.json README.md docs/frontend.md"
+  },
+  "dependencies": {
+    "leaflet": "^1.9.4",
+    "lucide-react": "^0.468.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.0.0",
+    "prettier": "^3.9.9",
+    "vite": "^7.1.0"
+  }
+}
