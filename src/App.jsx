@@ -154,6 +154,9 @@ export default function App() {
   const [adding, setAdding] = useState(false);
   const requests = useRef({});
   const retryAt = useRef({});
+  const mapBounds = useRef(null);
+  const viewportMode = useRef(false);
+  const [viewportMap, setViewportMap] = useState(false);
   const workspace = useRef(null);
 
   const cancelRequests = useCallback(() => {
@@ -163,6 +166,9 @@ export default function App() {
   const clearInspector = useCallback(() => {
     cancelRequests();
     retryAt.current = {};
+    mapBounds.current = null;
+    viewportMode.current = false;
+    setViewportMap(false);
     setUser(null);
     setSelection(null);
     setFocusId(null);
@@ -201,7 +207,12 @@ export default function App() {
           requests.current[key] = controller;
           setResources((previous) => ({ ...previous, [key]: { ...previous[key], loading: true } }));
           try {
-            const result = await LOADERS[key]({ signal: controller.signal });
+            const result = await LOADERS[key]({
+              signal: controller.signal,
+              ...(key === 'map' && viewportMode.current && mapBounds.current
+                ? { bbox: mapBounds.current }
+                : {}),
+            });
             if (controller.signal.aborted || requests.current[key] !== controller) return;
             const receivedAt = new Date();
             setData((previous) => ({ ...previous, [key]: result }));
@@ -223,6 +234,10 @@ export default function App() {
               return;
             }
             if (err.retryAfter) retryAt.current[key] = Date.now() + err.retryAfter * 1000;
+            if (key === 'map' && err.code === 'map_limit_exceeded') {
+              viewportMode.current = true;
+              setViewportMap(true);
+            }
             setResources((previous) => ({
               ...previous,
               [key]: { ...previous[key], loading: false, error: err },
@@ -273,7 +288,15 @@ export default function App() {
   const resourceErrors = Object.entries(resources).filter(([, resource]) => resource.error);
   const refreshing = Object.values(resources).some((resource) => resource.loading);
   const hasMapFeatures = data.map.plots.features.length > 0 || data.map.reports.features.length > 0;
-  const canShowMap = resources.map.loaded && (!resources.map.error || hasMapFeatures);
+  const canShowMap =
+    viewportMap || (resources.map.loaded && (!resources.map.error || hasMapFeatures));
+  const onMapBoundsChange = useCallback(
+    (bounds) => {
+      mapBounds.current = bounds;
+      if (viewportMode.current) refresh({ only: 'map', force: true });
+    },
+    [refresh],
+  );
   const selectReport = (id) => {
     setSelection({ type: 'report', id });
     setFocusId(`report:${id}`);
@@ -694,6 +717,7 @@ export default function App() {
                           {canShowMap ? (
                             <>
                               <LandMap
+                                onBoundsChange={onMapBoundsChange}
                                 data={filtered.map}
                                 onSelectReport={selectReport}
                                 onSelectPlot={selectPlot}

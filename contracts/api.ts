@@ -1,4 +1,4 @@
-/** Proposed API v0.1. No backend implementation yet. Dates and UUIDs are strings. */
+/** Agreed API v0.1, implemented in Django/DRF. Dates and UUIDs are strings. */
 export type UUID = string;
 export type ReportStatus = 'NEW' | 'INSPECTION' | 'VIOLATION' | 'IN_PROGRESS' | 'RESOLVED';
 export type PlotStatus = 'NORMAL' | 'INSPECTION' | 'VIOLATION';

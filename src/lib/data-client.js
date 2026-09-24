@@ -484,7 +484,22 @@ export function createApiClient({
   }
 
   return {
-    getMap: async (options) => validateMapResponse(await request('map', options)),
+    async getMap({ signal, bbox } = {}) {
+      const url = endpoint('map');
+      if (bbox !== undefined) {
+        if (
+          !Array.isArray(bbox) ||
+          bbox.length !== 4 ||
+          !bbox.every(Number.isFinite) ||
+          !(-180 <= bbox[0] && bbox[0] < bbox[2] && bbox[2] <= 180) ||
+          !(-90 <= bbox[1] && bbox[1] < bbox[3] && bbox[3] <= 90)
+        ) {
+          throw validation({ bbox: ['Ожидаются границы west, south, east, north в WGS84'] });
+        }
+        url.searchParams.set('bbox', bbox.join(','));
+      }
+      return validateMapResponse(await request(url, { signal }));
+    },
     getReports: (options) => allPages('reports?page_size=100', options),
     getPlots: (options) => allPages('plots?page_size=100', options),
     getReport: (id, options) => request(`reports/${encodeURIComponent(id)}`, options),

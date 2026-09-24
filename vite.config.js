@@ -6,6 +6,7 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
-    proxy: { '/api': { target: 'http://localhost:8000', changeOrigin: true } },
+    // Preserve the browser host so Django's absolute pagination URLs stay on /api via Vite.
+    proxy: { '/api': { target: 'http://localhost:8000', changeOrigin: false } },
   },
 });

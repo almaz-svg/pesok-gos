@@ -290,6 +290,55 @@ test('API map rejects malformed collections and geometry instead of crashing ren
   }
 });
 
+test('API map adds optional viewport bounds without mutating options or losing cancellation', async () => {
+  const body = await fresh().getMap();
+  const calls = [];
+  const api = createApiClient({
+    fetchImpl: async (url, options) => {
+      calls.push({ url: new URL(url), options });
+      return json(body);
+    },
+  });
+  await api.getMap();
+  assert.equal(calls[0].url.pathname, '/api/map');
+  assert.equal(calls[0].url.search, '');
+  const controller = new AbortController();
+  const bbox = Object.freeze([68.2, 43.2, 68.4, 43.4]);
+  const options = Object.freeze({ bbox, signal: controller.signal });
+  await api.getMap(options);
+  assert.equal(calls[1].url.searchParams.get('bbox'), '68.2,43.2,68.4,43.4');
+  assert.equal(calls[1].options.method, 'GET');
+  assert.equal(options.signal, controller.signal);
+  assert.deepEqual(options.bbox, [68.2, 43.2, 68.4, 43.4]);
+  assert.equal(controller.signal.aborted, false);
+  for (const invalid of [
+    null,
+    [1, 2, 3],
+    [68.4, 43.2, 68.2, 43.4],
+    [0, -91, 1, 1],
+    [0, 0, Infinity, 1],
+    ['0', 0, 1, 1],
+  ]) {
+    await assert.rejects(api.getMap({ bbox: invalid }), matches('validation_error', 'bbox'));
+  }
+  assert.equal(calls.length, 2);
+
+  let networkSignal;
+  const pendingApi = createApiClient({
+    fetchImpl: (_url, { signal }) => {
+      networkSignal = signal;
+      return new Promise((_resolve, reject) =>
+        signal.addEventListener('abort', () => reject(signal.reason), { once: true }),
+      );
+    },
+  });
+  const pending = pendingApi.getMap(options);
+  controller.abort();
+  await assert.rejects(pending, (error) => error.name === 'AbortError');
+  assert.equal(networkSignal.aborted, true);
+  assert.equal(networkSignal.reason, controller.signal.reason);
+});
+
 test('API supports caller abort and timeout, and never retries uncertain mutations', async () => {
   const abortableFetch = (_url, { signal }) =>
     new Promise((_resolve, reject) => {

@@ -22,6 +22,7 @@ export default function LandMap({
   data,
   onSelectReport,
   onSelectPlot,
+  onBoundsChange,
   selectedId,
   focusId,
   showPlots = true,
@@ -31,11 +32,11 @@ export default function LandMap({
   const mapRef = useRef(null);
   const tilesRef = useRef(null);
   const featuresRef = useRef(new Map());
-  const callbackRef = useRef({ onSelectReport, onSelectPlot });
+  const callbackRef = useRef({ onSelectReport, onSelectPlot, onBoundsChange });
   const initialFitRef = useRef(false);
   const lastFocusRef = useRef(null);
   const [tileError, setTileError] = useState(false);
-  callbackRef.current = { onSelectReport, onSelectPlot };
+  callbackRef.current = { onSelectReport, onSelectPlot, onBoundsChange };
 
   function fitFeatures() {
     const layers = [...featuresRef.current.values()];
@@ -66,10 +67,24 @@ export default function LandMap({
     tiles.on('tileerror', () => setTileError(true));
     mapRef.current = map;
     tilesRef.current = tiles;
+    const emitBounds = () => {
+      const bounds = map.getBounds();
+      const bbox = [
+        Math.max(-180, Math.min(180, bounds.getWest())),
+        Math.max(-90, Math.min(90, bounds.getSouth())),
+        Math.max(-180, Math.min(180, bounds.getEast())),
+        Math.max(-90, Math.min(90, bounds.getNorth())),
+      ];
+      if (!bbox.every(Number.isFinite) || bbox[0] >= bbox[2] || bbox[1] >= bbox[3]) return;
+      callbackRef.current.onBoundsChange?.(bbox);
+    };
+    map.on('moveend', emitBounds);
+    emitBounds();
     const resize = new ResizeObserver(() => map.invalidateSize({ animate: false }));
     resize.observe(containerRef.current);
     return () => {
       resize.disconnect();
+      map.off('moveend', emitBounds);
       map.remove();
       mapRef.current = null;
       tilesRef.current = null;

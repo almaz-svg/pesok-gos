@@ -1,11 +1,11 @@
 # API для React — контракт v0.1
 
-Статус: проектирование, endpoints ещё не реализованы. Эти решения — стартовая договорённость для команды, а не описание готового сервера.
+Статус: контракт v0.1 согласован, endpoints реализованы в Django/DRF. Локальный запуск описан в README. Production URL и интеграция React/Telegram пока не настроены.
 
 ## Общие правила
 
 - Base URL в development: `http://localhost:8000/api`. В production рекомендуется общий origin и `/api`. В React используется `VITE_API_BASE_URL`; секретов в VITE-переменных нет.
-- URL **без завершающего слеша**. Django routers будут настроены под это правило, POST/PATCH не должны зависеть от redirect.
+- URL **без завершающего слеша**. Маршруты Django настроены под это правило, POST/PATCH не зависят от redirect.
 - JSON, `Content-Type: application/json`; UUID — строки; даты-время — ISO 8601 UTC с `Z`; deadline — календарная дата `YYYY-MM-DD`.
 - В интерфейсе время отображается в `Asia/Qyzylorda`. Обращение просрочено, если deadline раньше сегодняшней даты в этой зоне и status != RESOLVED. В день deadline оно ещё не просрочено.
 - Координаты WGS84: объект `{latitude, longitude}`; **GeoJSON — `[longitude, latitude]`**. Leaflet `LatLng` получает обратный порядок.
@@ -152,4 +152,4 @@ GET можно повторять с задержкой. PATCH после сет
 5. Использовать ответ PATCH, обновить карту/списки/статистику. При закрытии запросить комментарий.
 6. Новое обращение из бота появляется при очередном polling; никакой ручной правки fixtures.
 
-До готовности backend использовать `contracts/api.ts` и `contracts/examples.json`; mock режим включать явно. Нельзя молча переключаться на mock при ошибках production API.
+Для разработки интерфейса доступны `contracts/api.ts` и `contracts/examples.json`; mock режим включать явно. Для интеграции используйте локальный backend. Нельзя молча переключаться на mock при ошибках production API.
