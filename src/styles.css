@@ -490,13 +490,15 @@ h1 {
 .section-kicker > span {
   color: #d0e6ac;
 }
-h2 {
+h2,
+.workspace-title {
   font-size: clamp(34px, 3.3vw, 48px);
   font-weight: 400;
   line-height: 1.1;
   letter-spacing: -1.8px;
 }
-h2 > span {
+h2 > span,
+.workspace-title > span {
   color: #869580;
 }
 .workspace-context {
@@ -1871,7 +1873,8 @@ h2 > span {
     letter-spacing: 1px;
     margin-bottom: 18px;
   }
-  h2 {
+  h2,
+  .workspace-title {
     font-size: 31px;
     letter-spacing: -1.3px;
   }
@@ -2234,7 +2237,8 @@ h2 > span {
     gap: 12px;
     font-size: 9px;
   }
-  h2 {
+  h2,
+  .workspace-title {
     font-size: 28px;
   }
   .view-tabs > button {

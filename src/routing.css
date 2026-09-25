@@ -1,0 +1,90 @@
+/* Layout changes required by independent pages; visual redesign is a separate step. */
+#main-content:focus {
+  outline: none;
+}
+.workspace-page {
+  padding-top: 34px;
+}
+.not-found-page {
+  margin: 40px 0 80px;
+  min-height: 45vh;
+}
+.not-found-page h1 {
+  font-size: clamp(30px, 4vw, 48px);
+  letter-spacing: -1.5px;
+}
+.hero-bottom-nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 11px;
+  border-radius: 24px;
+  color: #9caa94;
+  font-size: 8px;
+}
+.hero-bottom-nav a:hover {
+  background: #cadfaf18;
+}
+.view-tabs > a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 15px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #8e9a89;
+}
+.view-tabs > a.selected {
+  border-color: #b5d18c27;
+  background: #a7cb7510;
+  color: #d5eac0;
+}
+.view-tabs > a:hover {
+  color: #e8efdf;
+  background: #a7cb7510;
+}
+@media (max-width: 600px) {
+  .site-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    height: auto;
+    padding: 18px 0 14px;
+    gap: 12px;
+  }
+  .header-nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-content: center;
+    gap: 27px;
+    margin: 0;
+    font-size: 11px;
+  }
+  .header-nav .nav-current {
+    display: block;
+  }
+  .workspace-page {
+    padding-top: 26px;
+  }
+  .view-tabs > a {
+    padding: 9px 10px;
+    font-size: 10px;
+    gap: 7px;
+  }
+  .view-tabs > a svg {
+    width: 14px;
+  }
+  .hero-bottom-nav a {
+    padding: 8px 14px;
+    gap: 13px;
+  }
+}
+@media (max-width: 380px) {
+  .view-tabs > a {
+    padding: 9px 8px;
+    font-size: 9px;
+  }
+  .view-tabs > a svg {
+    width: 13px;
+  }
+}
