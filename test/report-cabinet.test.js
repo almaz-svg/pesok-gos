@@ -110,6 +110,46 @@ test('a submitted report is visible after restarting the bot with its evidence a
   assert.match(stranger.replies.at(-1).text, /пока нет обращений/);
 });
 
+test('cabinet shows the violation passport without breaking old report cards', async t => {
+  const { api, reportsFile } = store(t);
+  await api.createReport({
+    ...reportInput,
+    description: 'Сосед перекрыл общий проход забором',
+    casePassport: {
+      type: 'blocked_access',
+      typeLabel: 'Перекрыт проход или доступ',
+      responsibleAuthority: 'Местный акимат',
+      urgency: 'high',
+      evidenceChecklist: ['Фото препятствия', 'Геолокация'],
+      officialDraft: 'Прошу провести проверку по факту перекрытия прохода.',
+      nextAction: 'Проверьте черновик и отправьте через eOtinish.',
+      followUpDays: 3,
+    },
+  });
+  const chat = conversation();
+  await chat.click('reports:open:DEMO-042');
+  assert.match(chat.replies.at(-1).text, /Паспорт нарушения/);
+  assert.match(chat.replies.at(-1).text, /Категория: Перекрыт проход или доступ/);
+  assert.match(chat.replies.at(-1).text, /Ответственный орган: Местный акимат/);
+  assert.match(chat.replies.at(-1).text, /Срочность: высокая/);
+  assert.match(chat.replies.at(-1).text, /Нужные доказательства/);
+  assert.match(chat.replies.at(-1).text, /Черновик обращения/);
+
+  await writeFile(reportsFile, JSON.stringify([{
+    id: 'DEMO-OLD',
+    telegramUserId: '101',
+    lat: 51,
+    lon: 71,
+    description: 'Старая запись',
+    telegramFileId: 'photo',
+    createdAt: '2026-09-20T12:00:00Z',
+    demoOnly: true,
+  }]));
+  await chat.click('reports:open:DEMO-OLD');
+  assert.match(chat.replies.at(-1).text, /Старая запись/);
+  assert.doesNotMatch(chat.replies.at(-1).text, /Паспорт нарушения/);
+});
+
 test('forged card and photo callbacks never disclose another user report', async t => {
   const { api } = store(t);
   await api.createReport(reportInput);

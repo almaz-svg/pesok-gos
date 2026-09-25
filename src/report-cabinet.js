@@ -52,6 +52,13 @@ const messages = {
     eotinish: 'Открыть eOtinish',
     refreshStatus: 'Обновить статус',
     chooseAction: 'Выберите действие:',
+    passport: 'Паспорт нарушения',
+    category: 'Категория:',
+    authority: 'Ответственный орган:',
+    urgency: 'Срочность:',
+    urgencyLabels: { high: 'высокая', normal: 'обычная' },
+    evidenceNeeded: 'Нужные доказательства:',
+    officialDraft: 'Черновик обращения:',
   },
   kk: {
     statuses: {
@@ -101,6 +108,13 @@ const messages = {
     eotinish: 'eOtinish ашу',
     refreshStatus: 'Мәртебені жаңарту',
     chooseAction: 'Әрекетті таңдаңыз:',
+    passport: 'Бұзушылық паспорты',
+    category: 'Санаты:',
+    authority: 'Жауапты орган:',
+    urgency: 'Шұғылдығы:',
+    urgencyLabels: { high: 'жоғары', normal: 'қалыпты' },
+    evidenceNeeded: 'Қажет дәлелдер:',
+    officialDraft: 'Өтініш жобасы:',
   },
 };
 
@@ -119,6 +133,20 @@ function mapUrl(report) {
   return `https://www.openstreetmap.org/?mlat=${report.lat}&mlon=${report.lon}#map=17/${report.lat}/${report.lon}`;
 }
 
+function passportText(passport, copy) {
+  if (!passport || typeof passport !== 'object') return [];
+  const lines = ['', copy.passport];
+  if (passport.typeLabel) lines.push(`${copy.category} ${shortText(passport.typeLabel, 120)}`);
+  if (passport.responsibleAuthority) lines.push(`${copy.authority} ${shortText(passport.responsibleAuthority, 220)}`);
+  const urgency = copy.urgencyLabels[passport.urgency] || shortText(passport.urgency, 40);
+  if (urgency) lines.push(`${copy.urgency} ${urgency}`);
+  if (Array.isArray(passport.evidenceChecklist) && passport.evidenceChecklist.length) {
+    lines.push('', copy.evidenceNeeded, ...passport.evidenceChecklist.slice(0, 6).map(item => `• ${shortText(item, 180)}`));
+  }
+  if (passport.officialDraft) lines.push('', copy.officialDraft, shortText(passport.officialDraft, 1400));
+  return lines;
+}
+
 function reportText(report, language) {
   const copy = messages[language];
   const nextStep = report.demoOnly
@@ -133,6 +161,7 @@ function reportText(report, language) {
   if (report.demoOnly) lines.push('', copy.demoNotice);
   lines.push('', copy.description, shortText(report.description, 2000) || copy.noDescription);
   lines.push('', mapUrl(report) ? `${copy.coordinates} ${report.lat}, ${report.lon}` : copy.noCoordinates);
+  lines.push(...passportText(report.casePassport, copy));
   if (report.explanation) lines.push('', shortText(report.explanation, 400));
   lines.push('', `${copy.nextStep} ${nextStep}`);
   return lines.join('\n');

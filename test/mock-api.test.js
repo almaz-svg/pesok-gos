@@ -53,6 +53,37 @@ test('cabinet persists ownership and lists only the current user reports, newest
   assert.equal(JSON.parse(await readFile(reportsFile, 'utf8')).length, 4);
 });
 
+test('mock reports persist the violation passport fields for the cabinet', async t => {
+  const reportsFile = join(tmpdir(), `zher-passport-${randomUUID()}.json`);
+  t.after(() => rm(reportsFile, { force: true }));
+  const api = createMockApi({ reportsFile });
+
+  await api.createReport({
+    telegramUserId: 101,
+    lat: 51.1693,
+    lon: 71.4492,
+    description: 'Сосед перекрыл общий проход забором',
+    telegramFileId: 'photo',
+    casePassport: {
+      type: 'blocked_access',
+      typeLabel: 'Перекрыт проход или доступ',
+      responsibleAuthority: 'Местный акимат',
+      urgency: 'high',
+      evidenceChecklist: ['Фото препятствия', 'Геолокация'],
+      officialDraft: 'Прошу провести проверку.',
+      nextAction: 'Отправить через eOtinish.',
+      followUpDays: 3,
+    },
+  });
+
+  const [report] = await createMockApi({ reportsFile }).listReports(101);
+  assert.equal(report.casePassport.type, 'blocked_access');
+  assert.equal(report.casePassport.urgency, 'high');
+  assert.deepEqual(report.casePassport.evidenceChecklist, ['Фото препятствия', 'Геолокация']);
+  assert.equal(report.casePassport.officialDraft, 'Прошу провести проверку.');
+  assert.equal(report.caseStatus, 'draft_ready');
+});
+
 test('cabinet rejects missing or invalid owners instead of returning unowned reports', async t => {
   const reportsFile = join(tmpdir(), `zher-owner-${randomUUID()}.json`);
   t.after(() => rm(reportsFile, { force: true }));

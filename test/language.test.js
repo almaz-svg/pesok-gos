@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 process.env.DATA_MODE = 'mock';
 const { createBot } = await import('../src/bot.js');
 const { mockApi } = await import('../src/mock-api.js');
+const { messages } = await import('../src/i18n.js');
 
 function preferences(initial = {}) {
   const values = new Map(Object.entries(initial));
@@ -111,6 +112,28 @@ test('Kazakh selection localizes the report flow without translating the submitt
   assert.match(chat.replies.at(-1).text, /DEMO-TEST.*сақталды/s);
   assert.match(chat.replies.at(-1).text, /жіберілмеді/);
   assert.ok(labels(chat.replies.at(-1)).includes('Менің өтініштерім'));
+});
+
+test('report submission sends a case passport with category, authority and draft', async t => {
+  let savedReport;
+  t.mock.method(mockApi, 'createReport', async report => {
+    savedReport = report;
+    return { id: 'DEMO-PASSPORT', demoOnly: true };
+  });
+  const chat = conversation(preferences({ 101: 'ru' }));
+
+  await chat.send(messages.ru.report);
+  await chat.send({ location: { latitude: 51.1693, longitude: 71.4492 } });
+  await chat.send({ photo: [{ file_id: 'photo', file_unique_id: 'p', width: 1, height: 1 }] });
+  await chat.send('Сосед поставил забор и перекрыл общий проход во двор');
+
+  assert.equal(savedReport.casePassport.type, 'blocked_access');
+  assert.equal(savedReport.casePassport.urgency, 'high');
+  assert.match(savedReport.casePassport.responsibleAuthority, /акимат|земельн|архитект/i);
+  assert.ok(savedReport.casePassport.evidenceChecklist.length >= 3);
+  assert.match(savedReport.casePassport.officialDraft, /Прошу провести проверку/i);
+  assert.match(savedReport.casePassport.nextAction, /eOtinish/i);
+  assert.match(chat.replies.at(-1).text, /DEMO-PASSPORT/);
 });
 
 test('language can be changed from a command or menu and the old report draft is cleared', async t => {

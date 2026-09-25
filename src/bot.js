@@ -1,5 +1,6 @@
 import { Markup, Telegraf } from 'telegraf';
 import { createReport, getApplication, listProcedures } from './api.js';
+import { analyzeViolationCase } from './case-analysis.js';
 import { config } from './config.js';
 import { registerReportCabinet } from './report-cabinet.js';
 import { copyFor, formatDate, languageOf, localizeError, messages } from './i18n.js';
@@ -261,6 +262,12 @@ export function createBot(token, telegramOptions = {}, { preferences = userPrefe
           lon: draft.lon,
           description,
           telegramFileId: draft.telegramFileId,
+          casePassport: analyzeViolationCase({
+            description,
+            lat: draft.lat,
+            lon: draft.lon,
+            hasPhoto: Boolean(draft.telegramFileId),
+          }),
         });
         if (!report?.id) throw new Error(copy.missingReportId);
         states.delete(ctx.from.id);

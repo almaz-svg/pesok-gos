@@ -61,6 +61,7 @@ export function createMockApi({ reportsFile = resolve('data/reports.json') } = {
           telegramUserId,
           id: `DEMO-${String(lastNumber + 1).padStart(3, '0')}`,
           status: 'signal_received',
+          caseStatus: report.casePassport ? 'draft_ready' : undefined,
           createdAt: new Date().toISOString(),
           demoOnly: true,
         };
