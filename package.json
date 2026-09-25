@@ -5,8 +5,9 @@
   "description": "Telegram bot for Kazakhstan land monitoring reports",
   "type": "module",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "node --watch src/index.js",
+    "start": "node --watch --watch-path=./src --watch-path=./.env --watch-path=./package.json --watch-preserve-output src/index.js",
+    "dev": "npm run start",
+    "start:once": "node src/index.js",
     "test": "node --test"
   },
   "engines": {
