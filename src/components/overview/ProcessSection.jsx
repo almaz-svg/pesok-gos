@@ -3,7 +3,7 @@ import { MoveUpRight, Radio, ScanLine, Check } from 'lucide-react';
 export default function ProcessSection() {
   return (
     <section className="process-section" aria-labelledby="process-title">
-      <div className="process-intro">
+      <div className="process-intro" data-reveal>
         <div className="section-kicker">
           <span>02 /</span> КАК ЭТО РАБОТАЕТ
         </div>
@@ -40,8 +40,13 @@ export default function ProcessSection() {
             tone: 'green',
             icon: Check,
           },
-        ].map(({ n, title, text, tone, icon: Icon }) => (
-          <div className={`process-step process-${tone}`} key={n}>
+        ].map(({ n, title, text, tone, icon: Icon }, index) => (
+          <div
+            className={`process-step process-${tone}`}
+            key={n}
+            data-reveal
+            style={{ '--reveal-delay': `${index * 90}ms` }}
+          >
             <div className="process-step-top">
               <span>{n}</span>
               <Icon size={21} strokeWidth={1.4} />

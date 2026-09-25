@@ -1,10 +1,12 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
+import '@fontsource-variable/inter';
 import 'leaflet/dist/leaflet.css';
 import App from './App.jsx';
 import './styles.css';
 import './routing.css';
+import './motion.css';
 
 class ErrorBoundary extends React.Component {
   state = { error: null };

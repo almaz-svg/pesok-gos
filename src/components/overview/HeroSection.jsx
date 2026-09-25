@@ -7,25 +7,27 @@ export default function HeroSection() {
       <div className="hero-ambient" />
       <Terrain />
       <div className="hero-content">
-        <div className="eyebrow">
+        <div className="eyebrow" data-reveal>
           <span className="live-dot" /> ЦИФРОВОЙ МОНИТОРИНГ ЗЕМЕЛЬ
         </div>
-        <h1 id="hero-title">
+        <h1 id="hero-title" data-reveal style={{ '--reveal-delay': '80ms' }}>
           Земля.
           <br />
           Под защитой<span className="title-dot">.</span>
         </h1>
-        <p className="hero-description">
+        <p className="hero-description" data-reveal style={{ '--reveal-delay': '150ms' }}>
           Видеть изменения. Слышать людей.
           <br />
           Сохранять то, что имеет значение.
         </p>
-        <Link className="button hero-button" to="/map">
-          Открыть карту
-          <span className="round-icon">
-            <ArrowUpRight size={20} />
-          </span>
-        </Link>
+        <div data-reveal style={{ '--reveal-delay': '220ms' }}>
+          <Link className="button hero-button" to="/map">
+            Открыть карту
+            <span className="round-icon">
+              <ArrowUpRight size={20} />
+            </span>
+          </Link>
+        </div>
       </div>
       <div className="terrain-coordinate">
         <span className="crosshair">+</span> 43°18′ N &nbsp; 68°16′ E
@@ -35,7 +37,7 @@ export default function HeroSection() {
         <span className="label-line" />
         <span className="live-dot" /> МОНИТОРИНГ ТЕРРИТОРИИ
       </div>
-      <div className="hero-side-note">
+      <div className="hero-side-note" data-reveal style={{ '--reveal-delay': '180ms' }}>
         <span className="tiny-index">01 / НАБЛЮДЕНИЕ</span>
         <p>
           Каждый сигнал

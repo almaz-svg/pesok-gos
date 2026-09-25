@@ -1,0 +1,116 @@
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-fast: 180ms;
+  --motion-reveal: 700ms;
+}
+
+.hero h1 {
+  font-weight: 450;
+  letter-spacing: -0.055em;
+  line-height: 1.06;
+  text-shadow: 0 2px 28px #06100833;
+}
+.hero-description {
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+.stat-bottom strong {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Only elements successfully observed by the hook receive a hidden state. */
+[data-reveal].reveal-ready {
+  opacity: 0;
+  translate: 0 20px;
+  transition:
+    opacity 600ms var(--ease-out) var(--reveal-delay, 0ms),
+    translate var(--motion-reveal) var(--ease-out) var(--reveal-delay, 0ms),
+    transform 250ms var(--ease-out),
+    background-color 250ms ease,
+    border-color 250ms ease;
+}
+[data-reveal].is-revealed,
+[data-reveal]:focus-within {
+  opacity: 1;
+  translate: 0 0;
+}
+[data-reveal]:focus-within {
+  transition-delay: 0ms;
+}
+
+.process-step {
+  border-radius: 0 0 10px 10px;
+  transition:
+    transform 250ms var(--ease-out),
+    background-color 250ms ease,
+    border-color 250ms ease;
+}
+.process-step-top svg,
+.process-intro > a svg,
+.rail-all svg,
+.button > svg {
+  transition: transform 250ms var(--ease-out);
+}
+.button,
+.round-icon,
+.header-cta,
+.report-preview,
+.stat-item {
+  transition-timing-function: var(--ease-out);
+}
+.stat-item {
+  transition: background-color 250ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .process-step:hover {
+    transform: translateY(-5px);
+    border-color: #b7d49e80;
+    background-color: #a7cb7507;
+  }
+  .process-step:hover .process-step-top svg {
+    transform: translateY(-2px);
+  }
+  .process-intro > a:hover svg,
+  .button:hover > svg {
+    transform: translate(2px, -2px);
+  }
+  .rail-all:hover svg {
+    transform: translateX(3px);
+  }
+  .header-cta:hover .round-icon,
+  a.button:hover .round-icon {
+    transform: rotate(45deg);
+  }
+  .stat-item:hover {
+    background-color: #a7cb7509;
+  }
+}
+.button:active:not(:disabled),
+.header-cta:active {
+  transform: translateY(0) scale(0.98);
+}
+
+@media (max-width: 600px) {
+  .hero h1 {
+    letter-spacing: -0.055em;
+    font-size: clamp(29px, 9.15vw, 55px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal].reveal-ready {
+    opacity: 1;
+    translate: none;
+    transition: none;
+  }
+  .process-step,
+  .process-step-top svg,
+  .process-intro > a svg,
+  .rail-all svg,
+  .button,
+  .button svg,
+  .round-icon,
+  .header-cta {
+    transform: none !important;
+  }
+}

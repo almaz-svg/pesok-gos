@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;450;500;550;600;650;700&display=swap');
-
 :root {
-  font-family: 'Golos Text', Arial, sans-serif;
+  --font-sans: 'Inter Variable', 'Inter', Arial, sans-serif;
+  font-family: var(--font-sans);
+  font-optical-sizing: auto;
   color: #eef1e8;
   background: #08100b;
   font-synthesis: none;
@@ -245,7 +245,8 @@ input[type='checkbox'] {
   padding: 100px 0 132px 5%;
   pointer-events: none;
 }
-.hero-content button {
+.hero-content button,
+.hero-content a {
   pointer-events: auto;
 }
 .eyebrow {
