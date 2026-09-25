@@ -31,7 +31,9 @@ npm --prefix frontend run dev
 
 [Запуск frontend, демо и подключение API](docs/frontend.md).
 
-## Запуск через Docker (PowerShell)
+## Запуск полного локального стенда через Docker (PowerShell)
+
+Compose собирает React в режиме API и раздаёт его через Nginx на `http://localhost:8080`. Запросы `/api` идут через тот же адрес в Django; PostgreSQL работает внутри сети Compose.
 
 Из корня репозитория:
 
@@ -39,14 +41,14 @@ npm --prefix frontend run dev
 Copy-Item .env.example .env
 # В .env замените DJANGO_SECRET_KEY, POSTGRES_PASSWORD и BOT_API_KEY.
 # Для пароля PostgreSQL используйте URL-safe символы, например случайный hex.
-docker compose up --build -d
+docker compose up --build -d --wait
 docker compose exec api python manage.py create_inspector --username inspector
 docker compose exec api python manage.py seed_demo --telegram-user-id 123456789
 ```
 
 Команда create_inspector интерактивно запрашивает пароль. Для автоматизации допустим `INSPECTOR_PASSWORD` в окружении процесса; пароль не передавать аргументом командной строки. Повторный запуск не сбрасывает существующий пароль.
 
-API: `http://localhost:8000/api`, health: `http://localhost:8000/api/health`. PostgreSQL доступен только внутри compose-сети; данные в volume. Seed не удаляет live-записи и не перезаписывает отредактированные данные. Seed без `--telegram-file-id` создаёт обращения без фотографий; настоящее фото можно добавить при первом seed этим флагом либо отправить новое обращение через API/бот.
+Готовая панель: `http://localhost:8080/map`. Прямой API для разработки: `http://localhost:8000/api`, health: `http://localhost:8080/api/health`. Логин инспектора — `inspector`; пароль задаётся при `create_inspector` или через `INSPECTOR_PASSWORD` в локальном `.env`. PostgreSQL доступен только внутри compose-сети; данные в volume. Seed не удаляет live-записи и не перезаписывает отредактированные данные. Seed без `--telegram-file-id` добавляет к обращениям явно подписанные примерные PNG-изображения. Они нужны только для проверки карточки и фото-прокси; настоящие снимки появляются через Telegram с реальным `file_id` и настроенным `BOT_TOKEN`.
 
 Seed: 55 участков, 20 обращений (10 violation, 5 inspection, 5 resolved), 10 заявлений, 3 инструкции. Участки: 10 violation, 5 inspection, 40 normal — статусы вычисляются из обращений. Границы вымышленные.
 

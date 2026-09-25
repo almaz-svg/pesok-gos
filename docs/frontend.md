@@ -4,6 +4,8 @@ React 19, Vite 7, JavaScript и Leaflet. Интерфейс включает п�
 
 ## Запуск
 
+Для проверки собранного приложения вместе с Django и PostgreSQL выполните из корня `docker compose up --build -d --wait` и откройте `http://localhost:8080/map`. Образ frontend собирается с `VITE_DATA_MODE=api`; Nginx раздаёт приложение и проксирует `/api` в Django. На чистой базе создайте инспектора и выполните `seed_demo` по командам в корневом README.
+
 Требуется Node.js 22.12+ (проверено на Node.js 24). Все файлы приложения находятся в `frontend/`. Ниже пути `src/`, `test/`, `public/` и конфигурации указаны относительно этой папки; общие `docs/` и `contracts/` остаются в корне репозитория.
 
 ```powershell

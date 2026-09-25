@@ -43,6 +43,11 @@ class LocationInput(StrictSerializer):
 class PhotoInput(StrictSerializer):
     telegram_file_id = serializers.CharField(max_length=1024)
 
+    def validate_telegram_file_id(self, value):
+        if value.startswith('demo-photo:'):
+            raise serializers.ValidationError('Ожидается Telegram file_id, демонстрационные значения запрещены')
+        return value
+
 class CreateReportSerializer(StrictSerializer):
     telegram_user_id = TelegramUserField()
     location = LocationInput()

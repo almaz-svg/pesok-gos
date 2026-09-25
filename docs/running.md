@@ -57,7 +57,7 @@ const map = await mapResponse.json();
 
 ## Production
 
-Compose-файл — локальный стенд, API порт привязан к loopback. Для production нужен HTTPS reverse proxy/hosting. Базовые настройки:
+Compose-файл — локальный стенд: панель на `http://localhost:8080`, прямой API на `http://localhost:8000`; оба порта привязаны к loopback. Для production нужен HTTPS reverse proxy/hosting. Базовые настройки:
 
 - DEBUG=false; новые случайные DJANGO_SECRET_KEY, BOT_API_KEY и пароль БД; настоящий BOT_TOKEN в secret store.
 - DATABASE_URL на PostgreSQL; ALLOWED_HOSTS — точный hostname; CORS/CSRF origins — точные HTTPS origins.

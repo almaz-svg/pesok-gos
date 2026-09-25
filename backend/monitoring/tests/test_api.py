@@ -147,6 +147,7 @@ class ApiTests(TestCase):
             {**payload(), 'status': 'RESOLVED'}, {**payload(), 'description': 'short'},
             {**payload(), 'telegram_user_id': 123}, {**payload(), 'category': 'UNKNOWN'},
             {**payload(), 'photos': [{'telegram_file_id': 'x'}, {'telegram_file_id': 'x'}]},
+            {**payload(), 'photos': [{'telegram_file_id': 'demo-photo:seed-v1'}]},
         ]
         for body in invalid:
             with self.subTest(body=body):
@@ -222,6 +223,11 @@ class ApiTests(TestCase):
         self.assertEqual(Report.objects.count(), 21)
         self.assertEqual(Application.objects.count(), 10)
         demo = Report.objects.get(tracking__number='KZ-2026-042')
+        sample_photo = ReportPhoto.objects.get(report=demo)
+        sample_response = self.web.get(f'/api/photos/{sample_photo.id}')
+        self.assertEqual(sample_response.status_code, 200)
+        self.assertEqual(sample_response['Content-Type'], 'image/png')
+        self.assertTrue(sample_response.content.startswith(b'\x89PNG'))
         demo.description = 'Edited by inspector'
         demo.save()
         call_command('seed_demo', stdout=io.StringIO())
@@ -229,6 +235,7 @@ class ApiTests(TestCase):
         self.assertEqual(demo.description, 'Edited by inspector')
         self.assertTrue(Report.objects.filter(pk=live['id']).exists())
         self.assertEqual(Report.objects.count(), 21)
+        self.assertEqual(ReportPhoto.objects.filter(report=demo).count(), 1)
         result = self.bot.get('/api/tracking/KZ-2026-102?telegram_user_id=123456789')
         self.assertEqual(result.json()['kind'], 'APPLICATION')
         self.assertEqual(len(self.bot.get('/api/instructions').json()), 3)
