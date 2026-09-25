@@ -1,0 +1,10 @@
+node_modules/
+.env
+.env.*
+!.env.example
+coverage/
+dist/
+data/reports.json
+data/user-preferences.json
+data/*.tmp
+npm-debug.log*

@@ -1,6 +1,6 @@
 # Pesok Gos — мониторинг земель
 
-Inspector Web (React) → Django REST Framework → PostgreSQL. Отдельный Telegram-бот отправляет обращения в тот же API.
+Inspector Web (React) → Django REST Framework → PostgreSQL. Telegram-бот находится отдельно в `bot/`; его подключение к общему Django API ещё не выполнено.
 
 ## Реализовано
 
@@ -8,7 +8,7 @@ Backend по контракту v0.1: session login/CSRF, отдельный к�
 
 Готова **веб-панель инспектора** на React/Vite и Leaflet: анимированный рельеф, интерактивная карта, фильтры, карточки, история, аналитика и смена статусов. По умолчанию работает на явно обозначенных DEMO-данных с сохранением в браузере. Режим `api` подключает Django по существующему контракту v0.1.
 
-Telegram-диалог и production deployment ещё не выполнены. Для реальных фото нужен серверный `BOT_TOKEN` того же бота, который прислал file_id. Секреты не попадают в frontend.
+В `bot/` реализован Telegram-диалог: выбор русского или казахского языка, сбор геолокации, фото и описания, личный кабинет обращений и справочник процедур. Сейчас бот запускается в `DATA_MODE=mock`: данные сохраняются локально и не попадают в Django или на карту инспектора. Его текущий API-клиент несовместим с контрактом backend v0.1; адаптация и production deployment ещё не выполнены. Для реальных фото нужен серверный `BOT_TOKEN` того же бота, который прислал file_id. Секреты не попадают в frontend.
 
 ## Запуск frontend
 
@@ -22,6 +22,24 @@ npm run dev
 Открыть `http://localhost:5173`. Сборка — `npm run build`, тесты — `npm test`, форматирование — `npm run format:check`. Для подключения бэкенда задать `VITE_DATA_MODE=api` в `.env` и перезапустить Vite. Запросы `/api` проксируются на `http://localhost:8000`.
 
 [Запуск frontend, демо и подключение API](docs/frontend.md).
+
+## Запуск Telegram-бота
+
+Бот использует отдельные зависимости и `.env`. Из корня репозитория, в отдельном терминале (Node.js 20+):
+
+```powershell
+cd bot
+npm ci
+Copy-Item .env.example .env
+# Укажите BOT_TOKEN в bot/.env и оставьте DATA_MODE=mock.
+npm start
+```
+
+Не запускайте вторую polling-копию с токеном уже работающего бота. Команда `npm test` из `bot/` проверяет бота; команды из корня по-прежнему относятся к frontend. Docker Compose пока запускает только backend и БД.
+
+`bot/.env`, `bot/data/reports.json` и `bot/data/user-preferences.json` не публикуются в Git. Перенос этих локальных файлов при смене места запуска выполняется отдельно, чтобы сохранить обращения и языки пользователей. Демо-сигнал не является официальным обращением в госорган.
+
+[Документация бота](bot/README.md), [краткий контекст для ИИ](bot/TZKZ), [контракт Django для будущего подключения](docs/backend-design.md).
 
 ## Запуск через Docker (PowerShell)
 
@@ -72,6 +90,8 @@ docker compose exec api python manage.py test monitoring.tests --verbosity 2
 - [API для React](docs/frontend-api.md)
 - [Backend и контракт бота](docs/backend-design.md)
 - [Локальный smoke-сценарий и деплой](docs/running.md)
+- [Telegram-бот: запуск, возможности и ограничения API](bot/README.md)
+- [Контекст Telegram-бота для ИИ](bot/TZKZ)
 - [Типы TypeScript](contracts/api.ts)
 - [Mock-данные](contracts/examples.json)
 
