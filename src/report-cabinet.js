@@ -1,31 +1,111 @@
 import { Markup } from 'telegraf';
 import { listReports } from './api.js';
+import { formatDate, languageOf, localizeError } from './i18n.js';
 
 const PAGE_SIZE = 5;
-const statusLabels = {
-  signal_received: 'Сигнал сохранён',
-  under_review: 'На рассмотрении',
-  inspection_scheduled: 'Назначена проверка',
-  approved: 'Одобрено',
-  rejected: 'Отклонено',
-};
-const nextSteps = {
-  signal_received: 'Проверьте статус позже: сигнал сохранён в сервисе.',
-  under_review: 'Проверяйте обновления и сохраняйте дополнительные материалы по проблеме.',
-  inspection_scheduled: 'Сохраните новые фото участка, если ситуация изменится.',
-  approved: 'Ознакомьтесь с решением и проверьте, устранена ли проблема.',
-  rejected: 'Ознакомьтесь с причиной отказа в ответе и уточните недостающие сведения.',
+const messages = {
+  ru: {
+    statuses: {
+      signal_received: 'Сигнал сохранён',
+      under_review: 'На рассмотрении',
+      inspection_scheduled: 'Назначена проверка',
+      approved: 'Одобрено',
+      rejected: 'Отклонено',
+    },
+    nextSteps: {
+      signal_received: 'Проверьте статус позже: сигнал сохранён в сервисе.',
+      under_review: 'Проверяйте обновления и сохраняйте дополнительные материалы по проблеме.',
+      inspection_scheduled: 'Сохраните новые фото участка, если ситуация изменится.',
+      approved: 'Ознакомьтесь с решением и проверьте, устранена ли проблема.',
+      rejected: 'Ознакомьтесь с причиной отказа в ответе и уточните недостающие сведения.',
+    },
+    savedInBot: 'Сохранено в боте',
+    unknownStatus: 'Статус уточняется',
+    demoNextStep: 'Для официального обращения перейдите в eOtinish. Сохраните фото и координаты.',
+    unknownNextStep: 'Обновите карточку позже, чтобы проверить статус.',
+    report: 'Обращение',
+    status: 'Статус:',
+    created: 'Создано:',
+    updated: 'Обновлено:',
+    demoNotice: 'Демо-сигнал. В госорганы не отправлялся.',
+    description: 'Описание:',
+    noDescription: 'Не указано.',
+    coordinates: 'Координаты:',
+    noCoordinates: 'Координаты не указаны.',
+    nextStep: 'Следующий шаг:',
+    mainMenu: 'Главное меню',
+    privateOnly: 'Мои обращения доступны только в личном чате с ботом.',
+    retry: 'Повторить',
+    empty: 'У вас пока нет обращений. Чтобы зафиксировать проблему, выберите «Сообщить о проблеме».',
+    myReports: 'Мои обращения:',
+    page: (page, count) => `Страница ${page} из ${count}`,
+    open: 'Открыть',
+    back: 'Назад',
+    next: 'Далее',
+    refresh: 'Обновить',
+    notFound: 'Обращение не найдено или недоступно.',
+    backToList: 'К списку',
+    noPhoto: 'У этого обращения нет сохранённого фото.',
+    photoCaption: id => `Фото обращения ${id}`,
+    photo: 'Фото',
+    map: 'Открыть на карте',
+    eotinish: 'Открыть eOtinish',
+    refreshStatus: 'Обновить статус',
+    chooseAction: 'Выберите действие:',
+  },
+  kk: {
+    statuses: {
+      signal_received: 'Сигнал сақталды',
+      under_review: 'Қаралуда',
+      inspection_scheduled: 'Тексеру тағайындалды',
+      approved: 'Мақұлданды',
+      rejected: 'Қабылданбады',
+    },
+    nextSteps: {
+      signal_received: 'Мәртебесін кейінірек тексеріңіз: сигнал сервисте сақталды.',
+      under_review: 'Жаңартуларды тексеріп, мәселе бойынша қосымша материалдарды сақтаңыз.',
+      inspection_scheduled: 'Жағдай өзгерсе, учаскенің жаңа фотоларын сақтаңыз.',
+      approved: 'Шешіммен танысып, мәселенің шешілгенін тексеріңіз.',
+      rejected: 'Жауаптағы бас тарту себебімен танысып, жетіспейтін мәліметтерді нақтылаңыз.',
+    },
+    savedInBot: 'Ботта сақталды',
+    unknownStatus: 'Мәртебесі нақтылануда',
+    demoNextStep: 'Ресми өтініш беру үшін eOtinish сервисіне өтіңіз. Фото мен координаттарды сақтаңыз.',
+    unknownNextStep: 'Мәртебесін тексеру үшін карточканы кейінірек жаңартыңыз.',
+    report: 'Өтініш',
+    status: 'Мәртебесі:',
+    created: 'Құрылған күні:',
+    updated: 'Жаңартылған күні:',
+    demoNotice: 'Демо-хабарлама. Мемлекеттік органдарға жіберілген жоқ.',
+    description: 'Сипаттамасы:',
+    noDescription: 'Көрсетілмеген.',
+    coordinates: 'Координаттары:',
+    noCoordinates: 'Координаттар көрсетілмеген.',
+    nextStep: 'Келесі қадам:',
+    mainMenu: 'Басты мәзір',
+    privateOnly: 'Менің өтініштерім бөлімі ботпен жеке чатта ғана қолжетімді.',
+    retry: 'Қайталау',
+    empty: 'Әзірге өтініштеріңіз жоқ. Мәселені тіркеу үшін «Мәселе туралы хабарлау» тармағын таңдаңыз.',
+    myReports: 'Менің өтініштерім:',
+    page: (page, count) => `Бет ${page} / ${count}`,
+    open: 'Ашу',
+    back: 'Артқа',
+    next: 'Келесі',
+    refresh: 'Жаңарту',
+    notFound: 'Өтініш табылмады немесе қолжетімсіз.',
+    backToList: 'Тізімге оралу',
+    noPhoto: 'Бұл өтініштің сақталған фотосы жоқ.',
+    photoCaption: id => `${id} өтінішінің фотосы`,
+    photo: 'Фото',
+    map: 'Картадан ашу',
+    eotinish: 'eOtinish ашу',
+    refreshStatus: 'Мәртебені жаңарту',
+    chooseAction: 'Әрекетті таңдаңыз:',
+  },
 };
 
-function dateLabel(value) {
-  const date = value ? new Date(value) : null;
-  return date && !Number.isNaN(date.getTime())
-    ? new Intl.DateTimeFormat('ru-RU', { timeZone: 'Asia/Almaty' }).format(date)
-    : 'не указана';
-}
-
-function statusLabel(report) {
-  return report.demoOnly ? 'Сохранено в боте' : statusLabels[report.status] || 'Статус уточняется';
+function statusLabel(report, copy) {
+  return report.demoOnly ? copy.savedInBot : copy.statuses[report.status] || copy.unknownStatus;
 }
 
 function shortText(value, limit) {
@@ -39,28 +119,33 @@ function mapUrl(report) {
   return `https://www.openstreetmap.org/?mlat=${report.lat}&mlon=${report.lon}#map=17/${report.lat}/${report.lon}`;
 }
 
-function reportText(report) {
+function reportText(report, language) {
+  const copy = messages[language];
   const nextStep = report.demoOnly
-    ? 'Для официального обращения перейдите в eOtinish. Сохраните фото и координаты.'
-    : shortText(report.nextStep, 500) || nextSteps[report.status] || 'Обновите карточку позже, чтобы проверить статус.';
+    ? copy.demoNextStep
+    : shortText(report.nextStep, 500) || copy.nextSteps[report.status] || copy.unknownNextStep;
   const lines = [
-    `Обращение ${report.id}`,
-    `Статус: ${statusLabel(report)}`,
-    `Создано: ${dateLabel(report.createdAt)}`,
+    `${copy.report} ${report.id}`,
+    `${copy.status} ${statusLabel(report, copy)}`,
+    `${copy.created} ${formatDate(report.createdAt, language)}`,
   ];
-  if (report.updatedAt) lines.push(`Обновлено: ${dateLabel(report.updatedAt)}`);
-  if (report.demoOnly) lines.push('', 'Демо-сигнал. В госорганы не отправлялся.');
-  lines.push('', 'Описание:', shortText(report.description, 2000) || 'Не указано.');
-  lines.push('', mapUrl(report) ? `Координаты: ${report.lat}, ${report.lon}` : 'Координаты не указаны.');
+  if (report.updatedAt) lines.push(`${copy.updated} ${formatDate(report.updatedAt, language)}`);
+  if (report.demoOnly) lines.push('', copy.demoNotice);
+  lines.push('', copy.description, shortText(report.description, 2000) || copy.noDescription);
+  lines.push('', mapUrl(report) ? `${copy.coordinates} ${report.lat}, ${report.lon}` : copy.noCoordinates);
   if (report.explanation) lines.push('', shortText(report.explanation, 400));
-  lines.push('', `Следующий шаг: ${nextStep}`);
+  lines.push('', `${copy.nextStep} ${nextStep}`);
   return lines.join('\n');
 }
 
-const menuButton = () => [Markup.button.callback('Главное меню', 'reports:menu')];
+const menuButton = copy => [Markup.button.callback(copy.mainMenu, 'reports:menu')];
 
 export function registerReportCabinet(bot, { menu, clearState }) {
+  const resolveMenu = ctx => typeof menu === 'function' ? menu(ctx) : menu;
+
   async function run(ctx, action) {
+    const language = languageOf(ctx);
+    const copy = messages[language];
     if (ctx.callbackQuery) {
       try {
         await ctx.answerCbQuery();
@@ -69,16 +154,16 @@ export function registerReportCabinet(bot, { menu, clearState }) {
       }
     }
     if (ctx.chat?.type !== 'private') {
-      await ctx.reply('Мои обращения доступны только в личном чате с ботом.');
+      await ctx.reply(copy.privateOnly);
       return;
     }
     clearState(ctx);
     try {
       await action();
     } catch (error) {
-      await ctx.reply(error.message, Markup.inlineKeyboard([
-        [Markup.button.callback('Повторить', 'reports:page:0')],
-        menuButton(),
+      await ctx.reply(localizeError(error, language), Markup.inlineKeyboard([
+        [Markup.button.callback(copy.retry, 'reports:page:0')],
+        menuButton(copy),
       ]));
     }
   }
@@ -92,65 +177,69 @@ export function registerReportCabinet(bot, { menu, clearState }) {
   }
 
   async function showList(ctx, requestedPage = 0) {
+    const language = languageOf(ctx);
+    const copy = messages[language];
     const reports = await loadReports(ctx);
     if (!reports.length) {
-      await ctx.reply('У вас пока нет обращений. Чтобы зафиксировать проблему, выберите «Сообщить о проблеме».', menu);
+      await ctx.reply(copy.empty, resolveMenu(ctx));
       return;
     }
     const pageCount = Math.ceil(reports.length / PAGE_SIZE);
     const page = Math.min(Math.max(0, requestedPage), pageCount - 1);
     const items = reports.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
     const text = [
-      `Мои обращения: ${reports.length}`,
-      `Страница ${page + 1} из ${pageCount}`,
-      ...items.map(report => `\n${report.id} | ${dateLabel(report.createdAt)}\n${statusLabel(report)}\n${shortText(report.description, 100)}`),
+      `${copy.myReports} ${reports.length}`,
+      copy.page(page + 1, pageCount),
+      ...items.map(report => `\n${report.id} | ${formatDate(report.createdAt, language)}\n${statusLabel(report, copy)}\n${shortText(report.description, 100)}`),
     ].join('\n');
-    const rows = items.map(report => [Markup.button.callback(`Открыть ${report.id}`, `reports:open:${report.id}`)]);
+    const rows = items.map(report => [Markup.button.callback(`${copy.open} ${report.id}`, `reports:open:${report.id}`)]);
     const navigation = [];
-    if (page > 0) navigation.push(Markup.button.callback('Назад', `reports:page:${page - 1}`));
-    if (page < pageCount - 1) navigation.push(Markup.button.callback('Далее', `reports:page:${page + 1}`));
+    if (page > 0) navigation.push(Markup.button.callback(copy.back, `reports:page:${page - 1}`));
+    if (page < pageCount - 1) navigation.push(Markup.button.callback(copy.next, `reports:page:${page + 1}`));
     if (navigation.length) rows.push(navigation);
-    rows.push([Markup.button.callback('Обновить', `reports:page:${page}`)], menuButton());
+    rows.push([Markup.button.callback(copy.refresh, `reports:page:${page}`)], menuButton(copy));
     await ctx.reply(text, Markup.inlineKeyboard(rows));
   }
 
   async function showReport(ctx, id, photoOnly) {
+    const language = languageOf(ctx);
+    const copy = messages[language];
     const reports = await loadReports(ctx);
     const index = reports.findIndex(report => report.id === id);
     if (index === -1) {
-      await ctx.reply('Обращение не найдено или недоступно.', Markup.inlineKeyboard([
-        [Markup.button.callback('К списку', 'reports:page:0')], menuButton(),
+      await ctx.reply(copy.notFound, Markup.inlineKeyboard([
+        [Markup.button.callback(copy.backToList, 'reports:page:0')], menuButton(copy),
       ]));
       return;
     }
     const report = reports[index];
     if (photoOnly) {
       if (!report.telegramFileId) {
-        await ctx.reply('У этого обращения нет сохранённого фото.');
+        await ctx.reply(copy.noPhoto);
         return;
       }
-      await ctx.replyWithPhoto(report.telegramFileId, { caption: `Фото обращения ${report.id}` });
+      await ctx.replyWithPhoto(report.telegramFileId, { caption: copy.photoCaption(report.id) });
       return;
     }
     const rows = [];
-    if (report.telegramFileId) rows.push([Markup.button.callback('Фото', `reports:photo:${report.id}`)]);
+    if (report.telegramFileId) rows.push([Markup.button.callback(copy.photo, `reports:photo:${report.id}`)]);
     const url = mapUrl(report);
-    if (url) rows.push([Markup.button.url('Открыть на карте', url)]);
-    if (report.demoOnly) rows.push([Markup.button.url('Открыть eOtinish', 'https://eotinish.kz/ru')]);
+    if (url) rows.push([Markup.button.url(copy.map, url)]);
+    if (report.demoOnly) rows.push([Markup.button.url(copy.eotinish, 'https://eotinish.kz/ru')]);
     rows.push(
-      [Markup.button.callback('Обновить статус', `reports:open:${report.id}`)],
-      [Markup.button.callback('К списку', `reports:page:${Math.floor(index / PAGE_SIZE)}`)],
-      menuButton(),
+      [Markup.button.callback(copy.refreshStatus, `reports:open:${report.id}`)],
+      [Markup.button.callback(copy.backToList, `reports:page:${Math.floor(index / PAGE_SIZE)}`)],
+      menuButton(copy),
     );
-    await ctx.reply(reportText(report), {
+    await ctx.reply(reportText(report, language), {
       ...Markup.inlineKeyboard(rows),
       link_preview_options: { is_disabled: true },
     });
   }
 
-  bot.hears('Мои обращения', ctx => run(ctx, () => showList(ctx)));
+  bot.hears(['Мои обращения', 'Менің өтініштерім'], ctx => run(ctx, () => showList(ctx)));
   bot.command('reports', ctx => run(ctx, () => showList(ctx)));
   bot.action(/^reports:page:(\d+)$/, ctx => run(ctx, () => showList(ctx, Number(ctx.match[1]))));
   bot.action(/^reports:(open|photo):(.+)$/, ctx => run(ctx, () => showReport(ctx, ctx.match[2], ctx.match[1] === 'photo')));
-  bot.action('reports:menu', ctx => run(ctx, () => ctx.reply('Выберите действие:', menu)));
+  bot.action('reports:menu', ctx => run(ctx, () => ctx.reply(messages[languageOf(ctx)].chooseAction, resolveMenu(ctx))));
 }

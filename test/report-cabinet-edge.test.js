@@ -32,7 +32,7 @@ function backend(t, respond) {
 }
 
 function conversation() {
-  const bot = createBot('test-token', { apiRoot: 'http://127.0.0.1:1' });
+  const bot = createBot('test-token', { apiRoot: 'http://127.0.0.1:1' }, { preferences: { getLanguage: async () => 'ru' } });
   bot.botInfo = { id: 1, is_bot: true, first_name: 'Test', username: 'test_bot' };
   bot.catch(error => { throw error; });
   const replies = [];

@@ -1,6 +1,7 @@
 export const commands = [
   { command: 'start', description: 'Открыть главное меню' },
   { command: 'reports', description: 'Мои обращения' },
+  { command: 'language', description: 'Язык / Тіл' },
   { command: 'cancel', description: 'Отменить текущее действие' },
 ];
 

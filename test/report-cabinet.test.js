@@ -21,7 +21,7 @@ function store(t) {
 }
 
 function conversation({ userId = 101, chatType = 'private', failCallbackAnswer = false } = {}) {
-  const bot = createBot('test-token');
+  const bot = createBot('test-token', {}, { preferences: { getLanguage: async () => 'ru' } });
   bot.botInfo = { id: 1, is_bot: true, first_name: 'Test', username: 'test_bot' };
   bot.catch(error => { throw error; });
   const replies = [];

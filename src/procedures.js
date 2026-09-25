@@ -14,6 +14,19 @@ export const referenceProcedures = [
     sourceUrl: 'https://www.gov.kz/services/4009?lang=ru',
     sourceCheckedAt: '2026-09-25',
     referenceOnly: true,
+    translations: {
+      kk: {
+        title: 'Жер учаскесі туралы мәліметтер',
+        menuLabel: 'Учаске туралы мәліметтер',
+        steps: [
+          'Төмендегі батырма арқылы Жария кадастрлық картаны ашыңыз.',
+          'Өңірді таңдап, учаскені кадастрлық нөмірі немесе мекенжайы бойынша табыңыз.',
+          'Табылған нысанды ашып, қолжетімді мәліметтерді және картадағы шекараларын қараңыз.',
+        ],
+        note: 'Бот кадастрдан мәліметтерді автоматты түрде сұратпайды. Учаске туралы мәліметтер ресми картада қаралады.',
+        officialButton: 'Кадастрлық картаны ашу',
+      },
+    },
   },
   {
     id: 'land-purpose',
@@ -32,6 +45,21 @@ export const referenceProcedures = [
     sourceUrl: 'https://www.gov.kz/services/3610?lang=ru',
     sourceCheckedAt: '2026-09-25',
     referenceOnly: true,
+    translations: {
+      kk: {
+        title: 'Жер учаскесінің нысаналы мақсатын өзгерту',
+        menuLabel: 'Нысаналы мақсат',
+        steps: [
+          'Қызмет бетін ашып, шарттарымен танысыңыз және онлайн өтінім беруге өтіңіз.',
+          'Жүйеге кіргеннен кейін Жария кадастрлық картадан учаскені таңдап, өтінімді толтырыңыз және қажетті құжаттарды тіркеңіз.',
+          'Толтырылған өтінімге өз ЭЦҚ-ңызбен қол қойып, оны портал арқылы жіберіңіз.',
+          'Нәтижені ресми сервистің «Өтінімдер» бөлімінен тексеріңіз.',
+        ],
+        durationText: 'Елді мекен шегінде 8 жұмыс күніне дейін; оның шегінен тыс жерде 16 жұмыс күніне дейін. Сатып алу-сату немесе жалдау шартын жасасу уақыты бұл мерзімге кірмейді.',
+        note: 'Учаскеңізге қатысты құжаттардың нақты тізімі мен шарттары қызмет бетінде көрсетілген.',
+        officialButton: 'Мемлекеттік қызметті ашу',
+      },
+    },
   },
   {
     id: 'land-complaint',
@@ -49,5 +77,36 @@ export const referenceProcedures = [
     sourceUrl: 'https://eotinish.kz/ru/guide?id=fa3c2d1a-925e-4892-af5c-37b09abcc7ee',
     sourceCheckedAt: '2026-09-25',
     referenceOnly: true,
+    translations: {
+      kk: {
+        title: 'Жер учаскесіндегі мәселе туралы хабарлау',
+        menuLabel: 'Мемлекеттік органға өтініш',
+        steps: [
+          'eOtinish жүйесіне кіріп, өтініш түрін және ол жолданатын мемлекеттік органды таңдаңыз.',
+          'Мәселені сипаттаңыз. Қажет болса, оның орналасқан жерін картада белгілеп, фотосуреттерді тіркеңіз.',
+          'Байланыс деректерін және тұрғылықты мекенжайыңызды толтырып, өтінішке ЭЦҚ-мен қол қойыңыз және оны жіберіңіз.',
+          'Берілген нөмірді сақтаңыз. Жауап пен қаралу барысы eOtinish жүйесінің «Менің өтініштерім» бөлімінде қолжетімді.',
+        ],
+        note: 'Бұл боттағы демо-хабарлама мемлекеттік органға берілген өтініш болып саналмайды. Ресми өтінішті eOtinish арқылы бөлек жіберу қажет.',
+        officialButton: 'eOtinish ашу',
+      },
+    },
   },
 ];
+
+export function localizeProcedure(procedure, language = 'ru') {
+  const translation = procedure.translations?.[language];
+  if (!translation || typeof translation !== 'object') return procedure;
+
+  const localized = { ...procedure };
+  // Translations may change text only, never source metadata or official links.
+  for (const field of ['title', 'menuLabel', 'note', 'officialButton', 'durationText']) {
+    if (typeof translation[field] === 'string') localized[field] = translation[field];
+  }
+  for (const field of ['steps', 'documents']) {
+    if (Array.isArray(translation[field]) && translation[field].every(item => typeof item === 'string')) {
+      localized[field] = translation[field];
+    }
+  }
+  return localized;
+}

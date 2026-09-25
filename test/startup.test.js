@@ -108,7 +108,7 @@ test('profile setup can be skipped without calling Telegram profile methods', as
   assert.deepEqual(calls, []);
 });
 
-test('Telegram command menu includes the personal report cabinet', async () => {
+test('Telegram command menu includes the personal report cabinet and language settings', async () => {
   let publishedCommands = [];
   await configureTelegramProfile({
     telegram: {
@@ -119,4 +119,5 @@ test('Telegram command menu includes the personal report cabinet', async () => {
     },
   }, { telegramSetupProfile: true, telegramStartupTimeoutMs: 1000 });
   assert.ok(publishedCommands.some(command => command.command === 'reports'));
+  assert.ok(publishedCommands.some(command => command.command === 'language'));
 });
