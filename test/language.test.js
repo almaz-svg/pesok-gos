@@ -14,8 +14,8 @@ function preferences(initial = {}) {
   };
 }
 
-function conversation(store, { userId = 101, chatType = 'private', failCallbackAnswer = false, onCallbackAnswer } = {}) {
-  const bot = createBot('test-token', {}, { preferences: store });
+function conversation(store, { userId = 101, chatType = 'private', failCallbackAnswer = false, onCallbackAnswer, assistant = { enabled: false } } = {}) {
+  const bot = createBot('test-token', {}, { preferences: store, assistant });
   bot.botInfo = { id: 1, is_bot: true, first_name: 'Test', username: 'test_bot' };
   bot.catch(error => { throw error; });
   const replies = [];
@@ -59,6 +59,78 @@ function assertLanguagePicker(reply) {
   assert.deepEqual(options.map(button => button.text).sort(), ['Русский', 'Қазақша'].sort());
   assert.deepEqual(options.map(button => button.callback_data).sort(), ['language:kk', 'language:ru']);
 }
+
+test('AI chat is localized, private and does not intercept the report workflow', async () => {
+  const calls = [];
+  const assistant = { enabled: true, ask: async (...args) => { calls.push(args); return 'Model answer'; } };
+  for (const language of ['ru', 'kk']) {
+    const copy = messages[language];
+    const chat = conversation(preferences({ 101: language }), { assistant });
+    await chat.send('/ask');
+    assert.equal(chat.replies.at(-1).text, copy.aiWelcome);
+    await chat.send('Help with a fence');
+    assert.equal(chat.replies.at(-1).text, 'Model answer');
+    assert.deepEqual(calls.at(-1), [101, 'Help with a fence', language]);
+    const count = calls.length;
+    await chat.send(copy.report);
+    await chat.send('51, 71');
+    assert.equal(chat.replies.at(-1).text, copy.steps.photo);
+    assert.equal(calls.length, count);
+    const group = conversation(preferences({ 101: language }), { assistant, chatType: 'supergroup' });
+    await group.send('/ask');
+    await group.send('Private issue');
+    assert.equal(calls.length, count);
+  }
+});
+
+test('missing AI key and provider errors show useful messages without losing existing bot actions', async () => {
+  const disabled = conversation(preferences({ 101: 'ru' }));
+  await disabled.send('/ask');
+  assert.equal(disabled.replies.at(-1)?.text, messages.ru.aiDisabled);
+  assert.ok(labels(disabled.replies.at(-1)).includes(messages.ru.report));
+  const chat = conversation(preferences({ 101: 'kk' }), {
+    assistant: { enabled: true, ask: async () => { throw new Error('secret provider details'); } },
+  });
+  await chat.send('/ask');
+  await chat.send('Question');
+  assert.equal(chat.replies.at(-1).text, messages.kk.aiUnavailable);
+  assert.doesNotMatch(chat.replies.at(-1).text, /secret/);
+  await chat.send(messages.kk.cancel);
+  assert.ok(labels(chat.replies.at(-1)).includes(messages.kk.report));
+});
+
+test('AI reset clears only the caller and late answers cannot interrupt a new report', { timeout: 2000 }, async () => {
+  let finish;
+  let started;
+  const ready = new Promise(resolve => { started = resolve; });
+  const resets = [];
+  const chat = conversation(preferences({ 101: 'ru' }), { assistant: {
+    enabled: true,
+    ask: async () => { started(); return new Promise(resolve => { finish = resolve; }); },
+    reset: async id => { resets.push(id); },
+  } });
+  await chat.send('/ask');
+  const pending = chat.send('Question');
+  await ready;
+  await chat.send(messages.ru.report);
+  finish('Obsolete answer');
+  await pending;
+  assert.ok(!chat.replies.some(reply => reply.text === 'Obsolete answer'));
+  await chat.send('/newchat');
+  assert.deepEqual(resets, [101]);
+  assert.equal(chat.replies.at(-1).text, messages.ru.aiReset);
+});
+
+test('long AI replies fit Telegram messages without splitting surrogate pairs', async () => {
+  const answer = 'a'.repeat(3499) + '\u{1F30D}' + 'b'.repeat(3500);
+  const chat = conversation(preferences({ 101: 'ru' }), { assistant: { enabled: true, ask: async () => answer } });
+  await chat.send('/ask');
+  const before = chat.replies.length;
+  await chat.send('Question');
+  const replies = chat.replies.slice(before);
+  assert.equal(replies.map(reply => reply.text).join(''), answer);
+  assert.ok(replies.every(reply => reply.text.length <= 3500 && !/[\uD800-\uDBFF]$/.test(reply.text)));
+});
 
 test('the first start or ordinary message asks for a language before displaying the menu', async () => {
   for (const text of ['/start', 'Здравствуйте']) {
@@ -134,6 +206,63 @@ test('report submission sends a case passport with category, authority and draft
   assert.match(savedReport.casePassport.officialDraft, /Прошу провести проверку/i);
   assert.match(savedReport.casePassport.nextAction, /eOtinish/i);
   assert.match(chat.replies.at(-1).text, /DEMO-PASSPORT/);
+});
+
+test('text coordinates advance the report and preserve latitude and longitude in both languages', async t => {
+  let savedReport;
+  t.mock.method(mockApi, 'createReport', async report => {
+    savedReport = report;
+    return { id: 'DEMO-COORDS', demoOnly: true };
+  });
+  for (const language of ['ru', 'kk']) {
+    const copy = messages[language];
+    const chat = conversation(preferences({ 101: language }));
+    for (const [text, lat, lon] of [['51.12955, 71.41540', 51.12955, 71.41540], [' -90, +180 ', -90, 180], ['0, 0', 0, 0]]) {
+      await chat.send(copy.report);
+      await chat.send(text);
+      assert.equal(chat.replies.at(-1).text, copy.steps.photo);
+      await chat.send({ photo: [{ file_id: 'photo', file_unique_id: 'p', width: 1, height: 1 }] });
+      await chat.send('Description');
+      assert.equal(savedReport.lat, lat);
+      assert.equal(savedReport.lon, lon);
+      assert.match(chat.replies.at(-1).text, /DEMO-COORDS/);
+    }
+  }
+});
+
+test('invalid text coordinates keep the location step and allow correction', async () => {
+  for (const language of ['ru', 'kk']) {
+    const copy = messages[language];
+    const chat = conversation(preferences({ 101: language }));
+    await chat.send(copy.report);
+    for (const value of ['91, 71', '51, -181', 'NaN, 71', '51,71,40', '51.2junk, 71', 'Астана']) {
+      await chat.send(value);
+      assert.equal(chat.replies.at(-1).text, copy.invalidLocation);
+      assert.ok(chat.replies.at(-1).text.includes('51.12955, 71.41540'));
+    }
+    await chat.send('51.12955, 71.41540');
+    assert.equal(chat.replies.at(-1).text, copy.steps.photo);
+  }
+});
+
+test('coordinates after restart show a localized way to begin again without starting a report silently', async () => {
+  for (const language of ['ru', 'kk']) {
+    const store = preferences({ 101: language });
+    const copy = messages[language];
+    const old = conversation(store);
+    await old.send(copy.report);
+    const reopened = conversation(store);
+    await reopened.send('51.12955, 71.41540');
+    assert.equal(reopened.replies.length, 1);
+    assert.equal(reopened.replies[0].text, copy.chooseFirst);
+    assert.ok(labels(reopened.replies[0]).includes(copy.report));
+    await reopened.send(copy.report);
+    await reopened.send('51.12955, 71.41540');
+    assert.equal(reopened.replies.at(-1).text, copy.steps.photo);
+    const group = conversation(store, { chatType: 'supergroup' });
+    await group.send('51.12955, 71.41540');
+    assert.equal(group.replies.length, 0);
+  }
 });
 
 test('language can be changed from a command or menu and the old report draft is cleared', async t => {

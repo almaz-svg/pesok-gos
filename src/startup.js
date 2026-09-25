@@ -2,6 +2,8 @@ export const commands = [
   { command: 'start', description: 'Открыть главное меню' },
   { command: 'reports', description: 'Мои обращения' },
   { command: 'language', description: 'Язык / Тіл' },
+  { command: 'ask', description: 'Обсудить земельную проблему с ИИ' },
+  { command: 'newchat', description: 'Очистить историю обсуждения с ИИ' },
   { command: 'cancel', description: 'Отменить текущее действие' },
 ];
 

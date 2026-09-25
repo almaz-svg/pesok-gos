@@ -6,6 +6,7 @@ import { registerReportCabinet } from './report-cabinet.js';
 import { copyFor, formatDate, languageOf, localizeError, messages } from './i18n.js';
 import { localizeProcedure } from './procedures.js';
 import { userPreferences } from './user-preferences.js';
+import { aiAssistant } from './ai-assistant.js';
 
 const LANGUAGE_PROMPT = 'Тілді таңдаңыз / Выберите язык:';
 const LANGUAGE_MENU = Markup.inlineKeyboard([
@@ -17,6 +18,7 @@ function menu(ctx) {
   return Markup.keyboard([
     [copy.report, copy.myReports],
     [copy.application, copy.procedures],
+    [copy.aiChat],
     ['Язык / Тіл'],
   ]).resize();
 }
@@ -29,9 +31,17 @@ function labels(key) {
   return Object.values(messages).map(copy => copy[key]);
 }
 
+function parseCoordinates(text) {
+  const match = /^\s*([+-]?\d+(?:\.\d+)?)\s*,\s*([+-]?\d+(?:\.\d+)?)\s*$/.exec(text);
+  if (!match) return null;
+  const lat = Number(match[1]);
+  const lon = Number(match[2]);
+  return Math.abs(lat) <= 90 && Math.abs(lon) <= 180 ? { lat, lon } : null;
+}
+
 const actionLabels = new Set([
   'Язык / Тіл',
-  ...['report', 'myReports', 'application', 'procedures', 'demoReport', 'mainMenu', 'cancel'].flatMap(labels),
+  ...['report', 'myReports', 'application', 'procedures', 'demoReport', 'mainMenu', 'cancel', 'aiChat'].flatMap(labels),
 ]);
 
 async function answerCallback(ctx) {
@@ -65,7 +75,7 @@ function procedureMenu(procedures, ctx) {
   return Markup.keyboard(rows).resize();
 }
 
-export function createBot(token, telegramOptions = {}, { preferences = userPreferences } = {}) {
+export function createBot(token, telegramOptions = {}, { preferences = userPreferences, assistant = aiAssistant } = {}) {
   const bot = new Telegraf(token, { telegram: telegramOptions });
   const states = new Map();
   const languageSelections = new Map();
@@ -94,7 +104,7 @@ export function createBot(token, telegramOptions = {}, { preferences = userPrefe
     }
     if (ctx.chat?.type !== 'private' && !ctx.state.language) {
       const text = ctx.message?.text || '';
-      const command = /^\/(?:start|reports|language|cancel)(?:@(\w+))?(?:\s|$)/.exec(text);
+      const command = /^\/(?:start|reports|language|cancel|ask|newchat)(?:@(\w+))?(?:\s|$)/.exec(text);
       const ownCommand = command && (!command[1] || command[1].toLowerCase() === ctx.botInfo.username.toLowerCase());
       if (ctx.callbackQuery || ownCommand || actionLabels.has(text)) {
         await answerCallback(ctx);
@@ -182,6 +192,26 @@ export function createBot(token, telegramOptions = {}, { preferences = userPrefe
   bot.hears(labels('report'), beginReport);
   if (config.dataMode === 'mock') bot.hears(labels('demoReport'), beginReport);
 
+  async function beginAiChat(ctx, reset = false) {
+    const copy = copyFor(ctx);
+    if (ctx.chat?.type !== 'private') return ctx.reply(copy.aiPrivate);
+    if (!assistant.enabled) return ctx.reply(copy.aiDisabled, menu(ctx));
+    const state = { step: 'assistant' };
+    states.set(ctx.from.id, state);
+    try {
+      if (reset) await assistant.reset(ctx.from.id);
+      if (states.get(ctx.from.id) === state) {
+        await ctx.reply(reset ? copy.aiReset : copy.aiWelcome, menu(ctx));
+      }
+    } catch {
+      if (states.get(ctx.from.id) === state) await ctx.reply(copy.aiUnavailable, menu(ctx));
+    }
+  }
+
+  bot.command('ask', ctx => beginAiChat(ctx));
+  bot.command('newchat', ctx => beginAiChat(ctx, true));
+  bot.hears(labels('aiChat'), ctx => beginAiChat(ctx));
+
   bot.hears(labels('application'), async ctx => {
     states.set(ctx.from.id, { step: 'application' });
     await ctx.reply(copyFor(ctx).enterApplication, cancelMenu(ctx));
@@ -223,8 +253,35 @@ export function createBot(token, telegramOptions = {}, { preferences = userPrefe
 
   bot.on('text', async ctx => {
     const draft = states.get(ctx.from.id);
-    if (!draft) return;
     const copy = copyFor(ctx);
+    if (!draft) {
+      if (ctx.chat?.type === 'private' && parseCoordinates(ctx.message.text)) {
+        await ctx.reply(copy.chooseFirst, menu(ctx));
+      }
+      return;
+    }
+
+    if (draft.step === 'assistant') {
+      if (ctx.chat?.type !== 'private') return;
+      if (ctx.message.text.startsWith('/')) return ctx.reply(copy.chooseAction, menu(ctx));
+      if (ctx.message.text.trim().length > 2000) return ctx.reply(copy.aiInput);
+      try {
+        const answer = await assistant.ask(ctx.from.id, ctx.message.text, languageOf(ctx));
+        for (let offset = 0; offset < answer.length;) {
+          if (states.get(ctx.from.id) !== draft) return;
+          let end = Math.min(offset + 3500, answer.length);
+          if (end < answer.length && /[\uD800-\uDBFF]/.test(answer[end - 1])) end -= 1;
+          await ctx.reply(answer.slice(offset, end), { ...menu(ctx), link_preview_options: { is_disabled: true } });
+          offset = end;
+        }
+      } catch (error) {
+        if (states.get(ctx.from.id) !== draft || error.code === 'AI_CANCELLED') return;
+        const message = error.code === 'AI_BUSY' ? copy.aiBusy
+          : error.code === 'AI_INPUT' ? copy.aiInput : copy.aiUnavailable;
+        await ctx.reply(message, menu(ctx));
+      }
+      return;
+    }
 
     if (draft.step === 'procedure') {
       const procedure = draft.procedures.find(item => (item.menuLabel || item.title) === ctx.message.text);
@@ -244,7 +301,18 @@ export function createBot(token, telegramOptions = {}, { preferences = userPrefe
       return;
     }
 
-    if (draft.step === 'location' || draft.step === 'photo') {
+    if (draft.step === 'location') {
+      const coordinates = parseCoordinates(ctx.message.text);
+      if (!coordinates) {
+        await ctx.reply(copy.invalidLocation);
+        return;
+      }
+      Object.assign(draft, coordinates, { step: 'photo' });
+      await ctx.reply(copy.steps.photo, cancelMenu(ctx));
+      return;
+    }
+
+    if (draft.step === 'photo') {
       await ctx.reply(copy.steps[draft.step]);
       return;
     }

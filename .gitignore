@@ -6,5 +6,6 @@ coverage/
 dist/
 data/reports.json
 data/user-preferences.json
+data/ai-history.json
 data/*.tmp
 npm-debug.log*

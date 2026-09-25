@@ -69,7 +69,7 @@ test('procedure selection recovers from unknown input and returns to main menu',
   await chat.send('unknown');
   assert.match(chat.replies.at(-1).text, /Выберите/);
   await chat.send('Главное меню');
-  assert.equal(chat.replies.at(-1).extra.reply_markup.keyboard.length, 3);
+  assert.equal(chat.replies.at(-1).extra.reply_markup.keyboard.length, 4);
   const replyCount = chat.replies.length;
   await chat.send('Сведения об участке');
   assert.equal(chat.replies.length, replyCount);
@@ -89,7 +89,7 @@ test('demo report is explicitly local and never claims submission to an authorit
   assert.match(receipt.text, /DEMO-TEST/);
   assert.match(receipt.text, /не отправ/);
   assert.doesNotMatch(receipt.text, /передан на первичную проверку/);
-  assert.equal(receipt.extra.reply_markup.keyboard.length, 3);
+  assert.equal(receipt.extra.reply_markup.keyboard.length, 4);
 });
 
 test('API procedures still work without optional menu labels and do not offer demo submission', async t => {
@@ -115,7 +115,7 @@ test('failed procedure reload clears the old selection and offers the main menu'
   t.mock.method(mockApi, 'listProcedures', async () => { throw new Error('Service unavailable'); });
   await chat.click('procedures:list');
   assert.equal(chat.replies.at(-1).text, 'Service unavailable');
-  assert.equal(chat.replies.at(-1).extra.reply_markup.keyboard.length, 3);
+  assert.equal(chat.replies.at(-1).extra.reply_markup.keyboard.length, 4);
   const count = chat.replies.length;
   await chat.send('Сведения об участке');
   assert.equal(chat.replies.length, count);
