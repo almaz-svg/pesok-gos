@@ -42,7 +42,7 @@ if (!mapResponse.ok) throw await mapResponse.json();
 const map = await mapResponse.json();
 ```
 
-В `.env` React нет BOT_API_KEY/BOT_TOKEN. Для локальной разработки React использует `http://localhost:5173`, API — `http://localhost:8000`. Если порт другой, измените CORS_ALLOWED_ORIGINS и CSRF_TRUSTED_ORIGINS в backend `.env`.
+В `frontend/.env` React нет BOT_API_KEY/BOT_TOKEN. Корневой `.env` используется Django/Compose. Для локальной разработки React использует `http://localhost:5173`, API — `http://localhost:8000`. Если порт другой, измените CORS_ALLOWED_ORIGINS и CSRF_TRUSTED_ORIGINS в backend `.env`.
 
 ## Проверка фото и полного сценария
 
