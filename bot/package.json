@@ -1,0 +1,19 @@
+{
+  "name": "zher-monitoring-telegram-bot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Telegram bot for Kazakhstan land monitoring reports",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "telegraf": "^4.16.3"
+  }
+}
