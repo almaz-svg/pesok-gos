@@ -14,6 +14,15 @@
   --green: #a5dc77;
   --yellow: #f0ca63;
   --red: #ef8977;
+  --surface-form: #f1f3ef;
+  --surface-input: #ffffff;
+  --text-on-light: #18261e;
+  --text-secondary-on-light: #657269;
+  --border-input: #d7ddd5;
+  --accent-form: var(--lime);
+  --radius-card: 24px;
+  --radius-input: 12px;
+  --radius-button: 12px;
   color-scheme: dark;
 }
 * {

@@ -1,4 +1,26 @@
-/* Layout changes required by independent pages; visual redesign is a separate step. */
+/* Shared navigation and page layout. */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+}
+.header-register {
+  font-size: 11px;
+  color: #afc2a4;
+  padding: 10px 0;
+}
+.header-register:hover,
+.header-register[aria-current='page'] {
+  color: var(--lime);
+}
+@media (max-width: 1000px) {
+  .header-actions {
+    gap: 18px;
+  }
+  .header-actions .header-cta > span:first-child {
+    display: none;
+  }
+}
 #main-content:focus {
   outline: none;
 }
@@ -45,6 +67,12 @@
   background: #a7cb7510;
 }
 @media (max-width: 600px) {
+  .header-actions {
+    gap: 15px;
+  }
+  .header-register {
+    font-size: 10px;
+  }
   .site-header {
     display: grid;
     grid-template-columns: 1fr auto;

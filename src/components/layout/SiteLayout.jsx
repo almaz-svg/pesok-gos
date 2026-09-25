@@ -3,7 +3,12 @@ import { Outlet, useLocation } from 'react-router-dom';
 import Header from './Header.jsx';
 import Footer from './Footer.jsx';
 
-const titles = { '/': 'Обзор', '/map': 'Карта земель', '/reports': 'Обращения' };
+const titles = {
+  '/': 'Обзор',
+  '/map': 'Карта земель',
+  '/reports': 'Обращения',
+  '/register': 'Регистрация',
+};
 
 export default function SiteLayout() {
   const { pathname } = useLocation();

@@ -24,12 +24,17 @@ export default function Header() {
           Обращения
         </NavLink>
       </nav>
-      <Link className="header-cta" to="/map" aria-label="Открыть панель инспектора">
-        <span>Панель инспектора</span>
-        <span className="round-icon">
-          <ArrowUpRight size={18} />
-        </span>
-      </Link>
+      <div className="header-actions">
+        <NavLink className="header-register" to="/register">
+          Регистрация
+        </NavLink>
+        <Link className="header-cta" to="/map" aria-label="Открыть панель инспектора">
+          <span>Панель инспектора</span>
+          <span className="round-icon">
+            <ArrowUpRight size={18} />
+          </span>
+        </Link>
+      </div>
     </header>
   );
 }
