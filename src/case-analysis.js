@@ -58,9 +58,10 @@ const CASE_TYPES = [
   {
     type: 'no_response',
     label: 'Нет ответа или проблема не решена',
+    priority: 4,
     urgency: 'high',
     authority: 'Орган, который получил первое обращение, и вышестоящий орган при бездействии',
-    keywords: ['не ответили', 'нет ответа', 'игнорируют', 'отписка', 'не решили', 'не устранено', 'просроч'],
+    keywords: ['не ответил', 'не ответили', 'нет ответа', 'игнорируют', 'отписка', 'не решили', 'не устранено', 'просроч'],
     evidence: [
       'Номер первого обращения',
       'Дата отправки обращения',
@@ -93,7 +94,7 @@ function detectCaseType(description) {
   const lower = description.toLowerCase();
   let best = { score: 0, item: FALLBACK };
   for (const item of CASE_TYPES) {
-    const score = item.keywords.reduce((count, keyword) => (lower.includes(keyword) ? count + 1 : count), 0);
+    const score = item.keywords.reduce((count, keyword) => (lower.includes(keyword) ? count + 1 : count), 0) * (item.priority || 1);
     if (score > best.score) best = { score, item };
   }
   return best.score > 0 ? best.item : FALLBACK;
@@ -118,6 +119,45 @@ function buildOfficialDraft({ type, description, lat, lon, evidenceChecklist }) 
     '',
     'Приложения и доказательства:',
     ...evidenceChecklist.map((item, index) => `${index + 1}. ${item}.`),
+  ].join('\n');
+}
+
+function buildFollowUpDraft({ type, description, lat, lon }) {
+  return [
+    'Прошу повторно рассмотреть ранее поданное обращение и дать мотивированный ответ по существу проблемы.',
+    '',
+    `Категория проблемы: ${type.label}.`,
+    `Место: ${coordinatesLine(lat, lon)}.`,
+    `Суть проблемы: ${description}.`,
+    '',
+    'Прошу сообщить:',
+    '1. Укажите регистрационный номер первого обращения и кому оно передано на исполнение.',
+    '2. Какие действия уже выполнены ответственным органом.',
+    '3. В какие сроки будет устранена проблема или предоставлен официальный отказ с основанием.',
+    '',
+    'Если вопрос не относится к компетенции адресата, прошу перенаправить обращение в уполномоченный орган и уведомить заявителя.',
+  ].join('\n');
+}
+
+function buildInactivityComplaintDraft({ type, description, lat, lon }) {
+  return [
+    'Жалоба на бездействие по обращению о земельной проблеме.',
+    '',
+    `Проблема: ${type.label}.`,
+    `Место: ${coordinatesLine(lat, lon)}.`,
+    `Описание: ${description}.`,
+    '',
+    'Прошу провести проверку бездействия ответственного органа, который не обеспечил рассмотрение обращения или не принял меры по устранению проблемы.',
+    'Также прошу дать правовую оценку срокам рассмотрения, сообщить ответственных исполнителей и направить заявителю письменный ответ по результатам проверки.',
+  ].join('\n');
+}
+
+function buildPublicText(type, description, lat, lon) {
+  return [
+    `Нужна публичная проверка: ${type.label}.`,
+    `Место: ${coordinatesLine(lat, lon)}.`,
+    `Что произошло: ${description}.`,
+    'Просим ответственный орган проверить ситуацию, сообщить статус рассмотрения и сроки решения.',
   ].join('\n');
 }
 
@@ -146,6 +186,9 @@ export function analyzeViolationCase({ description, lat, lon, hasPhoto = false }
     urgency: type.urgency,
     evidenceChecklist,
     officialDraft,
+    followUpDraft: buildFollowUpDraft({ type, description: cleanDescription, lat, lon }),
+    inactivityComplaintDraft: buildInactivityComplaintDraft({ type, description: cleanDescription, lat, lon }),
+    publicText: buildPublicText(type, cleanDescription, lat, lon),
     socialText: buildSocialText(type, cleanDescription),
     nextAction: 'Проверьте черновик и отправьте официальное обращение через eOtinish или профильный орган.',
     followUpDays: type.urgency === 'high' ? 3 : 7,

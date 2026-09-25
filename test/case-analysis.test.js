@@ -18,6 +18,23 @@ test('case analysis recognizes real Russian user text and returns readable draft
   assert.match(analysis.nextAction, /Проверьте черновик/i);
 });
 
+test('case analysis prepares an official follow-up package for unresolved cases', () => {
+  const analysis = analyzeViolationCase({
+    description: 'Акимат не ответил на обращение по захвату участка',
+    lat: 51.1693,
+    lon: 71.4492,
+    hasPhoto: true,
+  });
+
+  assert.equal(analysis.type, 'no_response');
+  assert.match(analysis.officialDraft, /Прошу провести проверку/i);
+  assert.match(analysis.followUpDraft, /повторно рассмотреть/i);
+  assert.match(analysis.followUpDraft, /первого обращения/i);
+  assert.match(analysis.inactivityComplaintDraft, /жалоб/i);
+  assert.match(analysis.inactivityComplaintDraft, /бездейств/i);
+  assert.match(analysis.publicText, /Нужна публичная проверка/i);
+});
+
 test('case analysis turns a blocked passage complaint into an actionable passport', () => {
   const analysis = analyzeViolationCase({
     description: 'Сосед поставил забор и перекрыл общий проход во двор',

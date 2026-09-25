@@ -150,6 +150,45 @@ test('cabinet shows the violation passport without breaking old report cards', a
   assert.doesNotMatch(chat.replies.at(-1).text, /Паспорт нарушения/);
 });
 
+test('cabinet opens separate draft texts only for the report owner', async t => {
+  const { api } = store(t);
+  await api.createReport({
+    ...reportInput,
+    description: 'Сосед перекрыл общий проход забором',
+    casePassport: {
+      type: 'blocked_access',
+      typeLabel: 'Перекрыт проход или доступ',
+      responsibleAuthority: 'Местный акимат',
+      urgency: 'high',
+      evidenceChecklist: ['Фото препятствия', 'Геолокация'],
+      officialDraft: 'Официальный текст для eOtinish.',
+      followUpDraft: 'Повторное обращение по ранее поданному сигналу.',
+      inactivityComplaintDraft: 'Жалоба на бездействие ответственного органа.',
+      publicText: 'Короткий публичный текст.',
+      nextAction: 'Проверьте черновик и отправьте через eOtinish.',
+      followUpDays: 3,
+    },
+  });
+
+  const owner = conversation();
+  await owner.click('reports:open:DEMO-042');
+  const cardButtons = buttons(owner.replies.at(-1));
+  assert.ok(cardButtons.some(button => button.callback_data === 'reports:draft:official:DEMO-042'));
+  assert.ok(cardButtons.some(button => button.callback_data === 'reports:draft:followup:DEMO-042'));
+  assert.ok(cardButtons.some(button => button.callback_data === 'reports:draft:complaint:DEMO-042'));
+  assert.ok(cardButtons.some(button => button.callback_data === 'reports:draft:public:DEMO-042'));
+
+  await owner.click('reports:draft:complaint:DEMO-042');
+  assert.match(owner.replies.at(-1).text, /Жалоба/);
+  assert.match(owner.replies.at(-1).text, /Жалоба на бездействие ответственного органа/);
+  assert.ok(buttons(owner.replies.at(-1)).some(button => button.callback_data === 'reports:open:DEMO-042'));
+
+  const stranger = conversation({ userId: 202 });
+  await stranger.click('reports:draft:official:DEMO-042');
+  assert.match(stranger.replies.at(-1).text, /не найдено|недоступно/);
+  assert.doesNotMatch(stranger.replies.at(-1).text, /Официальный текст/);
+});
+
 test('forged card and photo callbacks never disclose another user report', async t => {
   const { api } = store(t);
   await api.createReport(reportInput);

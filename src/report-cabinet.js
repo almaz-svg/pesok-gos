@@ -59,6 +59,17 @@ const messages = {
     urgencyLabels: { high: 'высокая', normal: 'обычная' },
     evidenceNeeded: 'Нужные доказательства:',
     officialDraft: 'Черновик обращения:',
+    draftOfficial: 'Черновик',
+    draftFollowUp: 'Повторное',
+    draftComplaint: 'Жалоба',
+    draftPublic: 'Публичный текст',
+    draftTitles: {
+      official: 'Черновик официального обращения',
+      followup: 'Повторное обращение',
+      complaint: 'Жалоба на бездействие',
+      public: 'Публичный текст',
+    },
+    noDraft: 'Для этого обращения пока нет готового текста.',
   },
   kk: {
     statuses: {
@@ -115,6 +126,17 @@ const messages = {
     urgencyLabels: { high: 'жоғары', normal: 'қалыпты' },
     evidenceNeeded: 'Қажет дәлелдер:',
     officialDraft: 'Өтініш жобасы:',
+    draftOfficial: 'Жоба',
+    draftFollowUp: 'Қайта өтініш',
+    draftComplaint: 'Шағым',
+    draftPublic: 'Жария мәтін',
+    draftTitles: {
+      official: 'Ресми өтініш жобасы',
+      followup: 'Қайта өтініш',
+      complaint: 'Әрекетсіздік туралы шағым',
+      public: 'Жария мәтін',
+    },
+    noDraft: 'Бұл өтініш үшін дайын мәтін әлі жоқ.',
   },
 };
 
@@ -145,6 +167,29 @@ function passportText(passport, copy) {
   }
   if (passport.officialDraft) lines.push('', copy.officialDraft, shortText(passport.officialDraft, 1400));
   return lines;
+}
+
+function draftOptions(passport, copy) {
+  if (!passport || typeof passport !== 'object') return [];
+  return [
+    ['official', copy.draftOfficial, passport.officialDraft],
+    ['followup', copy.draftFollowUp, passport.followUpDraft],
+    ['complaint', copy.draftComplaint, passport.inactivityComplaintDraft],
+    ['public', copy.draftPublic, passport.publicText || passport.socialText],
+  ].filter(([, , text]) => typeof text === 'string' && text.trim());
+}
+
+function draftText(report, kind, copy) {
+  const passport = report.casePassport;
+  const values = {
+    official: passport?.officialDraft,
+    followup: passport?.followUpDraft,
+    complaint: passport?.inactivityComplaintDraft,
+    public: passport?.publicText || passport?.socialText,
+  };
+  const text = values[kind];
+  if (typeof text !== 'string' || !text.trim()) return null;
+  return `${copy.draftTitles[kind] || copy.officialDraft}\n\n${shortText(text, 3500)}`;
 }
 
 function reportText(report, language) {
@@ -255,6 +300,9 @@ export function registerReportCabinet(bot, { menu, clearState }) {
     const url = mapUrl(report);
     if (url) rows.push([Markup.button.url(copy.map, url)]);
     if (report.demoOnly) rows.push([Markup.button.url(copy.eotinish, 'https://eotinish.kz/ru')]);
+    const draftRows = draftOptions(report.casePassport, copy).map(([kind, label]) =>
+      Markup.button.callback(label, `reports:draft:${kind}:${report.id}`));
+    for (let i = 0; i < draftRows.length; i += 2) rows.push(draftRows.slice(i, i + 2));
     rows.push(
       [Markup.button.callback(copy.refreshStatus, `reports:open:${report.id}`)],
       [Markup.button.callback(copy.backToList, `reports:page:${Math.floor(index / PAGE_SIZE)}`)],
@@ -266,9 +314,29 @@ export function registerReportCabinet(bot, { menu, clearState }) {
     });
   }
 
+  async function showDraft(ctx, kind, id) {
+    const language = languageOf(ctx);
+    const copy = messages[language];
+    const reports = await loadReports(ctx);
+    const report = reports.find(item => item.id === id);
+    if (!report) {
+      await ctx.reply(copy.notFound, Markup.inlineKeyboard([
+        [Markup.button.callback(copy.backToList, 'reports:page:0')], menuButton(copy),
+      ]));
+      return;
+    }
+    const text = draftText(report, kind, copy);
+    await ctx.reply(text || copy.noDraft, Markup.inlineKeyboard([
+      [Markup.button.callback(copy.back, `reports:open:${report.id}`)],
+      [Markup.button.callback(copy.backToList, `reports:page:${Math.floor(reports.indexOf(report) / PAGE_SIZE)}`)],
+      menuButton(copy),
+    ]));
+  }
+
   bot.hears(['Мои обращения', 'Менің өтініштерім'], ctx => run(ctx, () => showList(ctx)));
   bot.command('reports', ctx => run(ctx, () => showList(ctx)));
   bot.action(/^reports:page:(\d+)$/, ctx => run(ctx, () => showList(ctx, Number(ctx.match[1]))));
+  bot.action(/^reports:draft:(official|followup|complaint|public):(.+)$/, ctx => run(ctx, () => showDraft(ctx, ctx.match[1], ctx.match[2])));
   bot.action(/^reports:(open|photo):(.+)$/, ctx => run(ctx, () => showReport(ctx, ctx.match[2], ctx.match[1] === 'photo')));
   bot.action('reports:menu', ctx => run(ctx, () => ctx.reply(messages[languageOf(ctx)].chooseAction, resolveMenu(ctx))));
 }
