@@ -1,6 +1,7 @@
 import { Markup } from 'telegraf';
 import { listReports } from './api.js';
 import { formatDate, languageOf, localizeError } from './i18n.js';
+import { formatLocationAnalysis } from './location.js';
 
 const PAGE_SIZE = 5;
 const messages = {
@@ -149,6 +150,18 @@ function shortText(value, limit) {
   return text.length > limit ? `${text.slice(0, limit - 1).replace(/[\uD800-\uDBFF]$/, '')}…` : text;
 }
 
+async function replyInChunks(ctx, text, extra) {
+  const { reply_markup, ...commonOptions } = extra;
+  for (let start = 0; start < text.length;) {
+    let end = Math.min(start + 3500, text.length);
+    // Keep UTF-16 surrogate pairs together at message boundaries.
+    if (end < text.length && /[\uD800-\uDBFF]/.test(text[end - 1])
+      && /[\uDC00-\uDFFF]/.test(text[end])) end -= 1;
+    await ctx.reply(text.slice(start, end), end === text.length ? extra : commonOptions);
+    start = end;
+  }
+}
+
 function mapUrl(report) {
   if (!Number.isFinite(report.lat) || Math.abs(report.lat) > 90
     || !Number.isFinite(report.lon) || Math.abs(report.lon) > 180) return null;
@@ -165,7 +178,9 @@ function passportText(passport, copy) {
   if (Array.isArray(passport.evidenceChecklist) && passport.evidenceChecklist.length) {
     lines.push('', copy.evidenceNeeded, ...passport.evidenceChecklist.slice(0, 6).map(item => `• ${shortText(item, 180)}`));
   }
-  if (passport.officialDraft) lines.push('', copy.officialDraft, shortText(passport.officialDraft, 1400));
+  if (typeof passport.officialDraft === 'string' && passport.officialDraft.trim()) {
+    lines.push('', copy.officialDraft, passport.officialDraft.trim());
+  }
   return lines;
 }
 
@@ -189,7 +204,7 @@ function draftText(report, kind, copy) {
   };
   const text = values[kind];
   if (typeof text !== 'string' || !text.trim()) return null;
-  return `${copy.draftTitles[kind] || copy.officialDraft}\n\n${shortText(text, 3500)}`;
+  return `${copy.draftTitles[kind] || copy.officialDraft}\n\n${text.trim()}`;
 }
 
 function reportText(report, language) {
@@ -206,6 +221,9 @@ function reportText(report, language) {
   if (report.demoOnly) lines.push('', copy.demoNotice);
   lines.push('', copy.description, shortText(report.description, 2000) || copy.noDescription);
   lines.push('', mapUrl(report) ? `${copy.coordinates} ${report.lat}, ${report.lon}` : copy.noCoordinates);
+  if (report.locationAnalysis) {
+    lines.push('', formatLocationAnalysis(report.locationAnalysis, language));
+  }
   lines.push(...passportText(report.casePassport, copy));
   if (report.explanation) lines.push('', shortText(report.explanation, 400));
   lines.push('', `${copy.nextStep} ${nextStep}`);
@@ -308,7 +326,7 @@ export function registerReportCabinet(bot, { menu, clearState }) {
       [Markup.button.callback(copy.backToList, `reports:page:${Math.floor(index / PAGE_SIZE)}`)],
       menuButton(copy),
     );
-    await ctx.reply(reportText(report, language), {
+    await replyInChunks(ctx, reportText(report, language), {
       ...Markup.inlineKeyboard(rows),
       link_preview_options: { is_disabled: true },
     });
@@ -326,7 +344,7 @@ export function registerReportCabinet(bot, { menu, clearState }) {
       return;
     }
     const text = draftText(report, kind, copy);
-    await ctx.reply(text || copy.noDraft, Markup.inlineKeyboard([
+    await replyInChunks(ctx, text || copy.noDraft, Markup.inlineKeyboard([
       [Markup.button.callback(copy.back, `reports:open:${report.id}`)],
       [Markup.button.callback(copy.backToList, `reports:page:${Math.floor(reports.indexOf(report) / PAGE_SIZE)}`)],
       menuButton(copy),

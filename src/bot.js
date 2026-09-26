@@ -7,6 +7,7 @@ import { copyFor, formatDate, languageOf, localizeError, messages } from './i18n
 import { localizeProcedure } from './procedures.js';
 import { userPreferences } from './user-preferences.js';
 import { aiAssistant } from './ai-assistant.js';
+import { analyzeLocation, formatLocationAnalysis, locationMapUrl, validCoordinates } from './location.js';
 
 const LANGUAGE_PROMPT = 'Тілді таңдаңыз / Выберите язык:';
 const LANGUAGE_MENU = Markup.inlineKeyboard([
@@ -36,7 +37,14 @@ function parseCoordinates(text) {
   if (!match) return null;
   const lat = Number(match[1]);
   const lon = Number(match[2]);
-  return Math.abs(lat) <= 90 && Math.abs(lon) <= 180 ? { lat, lon } : null;
+  return validCoordinates(lat, lon) ? { lat, lon } : null;
+}
+
+function incomingLocation(message) {
+  const location = message?.location || message?.venue?.location;
+  if (!location) return null;
+  return { lat: location.latitude, lon: location.longitude, accuracyMeters: location.horizontal_accuracy,
+    live: Boolean(location.live_period), inputType: message.venue ? 'venue' : 'telegram' };
 }
 
 const actionLabels = new Set([
@@ -102,10 +110,14 @@ export function createBot(token, telegramOptions = {}, { preferences = userPrefe
       await ctx.reply('Не удалось загрузить настройки языка. Попробуйте позже.\nТіл баптауларын жүктеу мүмкін болмады. Кейінірек қайталап көріңіз.');
       return;
     }
-    if (ctx.chat?.type !== 'private' && !ctx.state.language) {
+    if (ctx.chat?.type !== 'private') {
       const text = ctx.message?.text || '';
       const command = /^\/(?:start|reports|language|cancel|ask|newchat)(?:@(\w+))?(?:\s|$)/.exec(text);
       const ownCommand = command && (!command[1] || command[1].toLowerCase() === ctx.botInfo.username.toLowerCase());
+      const safePrivateRedirect = /^reports:|^language:/.test(ctx.callbackQuery?.data || '')
+        || (ownCommand && /^\/(reports|ask|newchat|language)(?:@|\s|$)/.test(text))
+        || ['myReports', 'aiChat'].flatMap(labels).includes(text) || text === 'Язык / Тіл';
+      if (ctx.state.language && safePrivateRedirect) return next();
       if (ctx.callbackQuery || ownCommand || actionLabels.has(text)) {
         await answerCallback(ctx);
         await showLanguagePicker(ctx);
@@ -114,6 +126,12 @@ export function createBot(token, telegramOptions = {}, { preferences = userPrefe
     }
     const choosingLanguage = ctx.callbackQuery?.data?.startsWith('language:');
     if (ctx.chat?.type === 'private' && !ctx.state.language && !choosingLanguage) {
+      const text = ctx.message?.text || '';
+      const cancelCommand = /^\/cancel(?:@(\w+))?(?:\s|$)/.exec(text);
+      if ((cancelCommand && (!cancelCommand[1] || cancelCommand[1].toLowerCase() === ctx.botInfo.username.toLowerCase()))
+        || labels('cancel').includes(text)) states.delete(ctx.from.id);
+      const input = incomingLocation(ctx.message) || parseCoordinates(ctx.message?.text || '');
+      if (input) states.set(ctx.from.id, { step: 'pending_location', input });
       await answerCallback(ctx);
       await showLanguagePicker(ctx);
       return;
@@ -139,23 +157,34 @@ export function createBot(token, telegramOptions = {}, { preferences = userPrefe
     }
     if (languageSelections.get(ctx.from.id) !== ctx.state.languageSelection) return;
     ctx.state.language = language;
-    states.delete(ctx.from.id);
+    const pending = states.get(ctx.from.id);
+    if (pending?.step !== 'pending_location') states.delete(ctx.from.id);
     await ctx.reply(copyFor(ctx).welcome, menu(ctx));
+    if (pending?.step === 'pending_location' && states.get(ctx.from.id) === pending
+      && languageSelections.get(ctx.from.id) === ctx.state.languageSelection) {
+      states.delete(ctx.from.id);
+      await acceptLocation(ctx, pending.input);
+    }
   });
 
   async function showProcedures(ctx) {
-    states.delete(ctx.from.id);
+    const loading = { step: 'procedures_loading' };
+    states.set(ctx.from.id, loading);
     try {
       const payload = await listProcedures();
+      if (states.get(ctx.from.id) !== loading) return;
       const source = Array.isArray(payload) ? payload : payload.procedures;
       const procedures = source?.map(procedure => localizeProcedure(procedure, languageOf(ctx)));
       if (!procedures?.length) {
+        states.delete(ctx.from.id);
         await ctx.reply(copyFor(ctx).emptyProcedures, menu(ctx));
         return;
       }
       states.set(ctx.from.id, { step: 'procedure', procedures });
       await ctx.reply(copyFor(ctx).chooseProcedure, procedureMenu(procedures, ctx));
     } catch (error) {
+      if (states.get(ctx.from.id) !== loading) return;
+      states.delete(ctx.from.id);
       await ctx.reply(localizeError(error, languageOf(ctx)), menu(ctx));
     }
   }
@@ -167,6 +196,19 @@ export function createBot(token, telegramOptions = {}, { preferences = userPrefe
     return ctx.reply(`${notice}${copy.steps.location}`, Markup.keyboard([
       [Markup.button.locationRequest(copy.shareLocation)], [copy.cancel],
     ]).resize());
+  }
+
+  async function acceptLocation(ctx, input) {
+    const copy = copyFor(ctx);
+    if (!validCoordinates(input.lat, input.lon)) return ctx.reply(copy.invalidLocation);
+    const locationAnalysis = analyzeLocation(input);
+    const draft = { step: 'photo', lat: input.lat, lon: input.lon, locationAnalysis };
+    states.set(ctx.from.id, draft);
+    await ctx.reply(formatLocationAnalysis(locationAnalysis, languageOf(ctx)), {
+      ...Markup.inlineKeyboard([[Markup.button.url(copy.locationMap, locationMapUrl(input))]]),
+      link_preview_options: { is_disabled: true },
+    });
+    if (states.get(ctx.from.id) === draft && draft.step === 'photo') await ctx.reply(copy.steps.photo, cancelMenu(ctx));
   }
 
   bot.start(async ctx => {
@@ -226,18 +268,7 @@ export function createBot(token, telegramOptions = {}, { preferences = userPrefe
 
   registerReportCabinet(bot, { menu, clearState: ctx => states.delete(ctx.from.id) });
 
-  bot.on('location', async ctx => {
-    const draft = states.get(ctx.from.id);
-    if (!draft) return;
-    if (draft.step !== 'location') {
-      await ctx.reply(copyFor(ctx).steps[draft.step] || copyFor(ctx).chooseFirst);
-      return;
-    }
-    draft.lat = ctx.message.location.latitude;
-    draft.lon = ctx.message.location.longitude;
-    draft.step = 'photo';
-    await ctx.reply(copyFor(ctx).steps.photo, cancelMenu(ctx));
-  });
+  bot.on(['location', 'venue'], ctx => acceptLocation(ctx, incomingLocation(ctx.message)));
 
   bot.on('photo', async ctx => {
     const draft = states.get(ctx.from.id);
@@ -255,9 +286,8 @@ export function createBot(token, telegramOptions = {}, { preferences = userPrefe
     const draft = states.get(ctx.from.id);
     const copy = copyFor(ctx);
     if (!draft) {
-      if (ctx.chat?.type === 'private' && parseCoordinates(ctx.message.text)) {
-        await ctx.reply(copy.chooseFirst, menu(ctx));
-      }
+      const coordinates = parseCoordinates(ctx.message.text);
+      if (coordinates) await acceptLocation(ctx, coordinates);
       return;
     }
 
@@ -307,10 +337,11 @@ export function createBot(token, telegramOptions = {}, { preferences = userPrefe
         await ctx.reply(copy.invalidLocation);
         return;
       }
-      Object.assign(draft, coordinates, { step: 'photo' });
-      await ctx.reply(copy.steps.photo, cancelMenu(ctx));
+      await acceptLocation(ctx, coordinates);
       return;
     }
+
+    if (draft.step === 'submitting') return ctx.reply(copy.reportSaving);
 
     if (draft.step === 'photo') {
       await ctx.reply(copy.steps[draft.step]);
@@ -323,6 +354,7 @@ export function createBot(token, telegramOptions = {}, { preferences = userPrefe
         await ctx.reply(copy.invalidDescription);
         return;
       }
+      draft.step = 'submitting';
       try {
         const report = await createReport({
           telegramUserId: ctx.from.id,
@@ -330,6 +362,7 @@ export function createBot(token, telegramOptions = {}, { preferences = userPrefe
           lon: draft.lon,
           description,
           telegramFileId: draft.telegramFileId,
+          locationAnalysis: draft.locationAnalysis,
           casePassport: analyzeViolationCase({
             description,
             lat: draft.lat,
@@ -338,12 +371,15 @@ export function createBot(token, telegramOptions = {}, { preferences = userPrefe
           }),
         });
         if (!report?.id) throw new Error(copy.missingReportId);
-        states.delete(ctx.from.id);
+        const current = states.get(ctx.from.id) === draft;
+        if (current) states.delete(ctx.from.id);
         await ctx.reply(
           report.demoOnly ? copy.demoReceipt(report.id) : copy.receipt(report.id),
-          menu(ctx),
+          current ? menu(ctx) : undefined,
         );
       } catch (error) {
+        if (states.get(ctx.from.id) !== draft) return;
+        draft.step = 'description';
         await ctx.reply(`${localizeError(error, languageOf(ctx))}\n\n${copy.draftRetry}`);
       }
       return;
@@ -360,10 +396,11 @@ export function createBot(token, telegramOptions = {}, { preferences = userPrefe
         const status = copy.statuses[application.stage] || copy.statusMissing;
         const explanation = application.demoOnly ? copy.demoApplication
           : application.translations?.[languageOf(ctx)]?.explanation || application.explanation || '';
-        states.delete(ctx.from.id);
+        const current = states.get(ctx.from.id) === draft;
+        if (current) states.delete(ctx.from.id);
         await ctx.reply(
           `${application.demoOnly ? `${copy.demoData}\n` : ''}${copy.applicationLabel} ${application.trackingNumber}\n${copy.status} ${status}\n${explanation}\n${copy.updated} ${formatDate(application.updatedAt, languageOf(ctx))}`,
-          menu(ctx),
+          current ? menu(ctx) : undefined,
         );
       } catch (error) {
         await ctx.reply(`${localizeError(error, languageOf(ctx))}\n\n${copy.applicationRetry}`);

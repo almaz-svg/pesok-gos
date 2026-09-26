@@ -245,7 +245,7 @@ test('invalid text coordinates keep the location step and allow correction', asy
   }
 });
 
-test('coordinates after restart show a localized way to begin again without starting a report silently', async () => {
+test('coordinates after restart start a fresh localized location draft only in private chat', async () => {
   for (const language of ['ru', 'kk']) {
     const store = preferences({ 101: language });
     const copy = messages[language];
@@ -253,11 +253,9 @@ test('coordinates after restart show a localized way to begin again without star
     await old.send(copy.report);
     const reopened = conversation(store);
     await reopened.send('51.12955, 71.41540');
-    assert.equal(reopened.replies.length, 1);
-    assert.equal(reopened.replies[0].text, copy.chooseFirst);
-    assert.ok(labels(reopened.replies[0]).includes(copy.report));
-    await reopened.send(copy.report);
-    await reopened.send('51.12955, 71.41540');
+    assert.equal(reopened.replies.length, 2);
+    assert.match(reopened.replies[0].text, /OpenStreetMap/);
+    assert.match(reopened.replies[0].text, /Астана/);
     assert.equal(reopened.replies.at(-1).text, copy.steps.photo);
     const group = conversation(store, { chatType: 'supergroup' });
     await group.send('51.12955, 71.41540');
@@ -270,11 +268,12 @@ test('language can be changed from a command or menu and the old report draft is
   const store = preferences({ 101: 'kk' });
   const chat = conversation(store);
   await chat.send('📍 Мәселе туралы хабарлау');
+  await chat.send({ location: { latitude: 51, longitude: 71 } });
+  await chat.send({ photo: [{ file_id: 'old-photo', file_unique_id: 'old', width: 1, height: 1 }] });
   await chat.send('/language');
   assertLanguagePicker(chat.replies.at(-1));
   await chat.click('language:ru');
   assert.ok(labels(chat.replies.at(-1)).includes('Мои обращения'));
-  await chat.send({ location: { latitude: 51, longitude: 71 } });
   await chat.send({ photo: [{ file_id: 'photo', file_unique_id: 'p', width: 1, height: 1 }] });
   await chat.send('Old description');
   assert.equal(requests.mock.callCount(), 0);

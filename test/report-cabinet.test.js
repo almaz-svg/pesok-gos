@@ -258,15 +258,21 @@ test('old card buttons reload the current status and handle deleted reports', as
 
 test('failed cabinet loading offers retry and clears the interrupted report draft', async t => {
   store(t);
+  const saves = t.mock.method(mockApi, 'createReport', async () => ({ id: 'DEMO-UNEXPECTED', demoOnly: true }));
   t.mock.method(mockApi, 'listReports', async () => { throw new Error('Сервис временно недоступен.'); });
   const chat = conversation();
   await chat.send('📍 Сообщить о проблеме');
+  await chat.send({ location: { latitude: 51, longitude: 71 } });
+  await chat.send({ photo: [{ file_id: 'old-photo', file_unique_id: 'old', width: 1, height: 1 }] });
   await chat.send('Мои обращения');
   assert.match(chat.replies.at(-1).text, /временно недоступен/);
   assert.ok(buttons(chat.replies.at(-1)).some(button => button.text === 'Повторить'));
   const count = chat.replies.length;
-  await chat.send({ location: { latitude: 51, longitude: 71 } });
+  await chat.send('Description of the discarded draft');
   assert.equal(chat.replies.length, count);
+  assert.equal(saves.mock.callCount(), 0);
+  await chat.send({ location: { latitude: 51.12955, longitude: 71.4154 } });
+  assert.ok(chat.replies.some(reply => /Астана/.test(reply.text)));
 });
 
 test('an expired callback acknowledgement still opens the card with ownership checked', async t => {
