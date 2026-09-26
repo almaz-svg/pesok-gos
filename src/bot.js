@@ -1,4 +1,5 @@
 import { Markup, Telegraf } from 'telegraf';
+import { randomBytes } from 'node:crypto';
 import { createReport, getApplication, listProcedures } from './api.js';
 import { analyzeViolationCase } from './case-analysis.js';
 import { config } from './config.js';
@@ -8,6 +9,9 @@ import { localizeProcedure } from './procedures.js';
 import { userPreferences } from './user-preferences.js';
 import { aiAssistant } from './ai-assistant.js';
 import { analyzeLocation, formatLocationAnalysis, locationMapUrl, validCoordinates } from './location.js';
+import { createLandService } from './land/service.js';
+import { registerLandFeatures } from './land/telegram.js';
+import { landCopy, landMessages } from './land/messages.js';
 
 const LANGUAGE_PROMPT = 'Тілді таңдаңыз / Выберите язык:';
 const LANGUAGE_MENU = Markup.inlineKeyboard([
@@ -19,7 +23,7 @@ function menu(ctx) {
   return Markup.keyboard([
     [copy.report, copy.myReports],
     [copy.application, copy.procedures],
-    [copy.aiChat],
+    [landCopy(languageOf(ctx)).sites, copy.aiChat],
     ['Язык / Тіл'],
   ]).resize();
 }
@@ -49,6 +53,7 @@ function incomingLocation(message) {
 
 const actionLabels = new Set([
   'Язык / Тіл',
+  ...Object.values(landMessages).map(copy => copy.sites),
   ...['report', 'myReports', 'application', 'procedures', 'demoReport', 'mainMenu', 'cancel', 'aiChat'].flatMap(labels),
 ]);
 
@@ -83,7 +88,7 @@ function procedureMenu(procedures, ctx) {
   return Markup.keyboard(rows).resize();
 }
 
-export function createBot(token, telegramOptions = {}, { preferences = userPreferences, assistant = aiAssistant } = {}) {
+export function createBot(token, telegramOptions = {}, { preferences = userPreferences, assistant = aiAssistant, landService = createLandService() } = {}) {
   const bot = new Telegraf(token, { telegram: telegramOptions });
   const states = new Map();
   const languageSelections = new Map();
@@ -112,7 +117,7 @@ export function createBot(token, telegramOptions = {}, { preferences = userPrefe
     }
     if (ctx.chat?.type !== 'private') {
       const text = ctx.message?.text || '';
-      const command = /^\/(?:start|reports|language|cancel|ask|newchat)(?:@(\w+))?(?:\s|$)/.exec(text);
+      const command = /^\/(?:start|reports|language|cancel|ask|newchat|sites|review|myid)(?:@(\w+))?(?:\s|$)/.exec(text);
       const ownCommand = command && (!command[1] || command[1].toLowerCase() === ctx.botInfo.username.toLowerCase());
       const safePrivateRedirect = /^reports:|^language:/.test(ctx.callbackQuery?.data || '')
         || (ownCommand && /^\/(reports|ask|newchat|language)(?:@|\s|$)/.test(text))
@@ -202,10 +207,13 @@ export function createBot(token, telegramOptions = {}, { preferences = userPrefe
     const copy = copyFor(ctx);
     if (!validCoordinates(input.lat, input.lon)) return ctx.reply(copy.invalidLocation);
     const locationAnalysis = analyzeLocation(input);
-    const draft = { step: 'photo', lat: input.lat, lon: input.lon, locationAnalysis };
+    const draft = { step: 'photo', lat: input.lat, lon: input.lon, locationAnalysis, landToken: randomBytes(6).toString('hex') };
     states.set(ctx.from.id, draft);
     await ctx.reply(formatLocationAnalysis(locationAnalysis, languageOf(ctx)), {
-      ...Markup.inlineKeyboard([[Markup.button.url(copy.locationMap, locationMapUrl(input))]]),
+      ...Markup.inlineKeyboard([
+        [Markup.button.url(copy.locationMap, locationMapUrl(input))],
+        [Markup.button.callback(landCopy(languageOf(ctx)).history, `land:area:${draft.landToken}`)],
+      ]),
       link_preview_options: { is_disabled: true },
     });
     if (states.get(ctx.from.id) === draft && draft.step === 'photo') await ctx.reply(copy.steps.photo, cancelMenu(ctx));
@@ -267,6 +275,7 @@ export function createBot(token, telegramOptions = {}, { preferences = userPrefe
   });
 
   registerReportCabinet(bot, { menu, clearState: ctx => states.delete(ctx.from.id) });
+  registerLandFeatures(bot, { states, service: landService });
 
   bot.on(['location', 'venue'], ctx => acceptLocation(ctx, incomingLocation(ctx.message)));
 
@@ -356,6 +365,10 @@ export function createBot(token, telegramOptions = {}, { preferences = userPrefe
       }
       draft.step = 'submitting';
       try {
+        if (draft.landCreation) {
+          try { await draft.landCreation; } catch { /* The report does not require a satellite case. */ }
+          if (states.get(ctx.from.id) !== draft) return;
+        }
         const report = await createReport({
           telegramUserId: ctx.from.id,
           lat: draft.lat,
@@ -363,6 +376,7 @@ export function createBot(token, telegramOptions = {}, { preferences = userPrefe
           description,
           telegramFileId: draft.telegramFileId,
           locationAnalysis: draft.locationAnalysis,
+          ...(draft.landCaseId ? { landCaseId: draft.landCaseId } : {}),
           casePassport: analyzeViolationCase({
             description,
             lat: draft.lat,
@@ -371,6 +385,11 @@ export function createBot(token, telegramOptions = {}, { preferences = userPrefe
           }),
         });
         if (!report?.id) throw new Error(copy.missingReportId);
+        if (draft.landCaseId) {
+          try { await landService.linkReport(draft.landCaseId, ctx.from.id, report.id); } catch {
+            // The report already exists; failure to add a reverse link must not duplicate it.
+          }
+        }
         const current = states.get(ctx.from.id) === draft;
         if (current) states.delete(ctx.from.id);
         await ctx.reply(

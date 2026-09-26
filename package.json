@@ -15,9 +15,16 @@
     "node": ">=22"
   },
   "dependencies": {
+    "@turf/area": "^7.4.0",
     "@turf/boolean-point-in-polygon": "^7.4.0",
+    "@turf/helpers": "^7.4.0",
+    "@turf/intersect": "^7.4.0",
+    "@turf/kinks": "^7.4.0",
     "dotenv": "^16.4.7",
+    "geotiff": "^3.0.5",
     "openai": "^7.23.0",
+    "pngjs": "^7.0.0",
+    "proj4": "^2.22.0",
     "telegraf": "^4.16.3"
   },
   "devDependencies": {

@@ -1,6 +1,8 @@
 export const commands = [
   { command: 'start', description: 'Открыть главное меню' },
   { command: 'reports', description: 'Мои обращения' },
+  { command: 'sites', description: 'Спутниковая история моих участков' },
+  { command: 'myid', description: 'Мой Telegram ID для настройки оператора' },
   { command: 'language', description: 'Язык / Тіл' },
   { command: 'ask', description: 'Обсудить земельную проблему с ИИ' },
   { command: 'newchat', description: 'Очистить историю обсуждения с ИИ' },

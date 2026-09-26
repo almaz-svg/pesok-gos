@@ -2,6 +2,7 @@ import { Markup } from 'telegraf';
 import { listReports } from './api.js';
 import { formatDate, languageOf, localizeError } from './i18n.js';
 import { formatLocationAnalysis } from './location.js';
+import { landCopy } from './land/messages.js';
 
 const PAGE_SIZE = 5;
 const messages = {
@@ -314,6 +315,9 @@ export function registerReportCabinet(bot, { menu, clearState }) {
       return;
     }
     const rows = [];
+    if (/^[a-f0-9]{12}$/.test(report.landCaseId || '')) {
+      rows.push([Markup.button.callback(landCopy(language).history, `land:open:${report.landCaseId}`)]);
+    }
     if (report.telegramFileId) rows.push([Markup.button.callback(copy.photo, `reports:photo:${report.id}`)]);
     const url = mapUrl(report);
     if (url) rows.push([Markup.button.url(copy.map, url)]);

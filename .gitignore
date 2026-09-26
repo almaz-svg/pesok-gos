@@ -7,5 +7,6 @@ dist/
 data/reports.json
 data/user-preferences.json
 data/ai-history.json
+data/land-cases.json
 data/*.tmp
 npm-debug.log*
