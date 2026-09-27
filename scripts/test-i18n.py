@@ -148,7 +148,7 @@ def main():
                 switch(page,'en')
                 expect(page.locator('#register-password-error')).to_have_text('Create a password.')
                 expect(page.locator('#register-email')).to_have_value('test@example.com')
-                assert page.title()=='Register — Pesok Gos'
+                assert page.title()=='Register — Terra AI'
                 page.reload(wait_until='networkidle')
                 expect(page.locator('html')).to_have_attribute('lang','en')
                 page.locator('.header-nav a[href="/reports"]').click()

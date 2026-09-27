@@ -1,6 +1,7 @@
 import { useI18n } from '../../i18n/useI18n.js';
 import { Link, useLocation } from 'react-router-dom';
-import { ArrowUpRight, Layers3 } from '../icons.jsx';
+import { ArrowUpRight } from '../icons.jsx';
+import BrandLogo from './BrandLogo.jsx';
 import './footer.css';
 import TelegramLink from './TelegramLink.jsx';
 
@@ -25,12 +26,8 @@ export default function Footer() {
     <footer className="site-footer footer-shell">
       <div className="footer-main">
         <div className="footer-intro">
-          <Link className="footer-brand" to="/" aria-label={t('Песок Гос — главная')}>
-            <Layers3 size={30} aria-hidden="true" />
-            <span>
-              песок<span className="footer-brand-dot">.</span>
-              <small>ГОС</small>
-            </span>
+          <Link className="footer-brand" to="/" aria-label={t('Terra AI — главная')}>
+            <BrandLogo />
           </Link>
           <p className="footer-description">
             {t(
@@ -76,7 +73,7 @@ export default function Footer() {
 
       <div className="footer-bottom">
         <span className="footer-copyright">
-          © {new Date().getFullYear()} {t('Песок Гос')}
+          © {new Date().getFullYear()} {t('Terra AI')}
         </span>
         <span className="footer-prototype">{t('Демонстрационный прототип')}</span>
         <span className="footer-signoff">

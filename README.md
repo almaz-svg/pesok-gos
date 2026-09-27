@@ -1,4 +1,4 @@
-# Pesok Gos — мониторинг земель
+# Terra AI — мониторинг земель
 
 Inspector Web (React) → Django REST Framework → PostgreSQL. Отдельный Telegram-бот отправляет обращения в тот же API.
 

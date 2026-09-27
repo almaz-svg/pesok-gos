@@ -22,7 +22,7 @@ export default function SiteLayout() {
       pathname === '/reports' && new URLSearchParams(search).get('view') === 'analytics'
         ? 'Аналитика'
         : titles[pathname.replace(/\/$/, '') || '/'] || 'Страница не найдена';
-    document.title = t('{value0} — Песок Гос', { value0: t(label) });
+    document.title = t('{value0} — Terra AI', { value0: t(label) });
   }, [pathname, search, t]);
   useLayoutEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });

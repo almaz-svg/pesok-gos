@@ -1,0 +1,27 @@
+.site-header .brand .terra-logo {
+  display: block;
+  width: 168px;
+  height: 42px;
+  flex-shrink: 0;
+}
+
+.footer-brand .terra-logo {
+  display: block;
+  width: 192px;
+  height: 48px;
+}
+
+.terra-logo__art {
+  filter: var(--logo-filter);
+}
+
+:root[data-theme='light'] .terra-logo__art {
+  filter: none;
+}
+
+@media (max-width: 600px) {
+  .site-header .brand .terra-logo {
+    width: 132px;
+    height: 33px;
+  }
+}

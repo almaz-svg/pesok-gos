@@ -101,9 +101,9 @@ export const messages = {
     kk: 'ЖИ көмекшісі',
     en: 'AI assistant',
   },
-  'Помощник Песок': {
-    kk: 'Песок көмекшісі',
-    en: 'Pesok assistant',
+  'Помощник Terra AI': {
+    kk: 'Terra AI көмекшісі',
+    en: 'Terra AI assistant',
   },
   'Помогу разобраться в проекте': {
     kk: 'Жобамен танысуға көмектесемін',
@@ -157,9 +157,9 @@ export const messages = {
     kk: 'Сіз',
     en: 'You',
   },
-  'Песок · ИИ': {
-    kk: 'Песок · ЖИ',
-    en: 'Pesok · AI',
+  'Terra AI · ИИ': {
+    kk: 'Terra AI · ЖИ',
+    en: 'Terra AI · AI',
   },
   'Ответ сокращён. Уточните вопрос, чтобы узнать больше.': {
     kk: 'Жауап қысқартылды. Толығырақ білу үшін сұрағыңызды нақтылаңыз.',
@@ -735,9 +735,9 @@ export const messages = {
     kk: 'Тіркелу',
     en: 'Register',
   },
-  'Песок Гос — главная': {
-    kk: 'Песок Гос — басты бет',
-    en: 'Pesok Gos — home',
+  'Terra AI — главная': {
+    kk: 'Terra AI — басты бет',
+    en: 'Terra AI — home',
   },
   'Цифровой мониторинг земель. Карта участков, обращения и контроль их исполнения в одном пространстве.':
     {
@@ -772,9 +772,9 @@ export const messages = {
     kk: 'Картаны ашу',
     en: 'Open map',
   },
-  'Песок Гос': {
-    kk: 'Песок Гос',
-    en: 'Pesok Gos',
+  'Terra AI': {
+    kk: 'Terra AI',
+    en: 'Terra AI',
   },
   'Демонстрационный прототип': {
     kk: 'Демонстрациялық прототип',
@@ -796,9 +796,9 @@ export const messages = {
     kk: 'Инспектор панелі',
     en: 'Inspector workspace',
   },
-  '{value0} — Песок Гос': {
-    kk: '{value0} — Песок Гос',
-    en: '{value0} — Pesok Gos',
+  '{value0} — Terra AI': {
+    kk: '{value0} — Terra AI',
+    en: '{value0} — Terra AI',
   },
   'Перейти к содержимому': {
     kk: 'Мазмұнға өту',

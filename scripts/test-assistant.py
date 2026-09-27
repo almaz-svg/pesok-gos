@@ -69,7 +69,7 @@ def main():
                 errors = []
                 page.on('pageerror', lambda error: errors.append(str(error)))
                 launcher = page.get_by_role('button', name='Открыть ИИ-помощника')
-                dialog = page.get_by_role('dialog', name='Помощник Песок')
+                dialog = page.get_by_role('dialog', name='Помощник Terra AI')
 
                 for index, route in enumerate([] if args.workflows_only else ROUTES):
                     def layout():

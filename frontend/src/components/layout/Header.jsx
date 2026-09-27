@@ -1,6 +1,6 @@
 import { useI18n } from '../../i18n/useI18n.js';
 import { Link, NavLink } from 'react-router-dom';
-import { Layers3 } from '../icons.jsx';
+import BrandLogo from './BrandLogo.jsx';
 import LanguageSwitcher from './LanguageSwitcher.jsx';
 import ThemeToggle from './ThemeToggle.jsx';
 import TelegramLink from './TelegramLink.jsx';
@@ -12,12 +12,8 @@ export default function Header() {
   const { t } = useI18n();
   return (
     <header className="site-header header-localized">
-      <Link className="brand" to="/" aria-label={t('Песок Гос — главная')}>
-        <Layers3 size={29} />
-        <span>
-          песок<span className="brand-dot">.</span>
-          <small>ГОС</small>
-        </span>
+      <Link className="brand" to="/" aria-label={t('Terra AI — главная')}>
+        <BrandLogo />
       </Link>
       <nav className="header-nav" aria-label={t('Основная навигация')}>
         <NavLink to="/" end className={navClass}>

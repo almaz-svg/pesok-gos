@@ -66,6 +66,8 @@ export default function Terrain() {
     const canvas = canvasRef.current;
     const context = canvas?.getContext('2d', { alpha: true });
     if (!canvas || !context) return undefined;
+    const surface = canvas.closest('.hero');
+    if (!surface) return undefined;
 
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     let width = 0;
@@ -81,13 +83,15 @@ export default function Terrain() {
     let pointerY = 0;
     let easedX = 0;
     let easedY = 0;
+    let hovering = false;
+    let hoverAmount = 0;
 
-    const project = (point, rotation, scale, cx, cy) => {
+    const project = (point, rotation, pitch, scale, cx, cy) => {
       const cosine = Math.cos(rotation);
       const sine = Math.sin(rotation);
       const rx = point.x * cosine + point.z * sine;
       const rz = -point.x * sine + point.z * cosine;
-      return { x: cx + rx * scale, y: cy + (rz * 0.46 - point.y * 1.04) * scale };
+      return { x: cx + rx * scale, y: cy + (rz * pitch - point.y * 1.04) * scale };
     };
 
     function draw(time) {
@@ -95,12 +99,15 @@ export default function Terrain() {
       context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
       context.clearRect(0, 0, width, height);
       const mobile = width < 760;
-      const scale = Math.min(width * (mobile ? 0.385 : 0.275), height * (mobile ? 0.42 : 0.76));
-      const drift = motion.matches ? 0 : Math.sin(time * 0.00017) * 0.018;
-      const rotation = -0.33 + drift + easedX * 0.035;
-      const cx = width * (mobile ? 0.56 : 0.682) + easedX * 7;
-      const cy = height * (mobile ? 0.7 : 0.55) + easedY * 5;
-      const p = (point) => project(point, rotation, scale, cx, cy);
+      const scale =
+        Math.min(width * (mobile ? 0.385 : 0.275), height * (mobile ? 0.42 : 0.76)) *
+        (1 + hoverAmount * 0.045);
+      const drift = motion.matches ? 0 : Math.sin(time * 0.00024) * 0.04;
+      const rotation = -0.33 + drift + easedX * 0.28;
+      const pitch = 0.46 + easedY * 0.15;
+      const cx = width * (mobile ? 0.56 : 0.682) + easedX * Math.min(width * 0.035, 44);
+      const cy = height * (mobile ? 0.7 : 0.55) + easedY * 24 - hoverAmount * 12;
+      const p = (point) => project(point, rotation, pitch, scale, cx, cy);
       const points = MESH.map((row) => row.map(p));
 
       // Atmospheric light under the floating parcel has no opaque canvas background.
@@ -285,11 +292,14 @@ export default function Terrain() {
       frame = 0;
       if (disposed || !visible || document.hidden || motion.matches) return;
       if (now - lastFrame >= 32) {
-        elapsed += previousTime ? Math.min(now - previousTime, 60) : 0;
+        const delta = previousTime ? Math.min(now - previousTime, 60) : 32;
+        elapsed += previousTime ? delta : 0;
         previousTime = now;
         lastFrame = now;
-        easedX += (pointerX - easedX) * 0.04;
-        easedY += (pointerY - easedY) * 0.04;
+        const ease = 1 - Math.exp(-delta / 150);
+        easedX += (pointerX - easedX) * ease;
+        easedY += (pointerY - easedY) * ease;
+        hoverAmount += ((hovering ? 1 : 0) - hoverAmount) * ease;
         draw(elapsed);
       }
       frame = window.requestAnimationFrame(animate);
@@ -303,6 +313,10 @@ export default function Terrain() {
       if (motion.matches) {
         easedX = 0;
         easedY = 0;
+        pointerX = 0;
+        pointerY = 0;
+        hovering = false;
+        hoverAmount = 0;
         draw(0);
       } else {
         frame = window.requestAnimationFrame(animate);
@@ -323,12 +337,17 @@ export default function Terrain() {
     const onPointer = (event) => {
       if (motion.matches || !visible || event.pointerType === 'touch') return;
       const bounds = canvas.getBoundingClientRect();
-      pointerX = clamp(((event.clientX - bounds.left) / Math.max(width, 1)) * 2 - 1, -1, 1);
-      pointerY = clamp(((event.clientY - bounds.top) / Math.max(height, 1)) * 2 - 1, -1, 1);
+      const x = (event.clientX - bounds.left) / Math.max(width, 1);
+      const y = (event.clientY - bounds.top) / Math.max(height, 1);
+      // Centre the response on the parcel, rather than the headline beside it.
+      pointerX = clamp((x - (width < 760 ? 0.56 : 0.68)) / 0.3, -1, 1);
+      pointerY = clamp((y - 0.5) * 2, -1, 1);
+      hovering = true;
     };
     const resetPointer = () => {
       pointerX = 0;
       pointerY = 0;
+      hovering = false;
     };
     const observer = new ResizeObserver(resize);
     observer.observe(canvas);
@@ -340,7 +359,10 @@ export default function Terrain() {
       { threshold: 0 },
     );
     intersection.observe(canvas);
-    window.addEventListener('pointermove', onPointer, { passive: true });
+    surface.addEventListener('pointerenter', onPointer, { passive: true });
+    surface.addEventListener('pointermove', onPointer, { passive: true });
+    surface.addEventListener('pointerleave', resetPointer);
+    surface.addEventListener('pointercancel', resetPointer);
     window.addEventListener('blur', resetPointer);
     document.addEventListener('visibilitychange', syncAnimation);
     motion.addEventListener('change', syncAnimation);
@@ -351,7 +373,10 @@ export default function Terrain() {
       window.cancelAnimationFrame(frame);
       observer.disconnect();
       intersection.disconnect();
-      window.removeEventListener('pointermove', onPointer);
+      surface.removeEventListener('pointerenter', onPointer);
+      surface.removeEventListener('pointermove', onPointer);
+      surface.removeEventListener('pointerleave', resetPointer);
+      surface.removeEventListener('pointercancel', resetPointer);
       window.removeEventListener('blur', resetPointer);
       document.removeEventListener('visibilitychange', syncAnimation);
       motion.removeEventListener('change', syncAnimation);

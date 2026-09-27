@@ -216,7 +216,7 @@ export default function AssistantWidget() {
             <AssistantChat size={22} />
           </span>
           <div>
-            <h2 id="assistant-title">{t('Помощник Песок')}</h2>
+            <h2 id="assistant-title">{t('Помощник Terra AI')}</h2>
             <p id="assistant-subtitle">{t('Помогу разобраться в проекте')}</p>
           </div>
           <button
@@ -282,7 +282,7 @@ export default function AssistantWidget() {
               {turn.answer && (
                 <div className="assistant-message assistant-message-reply">
                   <span className="assistant-speaker">
-                    <AssistantChat size={13} /> {t('Песок · ИИ')}
+                    <AssistantChat size={13} /> {t('Terra AI · ИИ')}
                   </span>
                   <p>{turn.answer}</p>
                   {turn.truncated && (
