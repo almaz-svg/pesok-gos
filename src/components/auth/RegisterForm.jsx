@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, Check, Eye, EyeOff, Info } from 'lucide-react';
+import { ArrowUpRight, Check, Eye, EyeOff, Info } from '../icons.jsx';
 import { REGISTRATION_FIELDS, validateRegistration } from '../../lib/registration-form.js';
 
 const initialValues = { name: '', email: '', password: '', passwordConfirmation: '' };

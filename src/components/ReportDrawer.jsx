@@ -17,7 +17,7 @@ import {
   Save,
   TriangleAlert,
   X,
-} from 'lucide-react';
+} from './icons.jsx';
 import { getReport, getPlots, patchReport, photoUrl } from '../lib/data-client.js';
 import {
   STATUS_META,

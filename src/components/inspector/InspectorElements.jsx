@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Radio, RefreshCw, LoaderCircle, ArrowRight } from 'lucide-react';
+import { Radio, RefreshCw, LoaderCircle, ArrowRight } from '../icons.jsx';
 import { login } from '../../lib/data-client.js';
 import { STATUS_META } from '../../lib/domain.js';
 export function ResourceState({ resource, label, onRetry }) {

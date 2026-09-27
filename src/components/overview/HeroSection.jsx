@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, ArrowDown, Plus } from 'lucide-react';
+import { ArrowUpRight, ArrowDown, Plus } from '../icons.jsx';
 import Terrain from '../Terrain.jsx';
 export default function HeroSection() {
   return (

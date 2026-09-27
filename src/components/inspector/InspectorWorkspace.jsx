@@ -18,7 +18,7 @@ import {
   CircleHelp,
   LogOut,
   LoaderCircle,
-} from 'lucide-react';
+} from '../icons.jsx';
 import useInspectorData, { RESOURCE_LABELS } from '../../hooks/useInspectorData.js';
 import { ResourceState, LoginForm } from './InspectorElements.jsx';
 import MapPanel from './MapPanel.jsx';

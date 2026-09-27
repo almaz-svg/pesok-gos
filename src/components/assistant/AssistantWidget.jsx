@@ -1,7 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
-import { ArrowUp, ArrowUpRight, LoaderCircle, RotateCcw, Sparkles, Square, X } from 'lucide-react';
+import {
+  ArrowUp,
+  ArrowUpRight,
+  LoaderCircle,
+  RotateCcw,
+  AssistantChat,
+  Square,
+  X,
+} from '../icons.jsx';
 import { assistantClient, chatHistory, MAX_QUESTION_LENGTH } from '../../lib/assistant-client.js';
 import './assistant.css';
 
@@ -155,9 +163,9 @@ export default function AssistantWidget() {
         aria-expanded={open}
         aria-controls="site-assistant"
       >
-        <Sparkles size={23} strokeWidth={1.6} />
+        <AssistantChat size={23} />
         <span>ИИ-помощник</span>
-        <i aria-hidden="true">↗</i>
+        <ArrowUpRight className="assistant-launcher-arrow" size={18} />
       </button>
       <dialog
         id="site-assistant"
@@ -202,7 +210,7 @@ export default function AssistantWidget() {
       >
         <header className="assistant-header">
           <span className="assistant-avatar" aria-hidden="true">
-            <Sparkles size={22} />
+            <AssistantChat size={22} />
           </span>
           <div>
             <h2 id="assistant-title">Помощник Песок</h2>
@@ -270,7 +278,7 @@ export default function AssistantWidget() {
               {turn.answer && (
                 <div className="assistant-message assistant-message-reply">
                   <span className="assistant-speaker">
-                    <Sparkles size={13} /> Песок · ИИ
+                    <AssistantChat size={13} /> Песок · ИИ
                   </span>
                   <p>{turn.answer}</p>
                   {turn.truncated && (

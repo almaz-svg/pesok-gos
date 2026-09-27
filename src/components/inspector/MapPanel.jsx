@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Radio, Search, Check, ArrowUpRight, ArrowRight } from 'lucide-react';
+import { Radio, Search, Check, ArrowUpRight, ArrowRight } from '../icons.jsx';
 import LandMap from '../LandMap.jsx';
 import { ResourceState, Status } from './InspectorElements.jsx';
 import { CATEGORY_LABELS, formatDate } from '../../lib/domain.js';

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
-import { LocateFixed, Minus, Plus, RefreshCw, TriangleAlert } from 'lucide-react';
+import { LocateFixed, Minus, Plus, RefreshCw, TriangleAlert } from './icons.jsx';
 import 'leaflet/dist/leaflet.css';
 import { STATUS_META } from '../lib/domain.js';
 import './inspector.css';

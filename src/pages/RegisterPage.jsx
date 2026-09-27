@@ -1,4 +1,4 @@
-import { ArrowUpRight, Layers3, MapPinned } from 'lucide-react';
+import { ArrowUpRight, Layers3, MapPinned } from '../components/icons.jsx';
 import { Link } from 'react-router-dom';
 import RegisterForm from '../components/auth/RegisterForm.jsx';
 import useScrollReveal from '../hooks/useScrollReveal.js';
@@ -59,7 +59,7 @@ export default function RegisterPage() {
           </span>
         </div>
         <div className="auth-story-footer">
-          <Layers3 size={20} strokeWidth={1.4} />
+          <Layers3 size={20} />
           <span>Технологии на стороне земли.</span>
         </div>
       </div>

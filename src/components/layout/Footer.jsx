@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { ArrowUpRight, Layers3 } from 'lucide-react';
+import { ArrowUpRight, Layers3 } from '../icons.jsx';
 import './footer.css';
 
 const links = [
@@ -22,7 +22,7 @@ export default function Footer() {
       <div className="footer-main">
         <div className="footer-intro">
           <Link className="footer-brand" to="/" aria-label="Песок Гос — главная">
-            <Layers3 size={30} strokeWidth={1.5} aria-hidden="true" />
+            <Layers3 size={30} aria-hidden="true" />
             <span>
               песок<span className="footer-brand-dot">.</span>
               <small>ГОС</small>

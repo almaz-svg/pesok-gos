@@ -1,4 +1,4 @@
-import { ArrowUpRight, Search } from 'lucide-react';
+import { ArrowUpRight, Search } from '../icons.jsx';
 import { Status } from './InspectorElements.jsx';
 import { CATEGORY_LABELS, formatDate } from '../../lib/domain.js';
 export default function ReportsTable({ filtered, data, resources, selectReport }) {

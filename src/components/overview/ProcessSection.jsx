@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { MoveUpRight, Radio, ScanLine, Check } from 'lucide-react';
+import { MoveUpRight, Radio, ScanLine, Check } from '../icons.jsx';
 export default function ProcessSection() {
   return (
     <section className="process-section" aria-labelledby="process-title">
@@ -49,7 +49,7 @@ export default function ProcessSection() {
           >
             <div className="process-step-top">
               <span>{n}</span>
-              <Icon size={21} strokeWidth={1.4} />
+              <Icon size={21} />
             </div>
             <h3>{title}</h3>
             <p>{text}</p>

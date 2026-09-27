@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight } from '../components/icons.jsx';
 
 export default function NotFoundPage() {
   return (

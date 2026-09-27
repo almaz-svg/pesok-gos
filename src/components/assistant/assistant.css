@@ -17,8 +17,7 @@
     0 8px 34px #0005,
     0 0 0 5px #cefa6909;
 }
-.assistant-launcher i {
-  font-style: normal;
+.assistant-launcher-arrow {
   margin-left: 6px;
 }
 .assistant-dialog {
@@ -367,7 +366,7 @@
     justify-content: center;
   }
   .assistant-launcher span,
-  .assistant-launcher i {
+  .assistant-launcher-arrow {
     display: none;
   }
 }
