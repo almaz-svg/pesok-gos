@@ -117,3 +117,17 @@ export const reportTransitions: Record<ReportStatus, readonly ReportStatus[]> = 
   IN_PROGRESS: ['RESOLVED'],
   RESOLVED: [],
 };
+
+/** Public website guide; no inspector data access. POST still requires CSRF. */
+export interface AssistantStatus {
+  available: boolean;
+  csrf_token: string;
+}
+export interface AssistantChatRequest {
+  messages: { role: 'user' | 'assistant'; content: string }[];
+  page?: '/' | '/map' | '/reports' | '/register';
+}
+export interface AssistantChatResponse {
+  reply: string;
+  truncated: boolean;
+}

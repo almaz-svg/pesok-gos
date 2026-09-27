@@ -1,8 +1,10 @@
 from django.urls import path
 from . import views
+from .assistant import AssistantView
 
 urlpatterns = [
     path('health', views.HealthView.as_view()),
+    path('assistant/chat', AssistantView.as_view()),
     path('auth/csrf', views.CsrfView.as_view()),
     path('auth/login', views.LoginView.as_view()),
     path('auth/me', views.MeView.as_view()),

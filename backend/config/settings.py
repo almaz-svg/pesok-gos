@@ -77,6 +77,8 @@ if os.getenv('TRUST_PROXY', 'false').lower() == 'true':
 CSRF_FAILURE_VIEW = 'monitoring.errors.csrf_failure'
 BOT_API_KEY = os.getenv('BOT_API_KEY', '')
 BOT_TOKEN = os.getenv('BOT_TOKEN', '')
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '').strip()
+OPENAI_MODEL = os.getenv('OPENAI_MODEL', 'gpt-4.1-mini').strip() or 'gpt-4.1-mini'
 PHOTO_MAX_BYTES = 10 * 1024 * 1024
 MAP_MAX_FEATURES = 2000
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
@@ -89,5 +91,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': ['rest_framework.parsers.JSONParser'],
     'EXCEPTION_HANDLER': 'monitoring.errors.exception_handler',
     'DATETIME_FORMAT': '%Y-%m-%dT%H:%M:%SZ',
-    'DEFAULT_THROTTLE_RATES': {'login': '10/min', 'bot': '120/min'},
+    'DEFAULT_THROTTLE_RATES': {
+        'login': '10/min', 'bot': '120/min',
+        'assistant_burst': '10/min', 'assistant_daily': '100/day',
+    },
 }

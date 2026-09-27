@@ -141,7 +141,7 @@ def main():
 
                     def workflows():
                         navigate(page, "/")
-                        page.get_by_role("link", name="Открыть карту", exact=True).tap()
+                        page.locator(".hero").get_by_role("link", name="Открыть карту", exact=True).tap()
                         expect(page).to_have_url(re.compile(r"/map$"))
                         expect(page.locator(".demo-label")).to_contain_text("DEMO")
                         expect(page.get_by_role("navigation", name="Основная навигация")
@@ -192,7 +192,9 @@ def main():
                         if width == 390:
                             page.set_viewport_size({"width": 390, "height": 420})
                             comment_field = dialog.get_by_label("Комментарий инспектора", exact=True)
-                            comment_field.scroll_into_view_if_needed()
+                            # Center explicitly after resize, avoiding fractional edge clipping
+                            # while the browser settles its native nearest-edge scroll.
+                            comment_field.evaluate("el => el.scrollIntoView({block:'center',behavior:'instant'})")
                             box = comment_field.bounding_box()
                             assert box["y"] >= 0 and box["y"] + box["height"] <= 421, box
                             layout(page, width)
@@ -202,7 +204,7 @@ def main():
                         page.reload(wait_until="networkidle")
                         row = page.locator("tbody tr").filter(has_text="DEMO-2026-000007")
                         expect(row).to_contain_text("На проверке")
-                        page.get_by_role("link", name="Аналитика", exact=True).tap()
+                        page.locator(".view-tabs").get_by_role("link", name="Аналитика", exact=True).tap()
                         expect(page.locator(".analytics-panel")).to_be_visible()
                         page.get_by_role("button", name="Посмотреть обращения", exact=True).tap()
                         expect(page.get_by_label("Только просроченные", exact=True)).to_be_checked()

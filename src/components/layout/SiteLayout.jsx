@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Header from './Header.jsx';
 import Footer from './Footer.jsx';
+import AssistantWidget from '../assistant/AssistantWidget.jsx';
 
 const titles = {
   '/': 'Обзор',
@@ -31,6 +32,7 @@ export default function SiteLayout() {
         </main>
         <Footer />
       </div>
+      <AssistantWidget />
     </>
   );
 }
