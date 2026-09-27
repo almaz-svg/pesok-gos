@@ -62,6 +62,7 @@ class Report(models.Model):
     tracking = models.OneToOneField(TrackingRecord, on_delete=models.PROTECT, related_name='report')
     category = models.CharField(max_length=30, choices=Category.choices, db_index=True)
     description = models.TextField()
+    bot_result = models.JSONField(null=True, blank=True)
     latitude = models.FloatField(validators=[MinValueValidator(-90), MaxValueValidator(90)])
     longitude = models.FloatField(validators=[MinValueValidator(-180), MaxValueValidator(180)])
     plot = models.ForeignKey(LandPlot, null=True, blank=True, on_delete=models.SET_NULL, related_name='reports')

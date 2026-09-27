@@ -1,5 +1,44 @@
 // Russian source messages are stable keys; user-written report content is never translated.
 export const messages = {
+  'Ответ Telegram-бота': { kk: 'Telegram-боттың жауабы', en: 'Telegram bot response' },
+  'Предварительный анализ · @zbjer_bot': {
+    kk: 'Алдын ала талдау · @zbjer_bot',
+    en: 'Preliminary analysis · @zbjer_bot',
+  },
+  'Категория по анализу бота': {
+    kk: 'Бот талдауы бойынша санат',
+    en: 'Category suggested by the bot',
+  },
+  'Рекомендуемое ведомство': { kk: 'Ұсынылатын мекеме', en: 'Suggested authority' },
+  'Срочность по анализу бота': {
+    kk: 'Бот талдауы бойынша жеделдік',
+    en: 'Urgency suggested by the bot',
+  },
+  Повышенная: { kk: 'Жоғары', en: 'High' },
+  Обычная: { kk: 'Қалыпты', en: 'Normal' },
+  'Место по данным бота': { kk: 'Бот деректері бойынша орын', en: 'Location reported by the bot' },
+  'Какие доказательства собрать': { kk: 'Қандай дәлелдер жинау керек', en: 'Evidence to collect' },
+  'Следующий шаг': { kk: 'Келесі қадам', en: 'Next step' },
+  'Повторное обращение через {days} дн.': {
+    kk: '{days} күннен кейін қайта өтініш беру',
+    en: 'Follow up in {days} days',
+  },
+  'Подготовленные тексты': { kk: 'Дайындалған мәтіндер', en: 'Prepared drafts' },
+  'Проект официального обращения': { kk: 'Ресми өтініштің жобасы', en: 'Official report draft' },
+  'Проект повторного обращения': { kk: 'Қайталама өтініштің жобасы', en: 'Follow-up report draft' },
+  'Проект жалобы на бездействие': {
+    kk: 'Әрекетсіздік туралы шағымның жобасы',
+    en: 'Inaction complaint draft',
+  },
+  'Текст для публикации': { kk: 'Жариялауға арналған мәтін', en: 'Public statement' },
+  'Текст для социальных сетей': {
+    kk: 'Әлеуметтік желілерге арналған мәтін',
+    en: 'Social media text',
+  },
+  'Ответ бота носит справочный характер. Результат проверки фиксирует инспектор.': {
+    kk: 'Боттың жауабы анықтамалық сипатта. Тексеру нәтижесін инспектор тіркейді.',
+    en: 'The bot response is for reference. The inspector records the inspection outcome.',
+  },
   'Включить светлую тему': { kk: 'Ашық тақырыпты қосу', en: 'Switch to light theme' },
   'Включить тёмную тему': { kk: 'Қараңғы тақырыпты қосу', en: 'Switch to dark theme' },
   Вход: { kk: 'Кіру', en: 'Sign in' },

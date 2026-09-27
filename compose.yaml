@@ -18,6 +18,7 @@ services:
     env_file: .env
     environment:
       DATABASE_URL: postgresql://pesok:${POSTGRES_PASSWORD}@db:5432/pesok
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1},api
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:
@@ -43,5 +44,19 @@ services:
       timeout: 5s
       retries: 10
     restart: unless-stopped
+  bot:
+    profiles: ["telegram"]
+    build: ./bot
+    env_file: .env
+    environment:
+      DATA_MODE: api
+      API_BASE_URL: http://api:8000/api
+    volumes:
+      - bot_data:/app/data
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
 volumes:
   postgres_data:
+  bot_data:

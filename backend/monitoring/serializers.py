@@ -3,6 +3,7 @@ from collections.abc import Mapping
 from datetime import timezone as utc
 
 from django.db import models
+from django.core.validators import RegexValidator
 from rest_framework import serializers
 
 from .models import Category, Instruction, LandPlot, Report, ReportPhoto, ReportStatus, StatusHistory
@@ -48,12 +49,52 @@ class PhotoInput(StrictSerializer):
             raise serializers.ValidationError('Ожидается Telegram file_id, демонстрационные значения запрещены')
         return value
 
+class BotTextField(serializers.CharField):
+    """Bot output is bounded plain text, not a number coerced to text or rendered HTML."""
+    def __init__(self, **kwargs):
+        kwargs.setdefault('required', False)
+        kwargs.setdefault('allow_blank', True)
+        super().__init__(trim_whitespace=False, **kwargs)
+
+    def to_internal_value(self, data):
+        if not isinstance(data, str):
+            raise serializers.ValidationError('Ожидается строка')
+        return super().to_internal_value(data)
+
+class BotDaysField(serializers.IntegerField):
+    def to_internal_value(self, data):
+        if isinstance(data, bool) or not isinstance(data, int):
+            raise serializers.ValidationError('Ожидается целое число')
+        return super().to_internal_value(data)
+
+class CasePassportInput(StrictSerializer):
+    type = BotTextField(max_length=80)
+    typeLabel = BotTextField(max_length=160)
+    responsibleAuthority = BotTextField(max_length=500)
+    urgency = serializers.ChoiceField(choices=['high', 'normal'], required=False)
+    evidenceChecklist = serializers.ListField(child=BotTextField(max_length=500), max_length=20, required=False)
+    officialDraft = BotTextField(max_length=12000)
+    followUpDraft = BotTextField(max_length=12000)
+    inactivityComplaintDraft = BotTextField(max_length=12000)
+    publicText = BotTextField(max_length=8000)
+    socialText = BotTextField(max_length=4000)
+    nextAction = BotTextField(max_length=1000)
+    followUpDays = BotDaysField(min_value=1, max_value=365, required=False)
+
+class BotResultInput(StrictSerializer):
+    language = serializers.ChoiceField(choices=['ru', 'kk', 'en'], required=False)
+    location_summary = BotTextField(max_length=4000)
+    land_case_id = BotTextField(allow_blank=False, min_length=12, max_length=12,
+                               validators=[RegexValidator(r'\A[0-9a-fA-F]{12}\Z')])
+    case_passport = CasePassportInput(required=False)
+
 class CreateReportSerializer(StrictSerializer):
     telegram_user_id = TelegramUserField()
     location = LocationInput()
     photos = PhotoInput(many=True, min_length=1, max_length=3)
     description = serializers.CharField(min_length=10, max_length=3000)
     category = serializers.ChoiceField(choices=Category.choices)
+    bot_result = BotResultInput(required=False, allow_null=True)
 
     def validate_photos(self, value):
         if len({photo['telegram_file_id'] for photo in value}) != len(value):
@@ -125,7 +166,18 @@ class ReportDetailSerializer(ReportSerializer):
     history = HistorySerializer(many=True)
 
     class Meta(ReportSerializer.Meta):
-        fields = ReportSerializer.Meta.fields + ['history']
+        fields = ReportSerializer.Meta.fields + ['history', 'bot_result']
+
+class BotPhotoSerializer(PhotoSerializer):
+    class Meta(PhotoSerializer.Meta):
+        fields = PhotoSerializer.Meta.fields + ['telegram_file_id']
+
+class BotReportSerializer(ReportSerializer):
+    telegram_user_id = serializers.CharField(source='tracking.owner_telegram_user_id')
+    photos = BotPhotoSerializer(many=True)
+
+    class Meta(ReportSerializer.Meta):
+        fields = ReportSerializer.Meta.fields + ['bot_result', 'telegram_user_id']
 
 class InstructionSerializer(UTCModelSerializer):
     class Meta:
@@ -138,6 +190,10 @@ class LoginSerializer(StrictSerializer):
 
 class TrackingQuerySerializer(StrictSerializer):
     telegram_user_id = TelegramUserField()
+
+class BotReportsQuery(TrackingQuerySerializer):
+    page = serializers.IntegerField(min_value=1, required=False, default=1)
+    page_size = serializers.IntegerField(min_value=1, max_value=100, required=False, default=20)
 
 class StrictBool(serializers.Field):
     def to_internal_value(self, data):

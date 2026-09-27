@@ -28,6 +28,7 @@ import {
   formatDateTime,
 } from '../lib/domain.js';
 import './inspector.css';
+import BotResult from './BotResult.jsx';
 
 const emptyDraft = { status: '', deadline: '', plot_id: '', comment: '' };
 const EMPTY_PLOTS = [];
@@ -238,7 +239,7 @@ export default function ReportDrawer({ selection, onClose, onSaved, plots = EMPT
       if (event.key !== 'Tab') return;
       const elements = [
         ...(panelRef.current?.querySelectorAll(
-          'a[href], button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex="0"]',
+          'a[href], button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), summary, [tabindex="0"]',
         ) || []),
       ].filter((element) => element.getClientRects().length);
       const first = elements[0];
@@ -482,6 +483,7 @@ export default function ReportDrawer({ selection, onClose, onSaved, plots = EMPT
                       {record.location.latitude.toFixed(5)}, {record.location.longitude.toFixed(5)}
                     </div>
                   </section>
+                  <BotResult key={record.id} result={record.bot_result} />
                   <section className="inspector-drawer__section">
                     <div className="inspector-drawer__section-heading">
                       <h3>{t('Фото с места')}</h3>

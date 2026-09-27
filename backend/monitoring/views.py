@@ -18,6 +18,7 @@ from .errors import ApiProblem
 from .models import Instruction, Report, ReportPhoto, ReportStatus, TrackingRecord
 from .photos import fetch_photo
 from .serializers import (
+    BotReportsQuery, BotReportSerializer,
     CreateReportSerializer, InstructionSerializer, LoginSerializer, MapQuery, PatchReportSerializer,
     PlotQuery, PlotSerializer, ReportDetailSerializer, ReportQuery, ReportSerializer,
     StrictSerializer, TrackingQuerySerializer, validate_query,
@@ -105,6 +106,15 @@ class ReportView(APIView):
         serializer.is_valid(raise_exception=True)
         report = update_report(report_id, serializer.validated_data, request.user)
         return Response(ReportDetailSerializer(report).data)
+
+class BotReportsView(APIView):
+    permission_classes = [IsBot]
+    throttle_classes = [BotThrottle]
+
+    def get(self, request):
+        params = validate_query(request, BotReportsQuery)
+        reports = report_queryset().filter(tracking__owner_telegram_user_id=int(params['telegram_user_id']))
+        return paginated(request, reports, BotReportSerializer, params)
 
 class PlotsView(APIView):
     def get(self, request):

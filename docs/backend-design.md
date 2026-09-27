@@ -30,7 +30,9 @@ Plot.status и active_reports_count вычисляются из связанны
 
 Один Telegram bot token обслуживает диалог и фото. Bot-разработчик хранит BOT_TOKEN на своём сервере; Django хранит тот же token только для getFile/download. Между bot и Django используется **другой** секрет BOT_API_KEY. Ни один из них не передаётся в React или git.
 
-Все bot-запросы: `Authorization: Bearer <BOT_API_KEY>`, HTTPS в production. Этот ключ разрешает создание reports, tracking только по указанному владельцу и чтение instructions. Он не разрешает inspector GET /reports, /map, /photos или PATCH. Ключ не является login-токеном инспектора. Скомпрометированный бот может заявить произвольный telegram_user_id, поэтому доверие к нему — явная серверная граница.
+Все bot-запросы: `Authorization: Bearer <BOT_API_KEY>`, HTTPS в production. Этот ключ разрешает создание reports, чтение `/api/bot/reports` только по указанному владельцу, tracking по владельцу и чтение instructions. Он не разрешает inspector GET /reports, /map, /photos или PATCH. Ключ не является login-токеном инспектора. Скомпрометированный бот может заявить произвольный telegram_user_id, поэтому доверие к нему — явная серверная граница.
+
+Необязательный `bot_result` в POST сохраняет предварительный анализ вместе с обращением. Inspector detail возвращает его в карточку; bot-only `/api/bot/reports?telegram_user_id=…` возвращает постраничный список владельца с паспортом и Telegram file_id для кабинета. Ограничения и настройка: [Telegram → сайт](telegram-integration.md). Обновите схему миграцией `0002_report_bot_result`.
 
 ### POST /api/reports
 

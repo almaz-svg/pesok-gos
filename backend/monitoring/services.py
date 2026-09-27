@@ -60,7 +60,8 @@ def create_report(data, key):
             raise ApiProblem('idempotency_conflict', 'Этот ключ уже использован для другого обращения', 409)
         return record.response
     tracking = TrackingRecord.allocate(int(data['telegram_user_id']))
-    report = Report.objects.create(tracking=tracking, category=data['category'], description=data['description'], **data['location'])
+    report = Report.objects.create(tracking=tracking, category=data['category'], description=data['description'],
+                                   bot_result=data.get('bot_result'), **data['location'])
     ReportPhoto.objects.bulk_create([
         ReportPhoto(report=report, ordinal=index, telegram_file_id=photo['telegram_file_id'])
         for index, photo in enumerate(data['photos'])

@@ -10,6 +10,27 @@ export type Polygon = { type: 'Polygon'; coordinates: Position[][] };
 export type MultiPolygon = { type: 'MultiPolygon'; coordinates: Position[][][] };
 export interface Location { latitude: number; longitude: number }
 export interface Photo { id: UUID; url: string }
+/** Bot-generated plain text. Render as text; this is not an inspector decision. */
+export interface CasePassport {
+  type?: string; // max 80
+  typeLabel?: string; // max 160
+  responsibleAuthority?: string; // max 500
+  urgency?: 'high' | 'normal';
+  evidenceChecklist?: string[]; // max 20 items, 500 characters each
+  officialDraft?: string; // max 12000
+  followUpDraft?: string; // max 12000
+  inactivityComplaintDraft?: string; // max 12000
+  publicText?: string; // max 8000
+  socialText?: string; // max 4000
+  nextAction?: string; // max 1000
+  followUpDays?: number; // integer 1..365
+}
+export interface BotResult {
+  language?: 'ru' | 'kk' | 'en';
+  location_summary?: string; // max 4000
+  land_case_id?: string; // exactly 12 hexadecimal characters
+  case_passport?: CasePassport;
+}
 export interface PlotRef { id: UUID; cadastral_number: string }
 export interface Plot extends PlotRef {
   area_ha: number;
@@ -44,7 +65,7 @@ export interface HistoryEvent {
   actor: { type: 'BOT' | 'INSPECTOR' | 'SYSTEM'; label: string };
   created_at: string;
 }
-export interface ReportDetail extends Report { history: HistoryEvent[] }
+export interface ReportDetail extends Report { history: HistoryEvent[]; bot_result: BotResult | null }
 export interface PatchReport {
   version: number;
   status?: ReportStatus;
@@ -91,7 +112,20 @@ export interface CreateReport {
   photos: { telegram_file_id: string }[];
   description: string;
   category: Category;
+  bot_result?: BotResult | null;
 }
+/** GET /api/bot/reports; Bearer bot credentials, never inspector/browser access. */
+export interface BotReportsQuery {
+  telegram_user_id: string;
+  page?: number; // defaults to 1
+  page_size?: number; // 1..100, defaults to 20
+}
+export interface BotReport extends Report {
+  telegram_user_id: string;
+  bot_result: BotResult | null;
+  photos: (Photo & { telegram_file_id: string })[];
+}
+export type BotReportsResponse = Page<BotReport>;
 export interface CreateReportResponse {
   id: UUID;
   tracking_number: string;

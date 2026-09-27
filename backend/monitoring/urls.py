@@ -10,6 +10,7 @@ urlpatterns = [
     path('auth/me', views.MeView.as_view()),
     path('auth/logout', views.LogoutView.as_view()),
     path('reports', views.ReportsView.as_view()),
+    path('bot/reports', views.BotReportsView.as_view()),
     path('reports/<uuid:report_id>', views.ReportView.as_view()),
     path('plots', views.PlotsView.as_view()),
     path('plots/<uuid:plot_id>', views.PlotView.as_view()),
