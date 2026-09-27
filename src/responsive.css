@@ -1,0 +1,344 @@
+/* Keep clipped table content, including screen-reader labels, in its own scroll area. */
+.table-container {
+  position: relative;
+  max-width: 100%;
+}
+.workspace-title,
+.not-found-page h1 {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.section-heading > div {
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 850px) {
+  .brand,
+  .header-nav a,
+  .header-register,
+  .header-cta,
+  .hero-bottom-nav a,
+  .scroll-cue,
+  .process-intro > a,
+  .view-tabs > a,
+  .rail-all,
+  .data-footer button,
+  .extra-filters label,
+  .extra-filters button,
+  .auth-back,
+  .auth-signin a,
+  .auth-text-link,
+  .analytics-callout button {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .header-cta,
+  .icon-button,
+  .sync-status button,
+  .search-field button,
+  .land-map__controls button,
+  .inspector-drawer__close {
+    min-width: 44px;
+    min-height: 44px;
+    flex-shrink: 0;
+  }
+  .header-cta {
+    justify-content: center;
+  }
+  .header-nav a {
+    min-width: 44px;
+    justify-content: center;
+  }
+  .table-report {
+    min-height: 44px;
+  }
+  .help-details summary {
+    min-height: 44px;
+  }
+  .sync-status button {
+    display: inline-grid;
+    place-items: center;
+  }
+  .search-field {
+    min-width: 0;
+  }
+  .search-field input,
+  .status-select select,
+  .login-card input,
+  .auth-input-wrap input,
+  .inspector-drawer__form input,
+  .inspector-drawer__form select,
+  .inspector-drawer__form textarea {
+    font-size: 16px;
+    min-height: 44px;
+  }
+  .search-field input::placeholder {
+    font-size: 12px;
+  }
+  .status-select {
+    min-width: 0;
+  }
+  .status-select select {
+    max-width: 100%;
+  }
+  .extra-filters label {
+    gap: 10px;
+  }
+  .extra-filters input[type='checkbox'] {
+    width: 22px;
+    height: 22px;
+  }
+  .extra-filters {
+    font-size: 12px;
+  }
+  .button,
+  .inspector-drawer__save {
+    min-height: 44px;
+  }
+  .password-toggle {
+    width: 44px;
+    height: 44px;
+    top: 3px;
+    right: 3px;
+  }
+  .auth-input-wrap input {
+    min-height: 50px;
+  }
+  .auth-input-wrap:has(.password-toggle) input {
+    padding-right: 52px;
+  }
+  .inspector-drawer__body {
+    min-height: 0;
+  }
+  .inspector-drawer__status-row {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 600px) {
+  .site-header {
+    column-gap: 8px;
+  }
+  .header-actions {
+    gap: 8px;
+  }
+  .header-nav {
+    gap: 22px;
+  }
+  .header-nav a {
+    font-size: 12px;
+  }
+  .header-register {
+    font-size: 11px;
+  }
+  .workspace-title {
+    line-height: 1.16;
+  }
+  .workspace-context p,
+  .user-label {
+    font-size: 11px;
+  }
+  .demo-label {
+    font-size: 9px;
+  }
+  .stat-top {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  .view-tabs > a {
+    font-size: 11px;
+    padding: 9px 8px;
+    gap: 6px;
+  }
+  .sync-status {
+    font-size: 10px;
+  }
+  .filter-toolbar {
+    gap: 8px;
+  }
+  .filter-actions {
+    min-width: 0;
+  }
+  .status-select select {
+    width: 100%;
+    padding-left: 8px;
+    padding-right: 22px;
+  }
+  .map-legend {
+    font-size: 8px;
+    flex-wrap: wrap;
+    max-width: calc(100% - 18px);
+  }
+  .report-preview p {
+    font-size: 12px;
+  }
+  .preview-top,
+  .preview-bottom,
+  .rail-all {
+    font-size: 11px;
+  }
+  .preview-bottom {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .status {
+    font-size: 10px;
+  }
+  .data-footer {
+    font-size: 8px;
+  }
+  .data-footer > span {
+    line-height: 1.7;
+  }
+  .data-footer button {
+    font-size: 12px;
+  }
+  .extra-filters {
+    gap: 5px;
+  }
+  .help-details summary {
+    font-size: 12px;
+  }
+  .help-details > div {
+    font-size: 12px;
+  }
+  .process-step p {
+    font-size: 12px;
+  }
+  .hero-footer {
+    left: 16px;
+    right: 16px;
+    gap: 6px;
+  }
+  .hero-bottom-nav {
+    gap: 0;
+    padding: 3px;
+  }
+  .hero-bottom-nav a {
+    padding: 8px;
+    gap: 6px;
+    font-size: 10px;
+  }
+  .scroll-cue {
+    font-size: 10px;
+  }
+  .terrain-coordinate {
+    bottom: 191px;
+    font-size: 7px;
+  }
+  .terrain-coordinate > span:last-child {
+    font-size: 6px;
+  }
+  .hero-side-note {
+    bottom: 129px;
+    left: 24px;
+    right: auto;
+  }
+  .tiny-index {
+    font-size: 7px;
+  }
+  .hero-side-note p {
+    font-size: 17px;
+  }
+  .hero-description {
+    font-size: 12px;
+  }
+  .inspector-drawer__form label {
+    font-size: 12px;
+  }
+  .inspector-drawer__header {
+    padding: 18px 16px;
+  }
+  .inspector-drawer__body {
+    padding: 20px 16px max(28px, env(safe-area-inset-bottom));
+  }
+  .inspector-drawer__date {
+    font-size: 11px;
+  }
+  .inspector-drawer__description {
+    font-size: 14px;
+  }
+  .inspector-drawer__save {
+    font-size: 13px;
+  }
+  .chart-row {
+    grid-template-columns: minmax(95px, 1.3fr) minmax(0, 1fr) 20px;
+    font-size: 11px;
+  }
+  .chart-row > span {
+    overflow-wrap: anywhere;
+  }
+
+  /* The same semantic table becomes stacked records, with every field visible. */
+  .table-container {
+    overflow: visible;
+    min-height: 0;
+  }
+  .table-container table,
+  .table-container tbody {
+    display: block;
+    width: 100%;
+    white-space: normal;
+  }
+  .table-container thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .table-container tbody tr {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 14px 12px;
+    padding: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .table-container td {
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+  .table-container td:first-child {
+    grid-column: 1 / -1;
+    padding-right: 48px;
+  }
+  .table-container .table-plot {
+    grid-column: 1 / -1;
+    font-size: 12px !important;
+  }
+  .table-container [data-label]::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 5px;
+    font-size: 10px;
+    color: #91a684;
+  }
+  .table-container .table-report {
+    min-height: 44px;
+    width: 100%;
+    font-size: 12px;
+    text-align: left;
+  }
+  .table-container td small {
+    font-size: 11px;
+  }
+  .table-container .status {
+    font-size: 10px;
+    white-space: normal;
+    max-width: 100%;
+    line-height: 1.5;
+  }
+  .table-container .table-open {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+  }
+}

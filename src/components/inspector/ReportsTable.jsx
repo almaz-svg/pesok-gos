@@ -4,38 +4,50 @@ import { CATEGORY_LABELS, formatDate } from '../../lib/domain.js';
 export default function ReportsTable({ filtered, data, resources, selectReport }) {
   return (
     <div className="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Обращение / категория</th>
-            <th>Участок</th>
-            <th>Статус</th>
-            <th>Контрольный срок</th>
-            <th>
+      <table role="table" aria-label="Обращения граждан">
+        <thead role="rowgroup">
+          <tr role="row">
+            <th scope="col" role="columnheader">
+              Обращение / категория
+            </th>
+            <th scope="col" role="columnheader">
+              Участок
+            </th>
+            <th scope="col" role="columnheader">
+              Статус
+            </th>
+            <th scope="col" role="columnheader">
+              Контрольный срок
+            </th>
+            <th scope="col" role="columnheader">
               <span className="sr-only">Открыть</span>
             </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody role="rowgroup">
           {filtered.reports.map((report) => (
-            <tr key={report.id}>
-              <td>
+            <tr key={report.id} role="row">
+              <td role="cell">
                 <button className="table-report" onClick={() => selectReport(report.id)}>
                   {report.tracking_number}
                   <small>{CATEGORY_LABELS[report.category]}</small>
                 </button>
               </td>
-              <td className="table-plot">
+              <td className="table-plot" data-label="Участок" role="cell">
                 {report.plot?.cadastral_number || 'Участок не привязан'}
               </td>
-              <td>
+              <td data-label="Статус" role="cell">
                 <Status status={report.status} />
               </td>
-              <td className={report.is_overdue ? 'overdue-date' : ''}>
+              <td
+                className={report.is_overdue ? 'overdue-date' : ''}
+                data-label="Контрольный срок"
+                role="cell"
+              >
                 {report.deadline ? formatDate(report.deadline) : 'Не назначен'}
                 {report.is_overdue && <small>Просрочено</small>}
               </td>
-              <td>
+              <td className="table-open" role="cell">
                 <button
                   className="icon-button"
                   aria-label={`Открыть ${report.tracking_number}`}

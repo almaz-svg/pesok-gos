@@ -7,6 +7,7 @@ import App from './App.jsx';
 import './styles.css';
 import './routing.css';
 import './motion.css';
+import './responsive.css';
 
 class ErrorBoundary extends React.Component {
   state = { error: null };
