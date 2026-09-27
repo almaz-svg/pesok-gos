@@ -79,12 +79,12 @@ def main():
                         run(f'{theme}-{width}-{index}',page,layout)
                 def state():
                     goto(page,'/register')
-                    page.locator('#register-name').fill('Мой черновик')
+                    page.locator('#register-username').fill('draft-login')
                     page.locator('#register-email').fill('draft@example.com')
                     page.locator('.theme-toggle').focus()
                     page.keyboard.press('Enter')
                     expect(page.locator('html')).to_have_attribute('data-theme','light')
-                    expect(page.locator('#register-name')).to_have_value('Мой черновик')
+                    expect(page.locator('#register-username')).to_have_value('draft-login')
                     for lang,label in [('kk','Қараңғы тақырыпты қосу'),('en','Switch to dark theme'),('ru','Включить тёмную тему')]:
                         page.locator('.language-trigger').click()
                         page.locator(f'.language-menu [lang="{lang}"]').click()

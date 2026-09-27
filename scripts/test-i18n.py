@@ -139,10 +139,10 @@ def main():
             page=context.new_page()
             def workflow():
                 goto(page,'/register')
-                page.locator('#register-name').fill('Тестовый пользователь')
+                page.locator('#register-username').fill('test-login')
                 page.locator('#register-email').fill('test@example.com')
                 switch(page,'kk')
-                expect(page.locator('#register-name')).to_have_value('Тестовый пользователь')
+                expect(page.locator('#register-username')).to_have_value('test-login')
                 page.locator('.auth-submit').click()
                 expect(page.locator('#register-password-error')).to_contain_text('Құпиясөз')
                 switch(page,'en')

@@ -50,18 +50,14 @@ export const messages = {
     kk: 'Карта, өтініштер және тексеру нәтижелері — сіздің жұмыс кеңістігіңізде.',
     en: 'Your map, reports and inspection results — all in your workspace.',
   },
-  'Введите имя пользователя': { kk: 'Пайдаланушы атын енгізіңіз', en: 'Enter your username' },
+  'Введите логин': { kk: 'Логинді енгізіңіз', en: 'Enter your login' },
   'Введите пароль': { kk: 'Құпиясөзді енгізіңіз', en: 'Enter your password' },
-  'Укажите имя пользователя.': { kk: 'Пайдаланушы атын көрсетіңіз.', en: 'Enter your username.' },
-  'Имя пользователя слишком длинное.': {
-    kk: 'Пайдаланушы аты тым ұзын.',
-    en: 'The username is too long.',
-  },
+  'Укажите логин.': { kk: 'Логинді көрсетіңіз.', en: 'Enter your login.' },
   'Введите пароль.': { kk: 'Құпиясөзді енгізіңіз.', en: 'Enter your password.' },
   'Пароль слишком длинный.': { kk: 'Құпиясөз тым ұзын.', en: 'The password is too long.' },
   'Неверный логин или пароль': {
     kk: 'Логин немесе құпиясөз қате',
-    en: 'Incorrect username or password',
+    en: 'Incorrect login or password',
   },
   'Нет прав инспектора': {
     kk: 'Инспектор құқықтары жоқ',
@@ -77,7 +73,7 @@ export const messages = {
   },
   'В деморежиме вход в аккаунт отключён. Демо-панель доступна без логина и пароля.': {
     kk: 'Демо-режимде аккаунтқа кіру өшірілген. Демо-панельге логин мен құпиясөзсіз кіруге болады.',
-    en: 'Account sign-in is disabled in demo mode. You can explore the demo workspace without a username or password.',
+    en: 'Account sign-in is disabled in demo mode. You can explore the demo workspace without a login or password.',
   },
   'Открыть демо-панель': { kk: 'Демо-панельді ашу', en: 'Open demo workspace' },
   'Нет аккаунта?': { kk: 'Аккаунтыңыз жоқ па?', en: "Don't have an account?" },
@@ -209,9 +205,9 @@ export const messages = {
     kk: 'Аты-жөні',
     en: 'Name',
   },
-  'Как к вам обращаться': {
-    kk: 'Сізге қалай жүгінуге болады',
-    en: 'What should we call you?',
+  'Придумайте логин': {
+    kk: 'Логин ойлап табыңыз',
+    en: 'Choose a login',
   },
   Пароль: {
     kk: 'Құпиясөз',
@@ -237,9 +233,9 @@ export const messages = {
     kk: 'Аккаунт ашу',
     en: 'Create account',
   },
-  'Начните с простого — расскажите немного о себе.': {
-    kk: 'Алдымен өзіңіз туралы қысқаша айтып беріңіз.',
-    en: 'Start with the basics — tell us a little about yourself.',
+  'Укажите логин, email и пароль.': {
+    kk: 'Логинді, email мен құпиясөзді көрсетіңіз.',
+    en: 'Enter your login, email and password.',
   },
   'Форма заполнена верно': {
     kk: 'Форма дұрыс толтырылды',
@@ -317,9 +313,9 @@ export const messages = {
     kk: 'Әкімші берген аккаунтты пайдаланыңыз.',
     en: 'Use the account provided by your administrator.',
   },
-  'Имя пользователя': {
-    kk: 'Пайдаланушы аты',
-    en: 'Username',
+  Логин: {
+    kk: 'Логин',
+    en: 'Login',
   },
   'Входим…': {
     kk: 'Кіру орындалуда…',
@@ -1253,7 +1249,7 @@ export const messages = {
   },
   'Заполните логин и пароль': {
     kk: 'Логин мен құпиясөзді толтырыңыз',
-    en: 'Enter your username and password',
+    en: 'Enter your login and password',
   },
   'Новый учебный сигнал из демонстрации Telegram-бота. Проверьте сведения, выберите участок и назначьте первичный осмотр. Все данные вымышлены.':
     {
@@ -1348,17 +1344,9 @@ export const messages = {
     kk: 'Басқа',
     en: 'Other',
   },
-  'Укажите ваше имя.': {
-    kk: 'Аты-жөніңізді көрсетіңіз.',
-    en: 'Enter your name.',
-  },
-  'Введите не менее 2 символов.': {
-    kk: 'Кемінде 2 таңба енгізіңіз.',
-    en: 'Enter at least 2 characters.',
-  },
-  'Имя должно быть не длиннее 150 символов.': {
-    kk: 'Аты-жөні 150 таңбадан аспауы керек.',
-    en: 'Your name must be no longer than 150 characters.',
+  'Логин должен быть не длиннее 150 символов.': {
+    kk: 'Логин 150 таңбадан аспауы керек.',
+    en: 'Your login must be no longer than 150 characters.',
   },
   'Укажите email.': {
     kk: 'Email көрсетіңіз.',

@@ -86,7 +86,7 @@ export default function LoginForm({ destination, onLogin }) {
       >
         <fieldset disabled={busy || !canSignIn}>
           <div className="auth-field">
-            <label htmlFor="login-username">{t('Имя пользователя')}</label>
+            <label htmlFor="login-username">{t('Логин')}</label>
             <div className={`auth-input-wrap ${errors.username ? 'has-error' : ''}`}>
               <input
                 id="login-username"
@@ -95,7 +95,7 @@ export default function LoginForm({ destination, onLogin }) {
                 autoCapitalize="none"
                 spellCheck={false}
                 maxLength={150}
-                placeholder={t('Введите имя пользователя')}
+                placeholder={t('Введите логин')}
                 value={values.username}
                 required
                 aria-invalid={Boolean(errors.username)}

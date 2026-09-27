@@ -133,7 +133,7 @@ def main():
                     page.locator('.language-menu [lang="en"]').click()
                     expect(page.locator('#login-password')).to_have_value(' pass ')
                     page.locator('.login-form button[type="submit"]').click()
-                    expect(page.locator('.login-error')).to_have_text('Incorrect username or password')
+                    expect(page.locator('.login-error')).to_have_text('Incorrect login or password')
                     expect(page.locator('.login-error')).to_be_focused()
                     expect(page.locator('#login-password')).to_have_value('')
                     assert state['posts'][-1]=={'username':'inspector','password':' pass '}

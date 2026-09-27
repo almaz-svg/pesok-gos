@@ -1,12 +1,11 @@
-export const REGISTRATION_FIELDS = ['name', 'email', 'password', 'passwordConfirmation'];
+export const REGISTRATION_FIELDS = ['username', 'email', 'password', 'passwordConfirmation'];
 
 export function validateRegistration(values) {
   const errors = {};
-  const name = values.name.trim();
+  const username = values.username.trim();
   const email = values.email.trim();
-  if (!name) errors.name = 'Укажите ваше имя.';
-  else if (name.length < 2) errors.name = 'Введите не менее 2 символов.';
-  else if (name.length > 150) errors.name = 'Имя должно быть не длиннее 150 символов.';
+  if (!username) errors.username = 'Укажите логин.';
+  else if (username.length > 150) errors.username = 'Логин должен быть не длиннее 150 символов.';
 
   if (!email) errors.email = 'Укажите email.';
   else if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))

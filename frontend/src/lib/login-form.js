@@ -11,8 +11,9 @@ export function authPath(page, destination) {
 
 export function validateLogin({ username, password }) {
   const errors = {};
-  if (!username.trim()) errors.username = 'Укажите имя пользователя.';
-  else if (username.trim().length > 150) errors.username = 'Имя пользователя слишком длинное.';
+  if (!username.trim()) errors.username = 'Укажите логин.';
+  else if (username.trim().length > 150)
+    errors.username = 'Логин должен быть не длиннее 150 символов.';
   if (!password) errors.password = 'Введите пароль.';
   else if (password.length > 4096) errors.password = 'Пароль слишком длинный.';
   return errors;

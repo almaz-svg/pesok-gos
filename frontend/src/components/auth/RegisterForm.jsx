@@ -6,13 +6,13 @@ import { REGISTRATION_FIELDS, validateRegistration } from '../../lib/registratio
 import { authPath } from '../../lib/login-form.js';
 import AuthTabs from './AuthTabs.jsx';
 
-const initialValues = { name: '', email: '', password: '', passwordConfirmation: '' };
+const initialValues = { username: '', email: '', password: '', passwordConfirmation: '' };
 const fields = [
   {
-    name: 'name',
-    label: 'Имя',
-    placeholder: 'Как к вам обращаться',
-    autoComplete: 'name',
+    name: 'username',
+    label: 'Логин',
+    placeholder: 'Придумайте логин',
+    autoComplete: 'username',
     maxLength: 150,
   },
   {
@@ -56,7 +56,7 @@ export default function RegisterForm() {
   useEffect(() => {
     if (validated) resultRef.current?.focus();
     else if (returningToForm.current) {
-      formRef.current?.elements.namedItem('name')?.focus();
+      formRef.current?.elements.namedItem('username')?.focus();
       returningToForm.current = false;
     }
   }, [validated]);
@@ -82,7 +82,7 @@ export default function RegisterForm() {
       <div className="register-card-heading">
         <span className="auth-eyebrow">{t('ЛИЧНЫЙ АККАУНТ')}</span>
         <h2 id="register-form-title">{t('Создать аккаунт')}</h2>
-        <p>{t('Начните с простого — расскажите немного о себе.')}</p>
+        <p>{t('Укажите логин, email и пароль.')}</p>
       </div>
       {validated ? (
         <div className="registration-result" tabIndex={-1} ref={resultRef} role="status">
@@ -132,8 +132,8 @@ export default function RegisterForm() {
                       type={isPassword && visible[field.name] ? 'text' : field.type || 'text'}
                       value={values[field.name]}
                       autoComplete={field.autoComplete}
-                      autoCapitalize={field.name === 'name' ? 'words' : 'none'}
-                      spellCheck={field.name === 'name'}
+                      autoCapitalize="none"
+                      spellCheck={false}
                       maxLength={field.maxLength}
                       placeholder={t(field.placeholder)}
                       required
