@@ -2,6 +2,14 @@
 
 Inspector Web (React) → Django REST Framework → PostgreSQL. Отдельный Telegram-бот отправляет обращения в тот же API.
 
+## Структура репозитория
+
+- `backend/` — Django/DRF, миграции и серверные тесты.
+- `frontend/` — React/Vite, ресурсы, npm-зависимости и frontend-тесты.
+- `contracts/` — общий API-контракт и примеры данных.
+- `docs/` — документация всей команды.
+- Корневые `compose.yaml` и `.env` — запуск React, API и PostgreSQL; `frontend/.env` — только публичные настройки React при разработке.
+
 ## Реализовано
 
 Backend по контракту v0.1: session login/CSRF, отдельный ключ бота, создание обращений с идемпотентностью, карта GeoJSON, карточки и списки, смена статуса/срока/участка с историей и контролем версии, фото-прокси, tracking, инструкции, статистика. Миграции, seed и тесты включены.
@@ -15,17 +23,19 @@ Telegram-диалог и production deployment ещё не выполнены. �
 Требуется Node.js 22.12+:
 
 ```powershell
-npm ci
-npm run dev
+npm --prefix frontend ci
+npm --prefix frontend run dev
 ```
 
-Открыть `http://localhost:5173`. Сборка — `npm run build`, тесты — `npm test`, форматирование — `npm run format:check`. Для подключения бэкенда задать `VITE_DATA_MODE=api` в `.env` и перезапустить Vite. Запросы `/api` проксируются на `http://localhost:8000`.
+Команды выполняются из корня репозитория. Открыть `http://localhost:5173`. Сборка — `npm --prefix frontend run build`, тесты — `npm --prefix frontend test`, форматирование — `npm --prefix frontend run format:check`. Для подключения бэкенда скопировать `frontend/.env.example` в `frontend/.env`, задать в нём `VITE_DATA_MODE=api` и перезапустить Vite. Корневой `.env` остаётся настройками Django/Compose. Запросы `/api` проксируются на `http://localhost:8000`.
 
 [Запуск frontend, демо и подключение API](docs/frontend.md).
 
 На всех страницах доступны ИИ-помощник и Footer с навигацией. Для ответов помощника запустите Django и задайте `OPENAI_API_KEY` в серверном `.env`; модель по умолчанию — `gpt-4.1-mini`. Ссылка на платформу не заменяет секретный API-ключ. Без настройки виджет показывает состояние недоступности. [Подключение помощника и браузерные проверки](docs/frontend.md#ии-помощник-и-footer).
 
-## Запуск через Docker (PowerShell)
+## Запуск полного локального стенда через Docker (PowerShell)
+
+Compose собирает React в режиме API и раздаёт его через Nginx на `http://localhost:8080`. Запросы `/api` идут через тот же адрес в Django; PostgreSQL работает внутри сети Compose.
 
 Из корня репозитория:
 
@@ -33,14 +43,14 @@ npm run dev
 Copy-Item .env.example .env
 # В .env замените DJANGO_SECRET_KEY, POSTGRES_PASSWORD и BOT_API_KEY.
 # Для пароля PostgreSQL используйте URL-safe символы, например случайный hex.
-docker compose up --build -d
+docker compose up --build -d --wait
 docker compose exec api python manage.py create_inspector --username inspector
 docker compose exec api python manage.py seed_demo --telegram-user-id 123456789
 ```
 
 Команда create_inspector интерактивно запрашивает пароль. Для автоматизации допустим `INSPECTOR_PASSWORD` в окружении процесса; пароль не передавать аргументом командной строки. Повторный запуск не сбрасывает существующий пароль.
 
-API: `http://localhost:8000/api`, health: `http://localhost:8000/api/health`. PostgreSQL доступен только внутри compose-сети; данные в volume. Seed не удаляет live-записи и не перезаписывает отредактированные данные. Seed без `--telegram-file-id` создаёт обращения без фотографий; настоящее фото можно добавить при первом seed этим флагом либо отправить новое обращение через API/бот.
+Готовая панель: `http://localhost:8080/map`. Прямой API для разработки: `http://localhost:8000/api`, health: `http://localhost:8080/api/health`. Логин инспектора — `inspector`; пароль задаётся при `create_inspector` или через `INSPECTOR_PASSWORD` в локальном `.env`. PostgreSQL доступен только внутри compose-сети; данные в volume. Seed не удаляет live-записи и не перезаписывает отредактированные данные. Seed без `--telegram-file-id` добавляет к обращениям явно подписанные примерные PNG-изображения. Они нужны только для проверки карточки и фото-прокси; настоящие снимки появляются через Telegram с реальным `file_id` и настроенным `BOT_TOKEN`.
 
 Seed: 55 участков, 20 обращений (10 violation, 5 inspection, 5 resolved), 10 заявлений, 3 инструкции. Участки: 10 violation, 5 inspection, 40 normal — статусы вычисляются из обращений. Границы вымышленные.
 

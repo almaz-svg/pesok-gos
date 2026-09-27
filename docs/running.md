@@ -42,7 +42,7 @@ if (!mapResponse.ok) throw await mapResponse.json();
 const map = await mapResponse.json();
 ```
 
-В `.env` React нет BOT_API_KEY/BOT_TOKEN. Для локальной разработки React использует `http://localhost:5173`, API — `http://localhost:8000`. Если порт другой, измените CORS_ALLOWED_ORIGINS и CSRF_TRUSTED_ORIGINS в backend `.env`.
+В `frontend/.env` React нет BOT_API_KEY/BOT_TOKEN. Корневой `.env` используется Django/Compose. Для локальной разработки React использует `http://localhost:5173`, API — `http://localhost:8000`. Если порт другой, измените CORS_ALLOWED_ORIGINS и CSRF_TRUSTED_ORIGINS в backend `.env`.
 
 ## Проверка фото и полного сценария
 
@@ -57,7 +57,7 @@ const map = await mapResponse.json();
 
 ## Production
 
-Compose-файл — локальный стенд, API порт привязан к loopback. Для production нужен HTTPS reverse proxy/hosting. Базовые настройки:
+Compose-файл — локальный стенд: панель на `http://localhost:8080`, прямой API на `http://localhost:8000`; оба порта привязаны к loopback. Для production нужен HTTPS reverse proxy/hosting. Базовые настройки:
 
 - DEBUG=false; новые случайные DJANGO_SECRET_KEY, BOT_API_KEY и пароль БД; настоящий BOT_TOKEN в secret store.
 - DATABASE_URL на PostgreSQL; ALLOWED_HOSTS — точный hostname; CORS/CSRF origins — точные HTTPS origins.

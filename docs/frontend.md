@@ -4,9 +4,12 @@ React 19, Vite 7, JavaScript и Leaflet. Интерфейс включает п�
 
 ## Запуск
 
-Требуется Node.js 22.12+ (проверено на Node.js 24).
+Для проверки собранного приложения вместе с Django и PostgreSQL выполните из корня `docker compose up --build -d --wait` и откройте `http://localhost:8080/map`. Образ frontend собирается с `VITE_DATA_MODE=api`; Nginx раздаёт приложение и проксирует `/api` в Django. На чистой базе создайте инспектора и выполните `seed_demo` по командам в корневом README.
+
+Требуется Node.js 22.12+ (проверено на Node.js 24). Все файлы приложения находятся в `frontend/`. Ниже пути `src/`, `test/`, `public/` и конфигурации указаны относительно этой папки; общие `docs/` и `contracts/` остаются в корне репозитория.
 
 ```powershell
+cd frontend
 npm ci
 npm run dev
 ```
@@ -18,7 +21,9 @@ npm run build
 npm run preview
 ```
 
-`npm test` запускает тесты доменной логики и HTTP-клиента.
+`npm test` запускает тесты доменной логики и HTTP-клиента. Все npm-команды в этой инструкции выполняются из `frontend/`; из корня используйте `npm --prefix frontend ...`. Сборка создаётся в `frontend/dist/`. GitHub Actions выполняет тесты, проверку форматирования и сборку из `frontend/`.
+
+Python-команды для `scripts/` и `backend/` ниже выполняются из корня репозитория, в отдельном терминале. Серверные переменные помощника находятся в корневом `.env.example`.
 
 ## Страницы и маршрутизация
 
@@ -129,7 +134,7 @@ Footer содержит описание проекта, ссылки на ра�
 python -m pip install playwright
 python -m playwright install chromium
 npm run dev
-# В другом терминале:
+# В другом терминале, из корня репозитория:
 python scripts/test-mobile.py --base http://localhost:5173
 ```
 
@@ -141,12 +146,14 @@ python scripts/test-mobile.py --base http://localhost:5173
 
 ## Подключение Django
 
-Скопировать `.env.example` в `.env` и задать:
+В папке `frontend/` скопировать `.env.example` в `.env` и задать (полные пути: `frontend/.env.example` → `frontend/.env`):
 
 ```dotenv
 VITE_DATA_MODE=api
 VITE_API_BASE_URL=/api
 ```
+
+Корневой `.env` предназначен для Django/Compose и не загружается Vite. Если раньше VITE_DATA_MODE/VITE_API_BASE_URL были заданы там, перенесите только эти публичные значения в `frontend/.env`; серверные секреты не копируйте.
 
 Перезапустить Vite. В development `/api` проксируется на `http://localhost:8000`; при другом адресе изменить `server.proxy` в `vite.config.js`. В production настроить reverse proxy `/api` на Django либо указать полный URL API до сборки. При разных origin сервер должен разрешать точный origin frontend, credentialed CORS и CSRF trusted origins. Предпочтителен общий origin.
 
@@ -164,6 +171,6 @@ VITE_API_BASE_URL=/api
 
 ## Границы реализации
 
-Репозиторий содержит frontend, Django API, миграции PostgreSQL и общий контракт. Backend запускается отдельно по инструкции в README; frontend по умолчанию использует demo. Реальный Telegram-диалог и публичный хостинг пока не настроены. Каталог `dist` после сборки готов для размещения на статическом хостинге. Реальные кадастровые сведения и государственные интеграции здесь не публикуются.
+Репозиторий содержит frontend, Django API, миграции PostgreSQL и общий контракт. Backend запускается отдельно по инструкции в README; frontend по умолчанию использует demo. Реальный Telegram-диалог и публичный хостинг пока не настроены. Каталог `frontend/dist` после сборки готов для размещения на статическом хостинге. Реальные кадастровые сведения и государственные интеграции здесь не публикуются.
 
 Рельеф первого экрана — декоративная графика, а не топографические данные Туркестана. Анимация останавливается вне экрана, на скрытой вкладке и при `prefers-reduced-motion`. Карта и карточки доступны с клавиатуры; мобильная карточка занимает всю ширину экрана.

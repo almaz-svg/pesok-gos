@@ -10,6 +10,7 @@ from monitoring.models import (
     LandPlot, Report, ReportPhoto, StatusHistory, TrackingRecord,
 )
 from monitoring.services import snapshot
+from monitoring.photos import DEMO_PHOTO_FILE_ID
 
 def demo_id(name):
     return uuid.uuid5(uuid.NAMESPACE_URL, f'https://pesok-gos.invalid/demo/{name}')
@@ -41,7 +42,10 @@ class Command(BaseCommand):
             })
             plots.append(plot)
         for index in range(20):
-            if Report.objects.filter(pk=demo_id(f'report/{index}')).exists():
+            existing = Report.objects.filter(pk=demo_id(f'report/{index}')).first()
+            if existing:
+                ReportPhoto.objects.get_or_create(report=existing, ordinal=0,
+                    defaults={'telegram_file_id': options['telegram_file_id'] or DEMO_PHOTO_FILE_ID})
                 continue
             # Three-digit demo numbers cannot collide with six-digit sequence numbers.
             tracking = TrackingRecord.objects.create(id=demo_id(f'report-tracking/{index}'),
@@ -63,8 +67,8 @@ class Command(BaseCommand):
                 report.save()
                 StatusHistory.objects.create(report=report, event='UPDATED', before=before, after=snapshot(report),
                     comment='Демонстрационное изменение статуса', actor_type='SYSTEM', actor_label='Демонстрационные данные')
-            if options['telegram_file_id']:
-                ReportPhoto.objects.create(report=report, ordinal=0, telegram_file_id=options['telegram_file_id'])
+            ReportPhoto.objects.create(report=report, ordinal=0,
+                telegram_file_id=options['telegram_file_id'] or DEMO_PHOTO_FILE_ID)
         for index in range(10):
             if Application.objects.filter(pk=demo_id(f'application/{index}')).exists():
                 continue
@@ -85,4 +89,4 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Demo seed ready: 55 plots, 20 reports, 10 applications. Existing records preserved.'))
         self.stdout.write('Tracking: KZ-2026-042; application: KZ-2026-102. Owner is set only on first creation.')
         if not options['telegram_file_id']:
-            self.stdout.write('No demo photos added. Supply a real --telegram-file-id on first seed or create a live report.')
+            self.stdout.write('Labeled sample images added to demo reports. Live Telegram photos still require BOT_TOKEN and real file_id.')

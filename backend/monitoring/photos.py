@@ -4,11 +4,31 @@ import warnings
 
 import requests
 from django.conf import settings
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageDraw, UnidentifiedImageError
 
 from .errors import ApiProblem
 
+DEMO_PHOTO_FILE_ID = 'demo-photo:seed-v1'
+
+def demo_photo():
+    """A clearly labeled local sample, never presented as Telegram evidence."""
+    image = Image.new('RGB', (640, 360), '#e2e8dc')
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((0, 0, 639, 58), fill='#173527')
+    draw.text((24, 20), 'DEMO PHOTO / SAMPLE ONLY', fill='white')
+    draw.polygon([(0, 240), (200, 180), (430, 225), (640, 165), (640, 359), (0, 359)], fill='#a9b69e')
+    draw.rectangle((105, 165, 360, 260), outline='#bd533f', width=5)
+    draw.line((105, 165, 360, 260), fill='#bd533f', width=3)
+    draw.line((105, 260, 360, 165), fill='#bd533f', width=3)
+    draw.rectangle((0, 316, 639, 359), fill='#173527')
+    draw.text((24, 332), 'Fictional location. No real violation shown.', fill='white')
+    output = io.BytesIO()
+    image.save(output, format='PNG')
+    return output.getvalue(), 'image/png'
+
 def fetch_photo(file_id):
+    if file_id == DEMO_PHOTO_FILE_ID:
+        return demo_photo()
     try:
         if not settings.BOT_TOKEN:
             raise ValueError

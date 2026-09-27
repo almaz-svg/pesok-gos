@@ -75,6 +75,8 @@ Report и Application различаются `kind`. Для Report возвра�
 
 ## Фото-прокси
 
+Seed содержит специально обозначенный sample PNG (`demo-photo:seed-v1`), который backend отдаёт локально для проверки карточки. Bot POST не принимает этот служебный file_id. Демонстрационная картинка не является доказательством нарушения.
+
 GET /api/photos/{uuid} требует inspector session. Найти ReportPhoto; неизвестный id → 404. Сервер вызывает Telegram getFile, затем получает bytes файла; никогда не делает redirect клиента на Telegram. Не принимать внешние download URLs от клиента. Использовать фиксированный Telegram host, запретить следование redirect на произвольные хосты, валидировать file_path, не логировать URL с токеном.
 
 Timeout соединения 3 секунды, чтения 10 секунд; лимит файла приложения 10 MiB (контролировать поток, не только Content-Length). Разрешить JPEG/PNG/WebP, проверить содержимое изображения, отдавать Content-Type и X-Content-Type-Options: nosniff. Ошибку Telegram/неподдерживаемый или слишком большой файл нормализовать в 502 photo_unavailable без деталей Telegram. Бот предупреждает об ограничении до отправки. Кеш server-side по Photo UUID допустим, но ответ браузеру private,no-store; invalid file_path не кешировать навсегда. Ограничение 10 MiB — наше продуктовое решение.
