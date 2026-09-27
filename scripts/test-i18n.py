@@ -18,7 +18,7 @@ AUDIT = """() => {
   const outside = [...document.querySelectorAll('.site-header a,.language-switcher,h1,h2,.view-tabs,.filter-toolbar,.footer-shell,.register-card')]
     .filter(visible).filter(el => {const r=el.getBoundingClientRect(); return r.left < -1 || r.right > width+1;})
     .map(el => el.textContent.trim().slice(0,100));
-  const small = [...document.querySelectorAll('.site-header a,.language-switcher select,.footer-telegram')]
+  const small = [...document.querySelectorAll('.site-header a,.language-trigger,.language-menu button,.footer-telegram')]
     .filter(visible).filter(el => el.getBoundingClientRect().height < 43.9)
     .map(el=>el.textContent.trim());
   return {width,documentWidth:document.documentElement.scrollWidth,outside,small};
@@ -60,7 +60,8 @@ def main():
         expect(page.locator('h1')).to_be_visible()
 
     def switch(page,language):
-        page.locator('.language-switcher select').select_option(language)
+        page.locator('.language-trigger').click()
+        page.locator(f'.language-menu [lang="{language}"]').click()
         expect(page.locator('html')).to_have_attribute('lang',language)
         expect(page.locator('.header-nav a')).to_have_text(LANGUAGES[language])
 
@@ -74,15 +75,50 @@ def main():
                 errors=[]
                 page.on('pageerror',lambda e:errors.append(str(e)))
                 goto(page,'/')
-                # DOM inspection precedes interactions; the selector and option values are visible here.
-                assert page.locator('.language-switcher option').evaluate_all('(els)=>els.map(e=>e.value)') == ['kk','ru','en']
+                # Inspect the rendered header before operating its language menu.
+                assert page.locator('.site-header').get_by_role('button', name='Язык интерфейса: Русский').is_visible()
+                def menu():
+                    trigger=page.locator('.language-trigger')
+                    trigger.click()
+                    options=page.get_by_role('menuitemradio')
+                    expect(options).to_have_text(['ҚАЗҚазақша','РУСРусский','ENGEnglish'])
+                    expect(options.nth(1)).to_have_attribute('aria-checked','true')
+                    expect(options.nth(1)).to_be_focused()
+                    box=page.get_by_role('menu').bounding_box()
+                    assert box['x'] >= 0 and box['x']+box['width'] <= width
+                    assert trigger.bounding_box()['width'] <= 90
+                    page.screenshot(path=str(out/f'menu-{width}.png'))
+                    page.keyboard.press('ArrowDown')
+                    expect(options.nth(2)).to_be_focused()
+                    page.keyboard.press('ArrowDown')
+                    expect(options.first).to_be_focused()
+                    page.keyboard.press('End')
+                    expect(options.last).to_be_focused()
+                    page.keyboard.press('Home')
+                    page.keyboard.press('Enter')
+                    expect(page.locator('html')).to_have_attribute('lang','kk')
+                    expect(trigger).to_be_focused()
+                    expect(page.get_by_role('menu')).to_have_count(0)
+                    trigger.press('ArrowUp')
+                    expect(page.get_by_role('menuitemradio').last).to_be_focused()
+                    page.keyboard.press('Escape')
+                    expect(trigger).to_be_focused()
+                    expect(trigger).to_have_attribute('aria-expanded','false')
+                    trigger.click()
+                    page.keyboard.press('Tab')
+                    expect(page.locator('.header-telegram')).to_be_focused()
+                    expect(page.get_by_role('menu')).to_have_count(0)
+                    trigger.click()
+                    page.locator('.site-header').click(position={'x':1,'y':1})
+                    expect(trigger).to_have_attribute('aria-expanded','false')
+                run(f'menu-{width}',page,menu)
                 for language in LANGUAGES:
                     switch(page,language)
                     for index,route in enumerate(ROUTES):
                         def layout():
                             goto(page,route)
                             expect(page.locator('html')).to_have_attribute('lang',language)
-                            expect(page.locator('.language-switcher select')).to_have_value(language)
+                            expect(page.locator('.language-trigger span')).to_have_attribute('lang',language)
                             expect(page.locator('.header-nav a')).to_have_text(LANGUAGES[language])
                             audit=page.evaluate(AUDIT)
                             assert audit['documentWidth']<=width+1 and not audit['outside'],audit

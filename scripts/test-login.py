@@ -51,7 +51,8 @@ def main():
                     page.on('pageerror', lambda e: errors.append(str(e)))
                     goto(page, '/login')
                     for language in ['kk','ru','en']:
-                        page.locator('.language-switcher select').select_option(language)
+                        page.locator('.language-trigger').click()
+                        page.locator(f'.language-menu [lang="{language}"]').click()
                         for route in ['/login','/register']:
                             def layout():
                                 goto(page, route)
@@ -128,7 +129,8 @@ def main():
                     page.locator('#login-password').fill(' pass ')
                     page.locator('.password-toggle').click()
                     expect(page.locator('#login-password')).to_have_attribute('type','text')
-                    page.locator('.language-switcher select').select_option('en')
+                    page.locator('.language-trigger').click()
+                    page.locator('.language-menu [lang="en"]').click()
                     expect(page.locator('#login-password')).to_have_value(' pass ')
                     page.locator('.login-form button[type="submit"]').click()
                     expect(page.locator('.login-error')).to_have_text('Incorrect username or password')
