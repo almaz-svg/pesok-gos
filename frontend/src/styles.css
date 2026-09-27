@@ -485,8 +485,9 @@ h1 {
 }
 .section-heading {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
+  gap: 28px;
   margin-bottom: 35px;
 }
 .section-kicker {

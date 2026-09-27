@@ -65,9 +65,6 @@
 .login-page .auth-story-copy {
   margin-top: 60px;
 }
-.login-gate > a {
-  margin-top: 18px;
-}
 @media (max-width: 760px) {
   .login-landmark {
     display: none;

@@ -193,11 +193,16 @@ export default function InspectorWorkspace({ view }) {
             </button>
           </div>
         ) : !user ? (
-          <div className="state-box login-gate">
-            <h3>{t('Войдите в рабочее пространство')}</h3>
-            <p>{t('Используйте учётную запись, выданную администратором.')}</p>
+          <section className="state-box login-gate" aria-labelledby="workspace-login-title">
+            <span className="login-gate__icon" aria-hidden="true">
+              <Layers3 size={25} />
+            </span>
+            <div className="login-gate__copy">
+              <h2 id="workspace-login-title">{t('Войдите в рабочее пространство')}</h2>
+              <p>{t('Используйте учётную запись, выданную администратором.')}</p>
+            </div>
             <Link
-              className="button button-lime"
+              className="button button-lime login-gate__action"
               to={authPath(
                 '/login',
                 tab === 'map'
@@ -209,7 +214,7 @@ export default function InspectorWorkspace({ view }) {
             >
               {t('Войти')} <ArrowUpRight size={17} />
             </Link>
-          </div>
+          </section>
         ) : (
           <>
             <div className="stat-grid" aria-busy={resources.statistics.loading}>
