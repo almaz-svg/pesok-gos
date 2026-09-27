@@ -13,6 +13,30 @@
 .header-localized .header-actions {
   gap: 16px;
 }
+.header-preferences {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  color: #c9d7bf;
+  background: transparent;
+  border-radius: 12px;
+}
+.theme-toggle:hover {
+  color: var(--lime);
+  background: #b8d09e13;
+}
+.theme-toggle:focus-visible {
+  outline: 1px solid #b7d28b;
+  outline-offset: 1px;
+}
 .header-localized .header-login {
   justify-content: center;
   padding: 0 12px;
@@ -218,7 +242,7 @@
   .header-localized .header-actions {
     display: contents;
   }
-  .header-localized .language-switcher {
+  .header-localized .header-preferences {
     grid-column: 2;
     grid-row: 1;
     justify-self: end;
@@ -266,6 +290,9 @@
   .language-trigger::before,
   .language-caret,
   .language-menu button {
+    transition: none;
+  }
+  .theme-toggle {
     transition: none;
   }
   .language-menu {

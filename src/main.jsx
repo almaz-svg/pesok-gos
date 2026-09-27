@@ -8,6 +8,7 @@ import './styles.css';
 import './routing.css';
 import './motion.css';
 import './responsive.css';
+import './themes.css';
 import { useI18n } from './i18n/useI18n.js';
 
 function FatalError() {

@@ -1,5 +1,7 @@
 // Russian source messages are stable keys; user-written report content is never translated.
 export const messages = {
+  'Включить светлую тему': { kk: 'Ашық тақырыпты қосу', en: 'Switch to light theme' },
+  'Включить тёмную тему': { kk: 'Қараңғы тақырыпты қосу', en: 'Switch to dark theme' },
   Вход: { kk: 'Кіру', en: 'Sign in' },
   'Вход и регистрация': { kk: 'Кіру және тіркелу', en: 'Sign in and registration' },
   'Войти в аккаунт': { kk: 'Аккаунтқа кіру', en: 'Sign in to your account' },

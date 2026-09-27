@@ -1,0 +1,540 @@
+/* Light surfaces and readable ink; lime remains the shared action colour. */
+:root[data-theme='light'] {
+  --bg: #f5f7f1;
+  --panel: #ffffff;
+  --ink: #203125;
+  --ink-secondary: #52644e;
+  --muted: #64735d;
+  --accent-ink: #426a25;
+  --line: #d9e1d2;
+  --surface-soft: #edf2e7;
+  --surface-form: #ffffff;
+  --surface-input: #ffffff;
+  --text-on-light: #203125;
+  --text-secondary-on-light: #52644e;
+  --border-input: #d3ddcb;
+  --green: #3d742c;
+  --yellow: #906410;
+  --red: #b84432;
+  color: var(--ink);
+  background: var(--bg);
+  color-scheme: light;
+}
+
+/* The terrain illustration keeps its own forest palette in both themes. */
+:root[data-theme='light'] .hero {
+  color: #eef1e8;
+  --green: #a5dc77;
+  --yellow: #f0ca63;
+  --red: #ef8977;
+}
+:root[data-theme='light'] :is(.workspace-title, .auth-story-copy h1, .not-found-page h1) {
+  text-shadow: none;
+}
+:root[data-theme='light']
+  :is(
+    .header-nav,
+    .header-register,
+    .header-telegram,
+    .footer-telegram,
+    .language-trigger,
+    .theme-toggle,
+    .language-menu button,
+    .language-caret,
+    .section-kicker,
+    h2 > span,
+    .workspace-title > span,
+    .workspace-context p,
+    .stat-top,
+    .stat-bottom > span,
+    .sync-status,
+    .sync-status button,
+    .view-tabs > a,
+    .search-field,
+    .search-field button,
+    .icon-button,
+    .extra-filters,
+    .rail-heading > span,
+    .preview-top,
+    .preview-top svg,
+    .report-preview p,
+    .preview-bottom > span:last-child,
+    .rail-empty,
+    .data-footer,
+    .table-container td,
+    .table-container td small,
+    .table-container [data-label]::before,
+    .analytics-panel p,
+    .chart-row,
+    .state-box,
+    .process-step-top,
+    .process-step p,
+    .help-details,
+    .auth-back,
+    .auth-story-copy h1 > span,
+    .auth-story-copy > p,
+    .auth-landscape-label,
+    .auth-story-footer,
+    .footer-brand small,
+    .footer-shell .footer-description,
+    .footer-heading,
+    .footer-eyebrow,
+    .footer-links a,
+    .footer-shell .footer-explore-description,
+    .footer-bottom,
+    .footer-prototype,
+    .footer-telegram small,
+    .fatal-error p
+  ) {
+  color: var(--ink-secondary);
+}
+:root[data-theme='light']
+  :is(
+    .header-nav .nav-current,
+    .header-nav a:hover,
+    .demo-label,
+    .user-label,
+    .rail-heading > div,
+    .report-preview h4,
+    .table-report,
+    .chart-row strong,
+    .state-box h3,
+    .footer-brand > span,
+    .footer-motto,
+    .footer-explore-title
+  ) {
+  color: var(--ink);
+}
+:root[data-theme='light']
+  :is(
+    .brand > svg,
+    .brand-dot,
+    .footer-brand > svg,
+    .footer-brand-dot,
+    .header-register:hover,
+    .header-register[aria-current='page'],
+    .header-telegram:hover,
+    .footer-telegram:hover,
+    .section-kicker > span,
+    .extra-filters button,
+    .rail-all,
+    .data-footer button,
+    .table-report:hover,
+    .analytics-callout button,
+    .process-intro > a,
+    .auth-back:hover,
+    .footer-links a:hover,
+    .footer-links a[aria-current='page'],
+    .footer-links a > svg,
+    .language-menu button > svg,
+    .theme-toggle:hover
+  ) {
+  color: var(--accent-ink);
+}
+:root[data-theme='light'] .brand small {
+  color: var(--muted);
+}
+:root[data-theme='light'] :is(button, a, input, select, textarea, summary):focus-visible {
+  outline-color: var(--accent-ink);
+}
+:root[data-theme='light'] .hero :focus-visible {
+  outline-color: var(--lime);
+}
+:root[data-theme='light'] input[type='checkbox'] {
+  accent-color: var(--accent-ink);
+}
+
+/* Header preferences. */
+:root[data-theme='light'] .language-menu {
+  background: var(--panel);
+  border-color: var(--line);
+  box-shadow:
+    0 12px 32px #243b1814,
+    0 2px 6px #243b1808;
+}
+:root[data-theme='light'] .language-code {
+  color: var(--muted);
+}
+:root[data-theme='light'] .language-trigger::before {
+  background: #426a2508;
+}
+:root[data-theme='light']
+  :is(.language-trigger:hover, .language-trigger[aria-expanded='true'])::before {
+  background: #426a2512;
+}
+:root[data-theme='light']
+  :is(
+    .language-menu button[aria-checked='true'],
+    .language-menu button:hover,
+    .language-menu button:focus-visible,
+    .theme-toggle:hover
+  ) {
+  color: var(--accent-ink);
+  background: var(--surface-soft);
+}
+
+/* Workspace, tables and overview details. */
+:root[data-theme='light'] :is(.stat-grid, .data-surface, .reports-rail, .footer-explore) {
+  background: var(--panel);
+  border-color: var(--line);
+}
+:root[data-theme='light']
+  :is(
+    .rail-heading,
+    .report-preview,
+    .table-container td,
+    .rail-all,
+    .process-step,
+    .footer-prototype,
+    .footer-shell .footer-telegram
+  ) {
+  border-color: var(--line);
+}
+:root[data-theme='light'] .stat-dash {
+  color: #c3cebb;
+}
+:root[data-theme='light'] :is(.view-tabs > a.selected, .view-tabs > a:hover) {
+  color: var(--accent-ink);
+  background: #e5eddc;
+  border-color: #ccdaba;
+}
+:root[data-theme='light'] .view-tabs small {
+  background: #dce6d1;
+}
+:root[data-theme='light'] :is(.search-field input, .status-select select) {
+  color: var(--ink);
+}
+:root[data-theme='light'] .search-field input::placeholder {
+  color: var(--muted);
+}
+:root[data-theme='light'] :is(.status-select select, .icon-button) {
+  background: var(--panel);
+  border-color: var(--line);
+}
+:root[data-theme='light'] :is(.icon-button:hover, .icon-button.is-active) {
+  color: var(--accent-ink);
+  background: var(--surface-soft);
+  border-color: #a9c18e;
+}
+:root[data-theme='light']
+  :is(
+    .report-preview:hover,
+    .report-preview.preview-selected,
+    .rail-all:hover,
+    .table-container tr:hover td
+  ) {
+  background: var(--surface-soft);
+}
+:root[data-theme='light'] :is(.data-footer, .table-container th, .rail-all) {
+  background: #f0f4eb;
+  color: var(--ink-secondary);
+}
+:root[data-theme='light'] .footer-separator {
+  color: #a8b59f;
+}
+:root[data-theme='light'] .status {
+  border-color: #c2d8b4;
+  background: #edf5e7;
+}
+:root[data-theme='light'] .status-yellow {
+  border-color: #e4d8b3;
+  background: #faf4e4;
+}
+:root[data-theme='light'] .status-red {
+  border-color: #e8c6be;
+  background: #fbefeb;
+}
+:root[data-theme='light'] .chart-row > div {
+  background: #e7eede;
+}
+:root[data-theme='light'] .analytics-callout {
+  background: #edf3e5;
+  border-color: var(--line);
+}
+:root[data-theme='light'] .analytics-callout > svg {
+  color: var(--accent-ink);
+}
+:root[data-theme='light'] .button:not(.button-lime, .auth-submit, .hero-button) {
+  background: var(--surface-soft);
+  color: var(--ink);
+  border-color: var(--line);
+}
+:root[data-theme='light'] .button:not(.button-lime, .auth-submit, .hero-button):hover {
+  background: #e2ebd8;
+}
+:root[data-theme='light'] .data-error {
+  background: #faeae3;
+  color: #8c432e;
+  border-color: #e4c1b4;
+}
+:root[data-theme='light'] .data-error button {
+  color: #8c432e;
+}
+:root[data-theme='light'] .loading-orbit {
+  border-color: #d3e0c9;
+  border-top-color: var(--accent-ink);
+}
+:root[data-theme='light'] .toast {
+  background: #f0f6e8;
+  border-color: #bfd3a9;
+  color: var(--ink);
+  box-shadow: 0 12px 40px #20312520;
+}
+:root[data-theme='light'] .toast > svg {
+  color: var(--accent-ink);
+}
+:root[data-theme='light'] .toast > button {
+  color: var(--ink-secondary);
+}
+
+/* Map imagery stays unfiltered in daylight; status hues retain their meaning. */
+:root[data-theme='light'] :is(.map-location, .map-legend) {
+  background: #ffffffed;
+  border-color: #c3cebb;
+  color: var(--ink);
+}
+:root[data-theme='light'] .map-location small {
+  color: var(--ink-secondary);
+}
+:root[data-theme='light'] .header-nav .nav-current:after {
+  background: var(--accent-ink);
+}
+:root[data-theme='light'] :is(.land-map, .land-map__canvas) {
+  background: #e7ecdf;
+  color: var(--ink);
+}
+:root[data-theme='light'] .land-map__tiles {
+  filter: none;
+}
+:root[data-theme='light']
+  :is(
+    .land-map__location,
+    .land-map__legend,
+    .land-map__controls button,
+    .land-map__tooltip.leaflet-tooltip,
+    .land-map__empty,
+    .land-map .leaflet-control-attribution
+  ) {
+  background: #ffffffed;
+  border-color: #c3cebb;
+  color: var(--ink);
+}
+:root[data-theme='light'] :is(.land-map__controls, .land-map__controls button + button) {
+  border-color: #c3cebb;
+}
+:root[data-theme='light'] .land-map__controls button:hover {
+  background: var(--surface-soft);
+}
+:root[data-theme='light']
+  :is(.land-map__location-coordinate, .land-map .leaflet-control-attribution a) {
+  color: var(--ink-secondary);
+  border-color: var(--line);
+}
+:root[data-theme='light'] .land-map__tooltip.leaflet-tooltip-top:before {
+  border-top-color: #c3cebb;
+}
+:root[data-theme='light'] .land-map__tooltip.leaflet-tooltip-right:before {
+  border-right-color: #c3cebb;
+}
+:root[data-theme='light'] .land-map__notice {
+  background: #fff8e7f5;
+  color: #785a18;
+  border-color: #decc98;
+}
+:root[data-theme='light'] .land-map__notice button {
+  color: #785a18;
+}
+:root[data-theme='light'] .land-map__marker--green {
+  --marker: #53843c;
+}
+:root[data-theme='light'] .land-map__marker--yellow {
+  --marker: #b88618;
+}
+:root[data-theme='light'] .land-map__marker--red {
+  --marker: #c45443;
+}
+:root[data-theme='light'] .land-map__marker-core {
+  border-color: white;
+  box-shadow:
+    0 0 0 1px var(--marker),
+    0 2px 8px #253c2133;
+}
+:root[data-theme='light'] .land-map__plot--green {
+  stroke: #53843c;
+  fill: #53843c;
+}
+:root[data-theme='light'] .land-map__plot--yellow {
+  stroke: #b88618;
+  fill: #b88618;
+}
+:root[data-theme='light'] .land-map__plot--red {
+  stroke: #c45443;
+  fill: #c45443;
+}
+:root[data-theme='light'] .land-map__legend .is-green {
+  background: #53843c;
+}
+:root[data-theme='light'] .land-map__legend .is-yellow {
+  background: #b88618;
+}
+:root[data-theme='light'] .land-map__legend .is-red {
+  background: #c45443;
+}
+
+/* Inspector detail overlay. */
+:root[data-theme='light'] .inspector-drawer__overlay {
+  color: var(--ink);
+}
+:root[data-theme='light'] .inspector-drawer {
+  background: var(--panel);
+  border-color: var(--line);
+  color-scheme: light;
+  box-shadow: -20px 0 80px #20312526;
+}
+:root[data-theme='light'] .inspector-drawer__header {
+  background: var(--panel);
+  border-color: var(--line);
+}
+:root[data-theme='light']
+  :is(
+    .inspector-drawer__header h2,
+    .inspector-drawer__section-heading h3,
+    .inspector-drawer__deadline strong,
+    .inspector-drawer__event-title,
+    .inspector-drawer__plot-stats strong
+  ) {
+  color: var(--ink);
+}
+:root[data-theme='light']
+  :is(
+    .inspector-drawer__eyebrow,
+    .inspector-drawer__date,
+    .inspector-drawer__close,
+    .inspector-drawer__description,
+    .inspector-drawer__helper,
+    .inspector-drawer__coordinates,
+    .inspector-drawer__section-heading,
+    .inspector-drawer__photo-error,
+    .inspector-drawer__no-photo,
+    .inspector-drawer__deadline span,
+    .inspector-drawer__form label,
+    .inspector-drawer__timeline p,
+    .inspector-drawer__event-meta,
+    .inspector-drawer__loading,
+    .inspector-drawer__plot-stats span
+  ) {
+  color: var(--ink-secondary);
+}
+:root[data-theme='light']
+  :is(
+    .inspector-drawer__close,
+    .inspector-drawer__photo,
+    .inspector-drawer__no-photo,
+    .inspector-drawer__deadline,
+    .inspector-drawer__timeline-icon,
+    .inspector-drawer__plot-stats > div,
+    .inspector-drawer__timeline .inspector-drawer__event-comment
+  ) {
+  border-color: var(--line);
+}
+:root[data-theme='light']
+  :is(
+    .inspector-drawer__section-heading > span,
+    .inspector-drawer__photo,
+    .inspector-drawer__deadline,
+    .inspector-drawer__timeline-icon,
+    .inspector-drawer__plot-stats > div,
+    .inspector-drawer__close:hover,
+    .inspector-drawer__timeline .inspector-drawer__event-comment
+  ) {
+  background: var(--surface-soft);
+  color: var(--ink-secondary);
+}
+:root[data-theme='light'] .inspector-drawer__body {
+  scrollbar-color: #a9b99b var(--panel);
+}
+:root[data-theme='light'] .inspector-drawer__timeline li:not(:last-child):before {
+  background: var(--line);
+}
+:root[data-theme='light'] .inspector-drawer__timeline-icon.is-created {
+  background: var(--lime);
+  color: #17230d;
+}
+:root[data-theme='light']
+  :is(
+    .inspector-drawer__photo-error button,
+    .inspector-drawer__error button,
+    .inspector-drawer__conflict button,
+    .inspector-drawer__close:hover
+  ) {
+  color: var(--accent-ink);
+}
+:root[data-theme='light']
+  :is(
+    .inspector-drawer__form input,
+    .inspector-drawer__form select,
+    .inspector-drawer__form textarea
+  ) {
+  background: #fafcf7;
+  color: var(--ink);
+  border-color: #c5d1bc;
+}
+:root[data-theme='light'] .inspector-drawer__form textarea::placeholder {
+  color: var(--muted);
+}
+:root[data-theme='light'] .inspector-drawer__form [aria-invalid='true'] {
+  border-color: var(--red);
+}
+:root[data-theme='light'] :is(.inspector-drawer__status.is-yellow, .inspector-drawer__conflict) {
+  color: var(--yellow);
+  background: #faf4e4;
+}
+:root[data-theme='light'] :is(.inspector-drawer__status.is-green, .inspector-drawer__success) {
+  color: var(--green);
+  background: #edf5e7;
+}
+:root[data-theme='light']
+  :is(
+    .inspector-drawer__status.is-red,
+    .inspector-drawer__deadline.is-overdue,
+    .inspector-drawer__deadline.is-overdue span,
+    .inspector-drawer__field-error,
+    .inspector-drawer__form-error,
+    .inspector-drawer__error
+  ) {
+  color: var(--red);
+}
+
+/* Authentication cards and assistant share the light form tokens. */
+:root[data-theme='light'] .register-card {
+  border-color: var(--line);
+  box-shadow: 0 18px 60px #29411c0d;
+}
+:root[data-theme='light'] .login-landmark {
+  color: #6f964d;
+}
+:root[data-theme='light'] .auth-contours {
+  color: #65834780;
+}
+:root[data-theme='light'] .assistant-launcher {
+  box-shadow: 0 8px 30px #29411c26;
+  border-color: #b2d954;
+}
+:root[data-theme='light'] .assistant-dialog {
+  background: #edf3e5;
+  border-color: #c8d4be;
+  box-shadow: 0 24px 80px #29411c33;
+}
+:root[data-theme='light'] .assistant-header {
+  color: var(--ink);
+}
+:root[data-theme='light'] .assistant-header p {
+  color: var(--ink-secondary);
+}
+:root[data-theme='light'] :is(.assistant-avatar, .assistant-icon-button) {
+  color: var(--accent-ink);
+  border-color: #c8d4be;
+}
+:root[data-theme='light'] .assistant-header button:focus-visible {
+  outline-color: var(--accent-ink);
+}

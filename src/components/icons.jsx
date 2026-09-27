@@ -1,4 +1,6 @@
 import { GlobeSimpleIcon } from '@phosphor-icons/react/dist/csr/GlobeSimple';
+import { SunIcon } from '@phosphor-icons/react/dist/csr/Sun';
+import { MoonIcon } from '@phosphor-icons/react/dist/csr/Moon';
 import { CaretDownIcon } from '@phosphor-icons/react/dist/csr/CaretDown';
 import { TelegramLogoIcon } from '@phosphor-icons/react/dist/csr/TelegramLogo';
 import { ArrowDownIcon } from '@phosphor-icons/react/dist/csr/ArrowDown';
@@ -52,6 +54,8 @@ function roundedIcon(Component, weight = 'duotone') {
 
 export const ArrowDown = roundedIcon(ArrowDownIcon, 'regular');
 export const Globe = roundedIcon(GlobeSimpleIcon);
+export const Sun = roundedIcon(SunIcon);
+export const Moon = roundedIcon(MoonIcon);
 export const ChevronDown = roundedIcon(CaretDownIcon, 'regular');
 export const Telegram = roundedIcon(TelegramLogoIcon);
 export const ArrowDownLeft = roundedIcon(ArrowDownLeftIcon, 'regular');

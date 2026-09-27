@@ -4,7 +4,22 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#08120d" />
+    <meta name="theme-color" content="#08100b" />
+    <script>
+      // Apply the saved palette before React and styles load to avoid a colour flash.
+      (() => {
+        let theme = 'dark';
+        try {
+          if (localStorage.getItem('pesok-theme') === 'light') theme = 'light';
+        } catch {
+          // Storage may be disabled; the switch still works for this visit.
+        }
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+        document.querySelector('meta[name="theme-color"]').content =
+          theme === 'light' ? '#f5f7f1' : '#08100b';
+      })();
+    </script>
     <meta
       name="description"
       content="Песок Гос — цифровой мониторинг земель. Карта участков, обращения граждан и работа инспектора в одном пространстве."

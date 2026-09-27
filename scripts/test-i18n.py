@@ -106,7 +106,7 @@ def main():
                     expect(trigger).to_have_attribute('aria-expanded','false')
                     trigger.click()
                     page.keyboard.press('Tab')
-                    expect(page.locator('.header-telegram')).to_be_focused()
+                    expect(page.locator('.theme-toggle')).to_be_focused()
                     expect(page.get_by_role('menu')).to_have_count(0)
                     trigger.click()
                     page.locator('.site-header').click(position={'x':1,'y':1})

@@ -101,6 +101,7 @@ export default function LandMap({
     const features = new Map();
     const plots = L.geoJSON(showPlots ? data?.plots || EMPTY : EMPTY, {
       style: (feature) => ({
+        className: `land-map__plot land-map__plot--${STATUS_META[feature.properties.status]?.tone || 'green'}`,
         color: featureColor(feature.properties.status),
         fillColor: featureColor(feature.properties.status),
         weight: matches(selectedId, 'plot', feature.id) ? 3 : 1.5,

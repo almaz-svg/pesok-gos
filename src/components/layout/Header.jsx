@@ -2,6 +2,7 @@ import { useI18n } from '../../i18n/useI18n.js';
 import { Link, NavLink } from 'react-router-dom';
 import { Layers3 } from '../icons.jsx';
 import LanguageSwitcher from './LanguageSwitcher.jsx';
+import ThemeToggle from './ThemeToggle.jsx';
 import TelegramLink from './TelegramLink.jsx';
 import './navigation.css';
 
@@ -30,7 +31,10 @@ export default function Header() {
         </NavLink>
       </nav>
       <div className="header-actions">
-        <LanguageSwitcher />
+        <div className="header-preferences">
+          <LanguageSwitcher />
+          <ThemeToggle />
+        </div>
         <TelegramLink className="header-telegram">
           <span>Telegram</span>
         </TelegramLink>
