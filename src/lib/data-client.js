@@ -507,10 +507,11 @@ export function createApiClient({
       request(`reports/${encodeURIComponent(id)}`, { method: 'PATCH', body: payload }),
     getStatistics: (options) => request('statistics', options),
     getSession: (options) => request('auth/me', options),
-    async login(username, password) {
+    async login(username, password, { signal } = {}) {
       const response = await request('auth/login', {
         method: 'POST',
         body: { username, password },
+        signal,
       });
       csrfToken = response.csrf_token;
       return response;
@@ -556,7 +557,7 @@ export const getReport = (id, options) => call('getReport', id, options);
 export const patchReport = (id, payload) => call('patchReport', id, payload);
 export const getStatistics = (options) => call('getStatistics', options);
 export const getSession = (options) => call('getSession', options);
-export const login = (username, password) => call('login', username, password);
+export const login = (username, password, options) => call('login', username, password, options);
 export const logout = () => call('logout');
 export const photoUrl = (url) =>
   dataMode === 'demo' ? (url === '/demo-photo.svg' ? url : '') : client.photoUrl(url);

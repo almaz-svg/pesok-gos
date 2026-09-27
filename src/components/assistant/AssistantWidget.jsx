@@ -15,7 +15,7 @@ import { assistantClient, chatHistory, MAX_QUESTION_LENGTH } from '../../lib/ass
 import './assistant.css';
 
 const suggestions = ['Как работает карта?', 'Что означают статусы?', 'Как отправить обращение?'];
-const pages = ['/', '/map', '/reports', '/register'];
+const pages = ['/', '/map', '/reports', '/register', '/login'];
 
 export default function AssistantWidget() {
   const { t, language } = useI18n();

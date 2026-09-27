@@ -1,8 +1,10 @@
 import { useI18n } from '../../i18n/useI18n.js';
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowUpRight, Check, Eye, EyeOff, Info } from '../icons.jsx';
 import { REGISTRATION_FIELDS, validateRegistration } from '../../lib/registration-form.js';
+import { authPath } from '../../lib/login-form.js';
+import AuthTabs from './AuthTabs.jsx';
 
 const initialValues = { name: '', email: '', password: '', passwordConfirmation: '' };
 const fields = [
@@ -41,6 +43,7 @@ const fields = [
 
 export default function RegisterForm() {
   const { t } = useI18n();
+  const [params] = useSearchParams();
   const [values, setValues] = useState(initialValues);
   const [touched, setTouched] = useState({});
   const [visible, setVisible] = useState({});
@@ -75,6 +78,7 @@ export default function RegisterForm() {
 
   return (
     <div className="register-card">
+      <AuthTabs />
       <div className="register-card-heading">
         <span className="auth-eyebrow">{t('ЛИЧНЫЙ АККАУНТ')}</span>
         <h2 id="register-form-title">{t('Создать аккаунт')}</h2>
@@ -200,8 +204,8 @@ export default function RegisterForm() {
           </form>
           <p className="auth-signin">
             {t('Уже есть доступ?')}{' '}
-            <Link to="/map">
-              {t('Открыть панель')} <ArrowUpRight size={13} />
+            <Link to={authPath('/login', params.get('next'))}>
+              {t('Войти')} <ArrowUpRight size={13} />
             </Link>
           </p>
         </>

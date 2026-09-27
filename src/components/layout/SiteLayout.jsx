@@ -10,6 +10,7 @@ const titles = {
   '/map': 'Карта земель',
   '/reports': 'Обращения',
   '/register': 'Регистрация',
+  '/login': 'Вход',
 };
 
 export default function SiteLayout() {

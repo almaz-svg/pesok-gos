@@ -1,5 +1,45 @@
 // Russian source messages are stable keys; user-written report content is never translated.
 export const messages = {
+  Вход: { kk: 'Кіру', en: 'Sign in' },
+  'Вход и регистрация': { kk: 'Кіру және тіркелу', en: 'Sign in and registration' },
+  'Войти в аккаунт': { kk: 'Аккаунтқа кіру', en: 'Sign in to your account' },
+  'С возвращением.': { kk: 'Қайта оралуыңызбен.', en: 'Welcome back.' },
+  'Продолжим работу.': { kk: 'Жұмысты жалғастырайық.', en: "Let's get back to work." },
+  'Карта, обращения и результаты проверок — в вашем рабочем пространстве.': {
+    kk: 'Карта, өтініштер және тексеру нәтижелері — сіздің жұмыс кеңістігіңізде.',
+    en: 'Your map, reports and inspection results — all in your workspace.',
+  },
+  'Введите имя пользователя': { kk: 'Пайдаланушы атын енгізіңіз', en: 'Enter your username' },
+  'Введите пароль': { kk: 'Құпиясөзді енгізіңіз', en: 'Enter your password' },
+  'Укажите имя пользователя.': { kk: 'Пайдаланушы атын көрсетіңіз.', en: 'Enter your username.' },
+  'Имя пользователя слишком длинное.': {
+    kk: 'Пайдаланушы аты тым ұзын.',
+    en: 'The username is too long.',
+  },
+  'Введите пароль.': { kk: 'Құпиясөзді енгізіңіз.', en: 'Enter your password.' },
+  'Пароль слишком длинный.': { kk: 'Құпиясөз тым ұзын.', en: 'The password is too long.' },
+  'Неверный логин или пароль': {
+    kk: 'Логин немесе құпиясөз қате',
+    en: 'Incorrect username or password',
+  },
+  'Нет прав инспектора': {
+    kk: 'Инспектор құқықтары жоқ',
+    en: 'This account does not have inspector access',
+  },
+  'Сессия обновилась. Повторите вход.': {
+    kk: 'Сессия жаңартылды. Қайта кіріңіз.',
+    en: 'Your session was refreshed. Please sign in again.',
+  },
+  'Слишком много попыток входа. Подождите и попробуйте снова.': {
+    kk: 'Кіру әрекеттері тым көп. Күтіп, қайта көріңіз.',
+    en: 'Too many sign-in attempts. Wait and try again.',
+  },
+  'В деморежиме вход в аккаунт отключён. Демо-панель доступна без логина и пароля.': {
+    kk: 'Демо-режимде аккаунтқа кіру өшірілген. Демо-панельге логин мен құпиясөзсіз кіруге болады.',
+    en: 'Account sign-in is disabled in demo mode. You can explore the demo workspace without a username or password.',
+  },
+  'Открыть демо-панель': { kk: 'Демо-панельді ашу', en: 'Open demo workspace' },
+  'Нет аккаунта?': { kk: 'Аккаунтыңыз жоқ па?', en: "Don't have an account?" },
   'Как работает карта?': {
     kk: 'Карта қалай жұмыс істейді?',
     en: 'How does the map work?',

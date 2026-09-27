@@ -10,6 +10,7 @@ const links = [
   { to: '/reports', label: 'Обращения' },
   { to: '/reports?view=analytics', label: 'Аналитика' },
   { to: '/register', label: 'Регистрация' },
+  { to: '/login', label: 'Войти' },
 ];
 
 export default function Footer() {

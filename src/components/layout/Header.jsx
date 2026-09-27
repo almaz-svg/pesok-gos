@@ -1,6 +1,6 @@
 import { useI18n } from '../../i18n/useI18n.js';
 import { Link, NavLink } from 'react-router-dom';
-import { ArrowUpRight, Layers3 } from '../icons.jsx';
+import { Layers3 } from '../icons.jsx';
 import LanguageSwitcher from './LanguageSwitcher.jsx';
 import TelegramLink from './TelegramLink.jsx';
 import './navigation.css';
@@ -37,12 +37,9 @@ export default function Header() {
         <NavLink className="header-register" to="/register">
           {t('Регистрация')}
         </NavLink>
-        <Link className="header-cta" to="/map" aria-label={t('Открыть панель инспектора')}>
-          <span>{t('Панель инспектора')}</span>
-          <span className="round-icon">
-            <ArrowUpRight size={18} />
-          </span>
-        </Link>
+        <NavLink className="header-cta header-login" to="/login">
+          {t('Войти')}
+        </NavLink>
       </div>
     </header>
   );

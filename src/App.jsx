@@ -4,6 +4,7 @@ import OverviewPage from './pages/OverviewPage.jsx';
 import MapPage from './pages/MapPage.jsx';
 import ReportsPage from './pages/ReportsPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
+import LoginPage from './pages/LoginPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 
 export default function App() {
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="map" element={<MapPage />} />
         <Route path="reports" element={<ReportsPage />} />
         <Route path="register" element={<RegisterPage />} />
+        <Route path="login" element={<LoginPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

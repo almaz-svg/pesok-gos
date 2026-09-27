@@ -13,6 +13,21 @@
 .header-localized .header-actions {
   gap: 16px;
 }
+.header-localized .header-login {
+  justify-content: center;
+  padding: 0 12px;
+  border-radius: 24px;
+  background: var(--lime);
+  color: #172411;
+  font-size: 12px;
+  font-weight: 550;
+}
+.header-localized .header-login:hover {
+  background: #e0ffa5;
+}
+.header-localized .header-login[aria-current='page'] {
+  box-shadow: 0 0 0 3px #cafa6526;
+}
 .language-switcher {
   display: inline-flex;
   align-items: center;

@@ -6,6 +6,76 @@
   margin: 26px auto 74px;
   align-items: stretch;
 }
+.auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  padding: 5px;
+  margin-bottom: 28px;
+  border-radius: 16px;
+  background: #e3e9de;
+}
+.auth-tabs a {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-size: 12px;
+  color: #53634c;
+}
+.auth-tabs a[aria-current='page'] {
+  background: white;
+  color: #23421b;
+  box-shadow: 0 2px 8px #152a1010;
+}
+.login-form fieldset {
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 18px;
+}
+.login-form fieldset:disabled {
+  opacity: 0.55;
+}
+.login-demo-notice {
+  margin-top: 24px;
+}
+.login-demo-link {
+  margin-top: 18px;
+}
+.login-error {
+  margin: 0;
+  padding: 12px;
+  background: #fae7e0;
+  border-radius: 12px;
+}
+.login-landmark {
+  display: grid;
+  place-items: center;
+  flex: 1;
+  min-height: 180px;
+  margin-top: 24px;
+  border-radius: 28px;
+  color: #b7d68e;
+  background: radial-gradient(ellipse at center, #9abb4918 0, transparent 65%);
+}
+.login-page .auth-story-copy {
+  margin-top: 60px;
+}
+.login-gate > a {
+  margin-top: 18px;
+}
+@media (max-width: 760px) {
+  .login-landmark {
+    display: none;
+  }
+  .login-page .auth-story-copy {
+    margin-top: 28px;
+  }
+}
 .register-story {
   display: flex;
   flex-direction: column;

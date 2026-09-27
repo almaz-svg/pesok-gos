@@ -21,7 +21,8 @@ import {
   LoaderCircle,
 } from '../icons.jsx';
 import useInspectorData, { RESOURCE_LABELS } from '../../hooks/useInspectorData.js';
-import { ResourceState, LoginForm } from './InspectorElements.jsx';
+import { ResourceState } from './InspectorElements.jsx';
+import { authPath } from '../../lib/login-form.js';
 import MapPanel from './MapPanel.jsx';
 import ReportsTable from './ReportsTable.jsx';
 import ReportDrawer from '../ReportDrawer.jsx';
@@ -42,7 +43,6 @@ export default function InspectorWorkspace({ view }) {
     );
   const {
     user,
-    setUser,
     sessionReady,
     sessionError,
     checkSession,
@@ -193,7 +193,23 @@ export default function InspectorWorkspace({ view }) {
             </button>
           </div>
         ) : !user ? (
-          <LoginForm onLogin={setUser} />
+          <div className="state-box login-gate">
+            <h3>{t('Войдите в рабочее пространство')}</h3>
+            <p>{t('Используйте учётную запись, выданную администратором.')}</p>
+            <Link
+              className="button button-lime"
+              to={authPath(
+                '/login',
+                tab === 'map'
+                  ? '/map'
+                  : tab === 'analytics'
+                    ? '/reports?view=analytics'
+                    : '/reports',
+              )}
+            >
+              {t('Войти')} <ArrowUpRight size={17} />
+            </Link>
+          </div>
         ) : (
           <>
             <div className="stat-grid" aria-busy={resources.statistics.loading}>
