@@ -1,3 +1,4 @@
+import { useI18n } from '../i18n/useI18n.js';
 import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import { LocateFixed, Minus, Plus, RefreshCw, TriangleAlert } from './icons.jsx';
@@ -28,6 +29,7 @@ export default function LandMap({
   showPlots = true,
   showReports = true,
 }) {
+  const { t } = useI18n();
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const tilesRef = useRef(null);
@@ -106,7 +108,10 @@ export default function LandMap({
         fillOpacity: matches(selectedId, 'plot', feature.id) ? 0.35 : 0.13,
       }),
       onEachFeature: (feature, layer) => {
-        const label = `Участок ${feature.properties.cadastral_number} — ${STATUS_META[feature.properties.status]?.label || feature.properties.status}`;
+        const label = t('Участок {value0} — {value1}', {
+          value0: feature.properties.cadastral_number,
+          value1: t(STATUS_META[feature.properties.status]?.label || feature.properties.status),
+        });
         layer.bindTooltip(tooltip(label), { sticky: true, className: 'land-map__tooltip' });
         layer.on('click', () => callbackRef.current.onSelectPlot?.(feature.id));
         layer.on('add', () => {
@@ -144,7 +149,11 @@ export default function LandMap({
         });
       },
       onEachFeature: (feature, layer) => {
-        const label = `Обращение ${feature.properties.tracking_number} — ${STATUS_META[feature.properties.status]?.label || feature.properties.status}${feature.properties.is_overdue ? ', просрочено' : ''}`;
+        const label = t('Обращение {value0} — {value1}{value2}', {
+          value0: feature.properties.tracking_number,
+          value1: t(STATUS_META[feature.properties.status]?.label || feature.properties.status),
+          value2: feature.properties.is_overdue ? `, ${t('Просрочено')}` : '',
+        });
         layer.bindTooltip(tooltip(label), {
           direction: 'top',
           offset: [0, -13],
@@ -177,7 +186,7 @@ export default function LandMap({
       reports.remove();
       featuresRef.current = new Map();
     };
-  }, [data, selectedId, showPlots, showReports]);
+  }, [data, selectedId, showPlots, showReports, t]);
 
   useEffect(() => {
     if (!focusId) {
@@ -203,31 +212,31 @@ export default function LandMap({
     <div
       className="land-map"
       role="region"
-      aria-label="Интерактивная карта земельных участков и обращений"
+      aria-label={t('Интерактивная карта земельных участков и обращений')}
     >
       <div className="land-map__canvas" ref={containerRef} />
-      <div className="land-map__controls" aria-label="Управление картой">
+      <div className="land-map__controls" aria-label={t('Управление картой')}>
         <button
           type="button"
           onClick={() => mapRef.current?.zoomIn()}
-          aria-label="Приблизить карту"
-          title="Приблизить"
+          aria-label={t('Приблизить карту')}
+          title={t('Приблизить')}
         >
           <Plus size={18} />
         </button>
         <button
           type="button"
           onClick={() => mapRef.current?.zoomOut()}
-          aria-label="Отдалить карту"
-          title="Отдалить"
+          aria-label={t('Отдалить карту')}
+          title={t('Отдалить')}
         >
           <Minus size={18} />
         </button>
         <button
           type="button"
           onClick={fitFeatures}
-          aria-label="Показать все видимые объекты"
-          title="Показать все объекты"
+          aria-label={t('Показать все видимые объекты')}
+          title={t('Показать все объекты')}
         >
           <LocateFixed size={18} />
         </button>
@@ -235,7 +244,7 @@ export default function LandMap({
       {tileError && (
         <div className="land-map__notice" role="status">
           <TriangleAlert size={15} />
-          <span>Подложка карты недоступна. Объекты остаются видимыми.</span>
+          <span>{t('Подложка карты недоступна. Объекты остаются видимыми.')}</span>
           <button
             type="button"
             onClick={() => {
@@ -244,13 +253,13 @@ export default function LandMap({
             }}
           >
             <RefreshCw size={13} />
-            Повторить
+            {t('Повторить')}
           </button>
         </div>
       )}
       {!showPlots && !showReports && (
         <div className="land-map__empty" role="status">
-          Включите слой участков или обращений
+          {t('Включите слой участков или обращений')}
         </div>
       )}
     </div>

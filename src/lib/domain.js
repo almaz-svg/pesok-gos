@@ -1,3 +1,4 @@
+import { getLocale, translate } from '../i18n/core.js';
 export const STATUS_META = Object.freeze({
   NEW: { label: 'Новое обращение', color: '#f4d35e', tone: 'yellow' },
   INSPECTION: { label: 'На проверке', color: '#f4d35e', tone: 'yellow' },
@@ -26,11 +27,11 @@ export const TRANSITIONS = Object.freeze({
 export const TIME_ZONE = 'Asia/Qyzylorda';
 
 export function formatDate(value) {
-  if (!value) return 'Не назначен';
+  if (!value) return translate('Не назначен');
   const date = new Date(value.length === 10 ? `${value}T12:00:00Z` : value);
   return Number.isNaN(date.getTime())
     ? '—'
-    : new Intl.DateTimeFormat('ru-RU', {
+    : new Intl.DateTimeFormat(getLocale(), {
         day: 'numeric',
         month: 'short',
         year: 'numeric',
@@ -43,7 +44,7 @@ export function formatDateTime(value) {
   const date = new Date(value);
   return Number.isNaN(date.getTime())
     ? '—'
-    : new Intl.DateTimeFormat('ru-RU', {
+    : new Intl.DateTimeFormat(getLocale(), {
         day: 'numeric',
         month: 'short',
         hour: '2-digit',

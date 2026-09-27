@@ -33,14 +33,16 @@ test('each send uses fresh CSRF and never adds a browser OpenAI credential', asy
     },
   });
   await client.send([{ role: 'user', content: 'Карта?' }], '/map');
-  await client.send([{ role: 'user', content: 'Статусы?' }], '/reports');
+  await client.send([{ role: 'user', content: 'Мәртебелер?' }], '/reports', undefined, 'kk');
   assert.equal(calls[1].headers['X-CSRFToken'], 'token-1');
   assert.equal(calls[3].headers['X-CSRFToken'], 'token-3');
   assert.ok(calls.every((call) => call.credentials === 'include' && !call.headers.Authorization));
   assert.deepEqual(JSON.parse(calls[1].body), {
     messages: [{ role: 'user', content: 'Карта?' }],
     page: '/map',
+    language: 'ru',
   });
+  assert.equal(JSON.parse(calls[3].body).language, 'kk');
 });
 
 test('missing configuration prevents POST and provider errors stay out of the UI', async () => {

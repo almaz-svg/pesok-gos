@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/useI18n.js';
 import { useLayoutEffect, useRef } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Header from './Header.jsx';
@@ -12,10 +13,17 @@ const titles = {
 };
 
 export default function SiteLayout() {
-  const { pathname } = useLocation();
+  const { t } = useI18n();
+  const { pathname, search } = useLocation();
   const mainRef = useRef(null);
   useLayoutEffect(() => {
-    document.title = `${titles[pathname.replace(/\/$/, '') || '/'] || 'Страница не найдена'} — Песок Гос`;
+    const label =
+      pathname === '/reports' && new URLSearchParams(search).get('view') === 'analytics'
+        ? 'Аналитика'
+        : titles[pathname.replace(/\/$/, '') || '/'] || 'Страница не найдена';
+    document.title = t('{value0} — Песок Гос', { value0: t(label) });
+  }, [pathname, search, t]);
+  useLayoutEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     mainRef.current?.focus({ preventScroll: true });
   }, [pathname]);
@@ -23,7 +31,7 @@ export default function SiteLayout() {
   return (
     <>
       <a className="skip-link" href="#main-content">
-        Перейти к содержимому
+        {t('Перейти к содержимому')}
       </a>
       <div className="site-shell">
         <Header />

@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/useI18n.js';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, Check, Eye, EyeOff, Info } from '../icons.jsx';
@@ -39,6 +40,7 @@ const fields = [
 ];
 
 export default function RegisterForm() {
+  const { t } = useI18n();
   const [values, setValues] = useState(initialValues);
   const [touched, setTouched] = useState({});
   const [visible, setVisible] = useState({});
@@ -74,17 +76,21 @@ export default function RegisterForm() {
   return (
     <div className="register-card">
       <div className="register-card-heading">
-        <span className="auth-eyebrow">ЛИЧНЫЙ АККАУНТ</span>
-        <h2 id="register-form-title">Создать аккаунт</h2>
-        <p>Начните с простого — расскажите немного о себе.</p>
+        <span className="auth-eyebrow">{t('ЛИЧНЫЙ АККАУНТ')}</span>
+        <h2 id="register-form-title">{t('Создать аккаунт')}</h2>
+        <p>{t('Начните с простого — расскажите немного о себе.')}</p>
       </div>
       {validated ? (
         <div className="registration-result" tabIndex={-1} ref={resultRef} role="status">
           <span className="registration-result-icon">
             <Check size={26} />
           </span>
-          <h3>Форма заполнена верно</h3>
-          <p>Создание аккаунтов ещё не подключено. Аккаунт не создан, ваши данные не отправлены.</p>
+          <h3>{t('Форма заполнена верно')}</h3>
+          <p>
+            {t(
+              'Создание аккаунтов ещё не подключено. Аккаунт не создан, ваши данные не отправлены.',
+            )}
+          </p>
           <button
             className="button auth-submit"
             onClick={() => {
@@ -92,10 +98,10 @@ export default function RegisterForm() {
               setValidated(false);
             }}
           >
-            Вернуться к форме <ArrowUpRight size={18} />
+            {t('Вернуться к форме')} <ArrowUpRight size={18} />
           </button>
           <Link className="auth-text-link" to="/map">
-            Посмотреть карту земель
+            {t('Посмотреть карту земель')}
           </Link>
         </div>
       ) : (
@@ -114,7 +120,7 @@ export default function RegisterForm() {
               const hintId = field.name === 'password' ? 'register-password-hint' : undefined;
               return (
                 <div className="auth-field" key={field.name}>
-                  <label htmlFor={inputId}>{field.label}</label>
+                  <label htmlFor={inputId}>{t(field.label)}</label>
                   <div className={`auth-input-wrap ${error ? 'has-error' : ''}`}>
                     <input
                       id={inputId}
@@ -125,7 +131,7 @@ export default function RegisterForm() {
                       autoCapitalize={field.name === 'name' ? 'words' : 'none'}
                       spellCheck={field.name === 'name'}
                       maxLength={field.maxLength}
-                      placeholder={field.placeholder}
+                      placeholder={t(field.placeholder)}
                       required
                       aria-invalid={Boolean(error)}
                       aria-describedby={
@@ -141,7 +147,15 @@ export default function RegisterForm() {
                       <button
                         type="button"
                         className="password-toggle"
-                        aria-label={`${visible[field.name] ? 'Скрыть' : 'Показать'} ${field.name === 'password' ? 'пароль' : 'подтверждение пароля'}`}
+                        aria-label={t(
+                          field.name === 'password'
+                            ? visible[field.name]
+                              ? 'Скрыть пароль'
+                              : 'Показать пароль'
+                            : visible[field.name]
+                              ? 'Скрыть подтверждение пароля'
+                              : 'Показать подтверждение пароля',
+                        )}
                         aria-pressed={Boolean(visible[field.name])}
                         aria-controls={inputId}
                         onClick={() =>
@@ -157,12 +171,12 @@ export default function RegisterForm() {
                   </div>
                   {hintId && (
                     <p className="auth-field-hint" id={hintId}>
-                      Не менее 8 символов. Можно использовать пробелы.
+                      {t('Не менее 8 символов. Можно использовать пробелы.')}
                     </p>
                   )}
                   {error && (
                     <p className="auth-field-error" id={`${inputId}-error`}>
-                      {error}
+                      {t(error)}
                     </p>
                   )}
                 </div>
@@ -171,8 +185,9 @@ export default function RegisterForm() {
             <div className="registration-notice" id="registration-notice">
               <Info size={16} aria-hidden="true" />
               <p>
-                Предпросмотр формы. Создание аккаунтов пока недоступно; данные никуда не
-                отправляются.
+                {t(
+                  'Предпросмотр формы. Создание аккаунтов пока недоступно; данные никуда не отправляются.',
+                )}
               </p>
             </div>
             <button
@@ -180,13 +195,13 @@ export default function RegisterForm() {
               className="button auth-submit"
               aria-describedby="registration-notice"
             >
-              Создать аккаунт <ArrowUpRight size={19} />
+              {t('Создать аккаунт')} <ArrowUpRight size={19} />
             </button>
           </form>
           <p className="auth-signin">
-            Уже есть доступ?{' '}
+            {t('Уже есть доступ?')}{' '}
             <Link to="/map">
-              Открыть панель <ArrowUpRight size={13} />
+              {t('Открыть панель')} <ArrowUpRight size={13} />
             </Link>
           </p>
         </>

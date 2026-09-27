@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/useI18n.js';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
@@ -17,6 +18,7 @@ const suggestions = ['Как работает карта?', 'Что означа
 const pages = ['/', '/map', '/reports', '/register'];
 
 export default function AssistantWidget() {
+  const { t, language } = useI18n();
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
   const [question, setQuestion] = useState('');
@@ -112,6 +114,7 @@ export default function AssistantWidget() {
         chatHistory(history, clean),
         pages.includes(pathname) ? pathname : '/',
         controller.signal,
+        language,
       );
       if (requestRef.current !== controller) return;
       setConnection('ready');
@@ -158,13 +161,13 @@ export default function AssistantWidget() {
         className="assistant-launcher"
         ref={launcherRef}
         onClick={() => setOpen(true)}
-        aria-label="Открыть ИИ-помощника"
+        aria-label={t('Открыть ИИ-помощника')}
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls="site-assistant"
       >
         <AssistantChat size={23} />
-        <span>ИИ-помощник</span>
+        <span>{t('ИИ-помощник')}</span>
         <ArrowUpRight className="assistant-launcher-arrow" size={18} />
       </button>
       <dialog
@@ -213,14 +216,14 @@ export default function AssistantWidget() {
             <AssistantChat size={22} />
           </span>
           <div>
-            <h2 id="assistant-title">Помощник Песок</h2>
-            <p id="assistant-subtitle">Помогу разобраться в проекте</p>
+            <h2 id="assistant-title">{t('Помощник Песок')}</h2>
+            <p id="assistant-subtitle">{t('Помогу разобраться в проекте')}</p>
           </div>
           <button
             className="assistant-icon-button"
             onClick={reset}
-            aria-label="Начать новый диалог"
-            title="Новый диалог"
+            aria-label={t('Начать новый диалог')}
+            title={t('Новый диалог')}
             disabled={!turns.length && !question}
           >
             <RotateCcw size={18} />
@@ -229,7 +232,7 @@ export default function AssistantWidget() {
             className="assistant-icon-button"
             ref={closeRef}
             onClick={() => setOpen(false)}
-            aria-label="Закрыть ИИ-помощника"
+            aria-label={t('Закрыть ИИ-помощника')}
           >
             <X size={21} />
           </button>
@@ -238,32 +241,33 @@ export default function AssistantWidget() {
           className="assistant-log"
           ref={logRef}
           role="log"
-          aria-label="Диалог с помощником"
+          aria-label={t('Диалог с помощником')}
           aria-live="polite"
           aria-relevant="additions text"
         >
           <div className="assistant-welcome">
-            <span className="assistant-eyebrow">НА СТОРОНЕ ЗЕМЛИ</span>
+            <span className="assistant-eyebrow">{t('НА СТОРОНЕ ЗЕМЛИ')}</span>
             <h3>
-              Давайте разберёмся
+              {t('Давайте разберёмся')}
               <br />
-              вместе<span>.</span>
+              {t('вместе')}
+              <span>.</span>
             </h3>
-            <p>Подскажу, где найти участок, как читать статусы и работать с обращениями.</p>
+            <p>{t('Подскажу, где найти участок, как читать статусы и работать с обращениями.')}</p>
             <div className="assistant-shortcuts">
               <Link to="/map" onClick={() => setOpen(false)}>
-                Карта земель <ArrowUpRight size={14} />
+                {t('Карта земель')} <ArrowUpRight size={14} />
               </Link>
               <Link to="/reports" onClick={() => setOpen(false)}>
-                Обращения <ArrowUpRight size={14} />
+                {t('Обращения')} <ArrowUpRight size={14} />
               </Link>
             </div>
           </div>
           {!turns.length && (
-            <div className="assistant-suggestions" aria-label="Примеры вопросов">
+            <div className="assistant-suggestions" aria-label={t('Примеры вопросов')}>
               {suggestions.map((text) => (
-                <button key={text} onClick={() => send(text)} disabled={sending}>
-                  {text}
+                <button key={text} onClick={() => send(t(text))} disabled={sending}>
+                  {t(text)}
                   <ArrowUpRight size={15} />
                 </button>
               ))}
@@ -272,31 +276,31 @@ export default function AssistantWidget() {
           {turns.map((turn, index) => (
             <div className="assistant-turn" key={turn.id}>
               <div className="assistant-message assistant-message-user">
-                <span className="assistant-speaker">Вы</span>
+                <span className="assistant-speaker">{t('Вы')}</span>
                 <p>{turn.question}</p>
               </div>
               {turn.answer && (
                 <div className="assistant-message assistant-message-reply">
                   <span className="assistant-speaker">
-                    <AssistantChat size={13} /> Песок · ИИ
+                    <AssistantChat size={13} /> {t('Песок · ИИ')}
                   </span>
                   <p>{turn.answer}</p>
                   {turn.truncated && (
-                    <small>Ответ сокращён. Уточните вопрос, чтобы узнать больше.</small>
+                    <small>{t('Ответ сокращён. Уточните вопрос, чтобы узнать больше.')}</small>
                   )}
                 </div>
               )}
               {turn.state === 'sending' && (
                 <div className="assistant-thinking" role="status">
-                  <LoaderCircle size={16} /> Помощник готовит ответ…
+                  <LoaderCircle size={16} /> {t('Помощник готовит ответ…')}
                 </div>
               )}
               {turn.state === 'error' && (
                 <div className="assistant-error" role="alert">
-                  <p>{turn.error}</p>
+                  <p>{t(turn.error)}</p>
                   {index === turns.length - 1 && (
                     <button disabled={sending} onClick={() => send(turn.question, turn.id)}>
-                      <RotateCcw size={14} /> Повторить отправку
+                      <RotateCcw size={14} /> {t('Повторить отправку')}
                     </button>
                   )}
                 </div>
@@ -307,8 +311,8 @@ export default function AssistantWidget() {
         <div className="assistant-bottom">
           {connection === 'unavailable' && !turns.length && (
             <div className="assistant-connection" role="status">
-              <span>Помощник пока недоступен</span>
-              <button onClick={checkConnection}>Проверить связь</button>
+              <span>{t('Помощник пока недоступен')}</span>
+              <button onClick={checkConnection}>{t('Проверить связь')}</button>
             </div>
           )}
           <form
@@ -319,7 +323,7 @@ export default function AssistantWidget() {
             }}
           >
             <label className="sr-only" htmlFor="assistant-question">
-              Ваш вопрос помощнику
+              {t('Ваш вопрос помощнику')}
             </label>
             <textarea
               id="assistant-question"
@@ -327,7 +331,7 @@ export default function AssistantWidget() {
               value={question}
               rows={2}
               maxLength={MAX_QUESTION_LENGTH}
-              placeholder="Спросите о проекте…"
+              placeholder={t('Спросите о проекте…')}
               onChange={(event) => setQuestion(event.target.value)}
               onKeyDown={(event) => {
                 if (
@@ -346,7 +350,7 @@ export default function AssistantWidget() {
                 type="button"
                 className="assistant-send"
                 onClick={() => requestRef.current?.abort()}
-                aria-label="Остановить ответ"
+                aria-label={t('Остановить ответ')}
               >
                 <Square size={17} />
               </button>
@@ -355,14 +359,14 @@ export default function AssistantWidget() {
                 type="submit"
                 className="assistant-send"
                 disabled={!question.trim()}
-                aria-label="Отправить сообщение"
+                aria-label={t('Отправить сообщение')}
               >
                 <ArrowUp size={21} />
               </button>
             )}
           </form>
           <div className="assistant-footnote">
-            <span>Сообщения обрабатывает OpenAI</span>
+            <span>{t('Сообщения обрабатывает OpenAI')}</span>
             <span>
               {question.length}/{MAX_QUESTION_LENGTH}
             </span>

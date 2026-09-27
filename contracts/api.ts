@@ -126,6 +126,7 @@ export interface AssistantStatus {
 export interface AssistantChatRequest {
   messages: { role: 'user' | 'assistant'; content: string }[];
   page?: '/' | '/map' | '/reports' | '/register';
+  language?: 'kk' | 'ru' | 'en';
 }
 export interface AssistantChatResponse {
   reply: string;

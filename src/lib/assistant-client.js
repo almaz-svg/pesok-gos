@@ -76,11 +76,15 @@ export function createAssistantClient({ fetchImpl = globalThis.fetch, timeoutMs 
     return data;
   }
 
-  async function send(messages, page, signal) {
+  async function send(messages, page, signal, language = 'ru') {
     // Get a fresh token: signing in on another page rotates Django's CSRF secret.
     const connection = await status(signal);
     if (!connection.available) throw new Error('Помощник пока недоступен. Попробуйте позже.');
-    const data = await request({ body: { messages, page }, csrf: connection.csrf_token, signal });
+    const data = await request({
+      body: { messages, page, language },
+      csrf: connection.csrf_token,
+      signal,
+    });
     if (typeof data?.reply !== 'string' || !data.reply.trim())
       throw new Error('Помощник вернул пустой ответ. Попробуйте ещё раз.');
     return { reply: data.reply, truncated: Boolean(data.truncated) };

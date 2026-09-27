@@ -1,19 +1,21 @@
+import { useI18n } from '../../i18n/useI18n.js';
 import { Link } from 'react-router-dom';
 import { MoveUpRight, Radio, ScanLine, Check } from '../icons.jsx';
 export default function ProcessSection() {
+  const { t } = useI18n();
   return (
     <section className="process-section" aria-labelledby="process-title">
       <div className="process-intro" data-reveal>
         <div className="section-kicker">
-          <span>02 /</span> КАК ЭТО РАБОТАЕТ
+          <span>02 /</span> {t('КАК ЭТО РАБОТАЕТ')}
         </div>
         <h2 id="process-title">
-          Ближе к земле.
+          {t('Ближе к земле.')}
           <br />
-          <span>Ближе к людям.</span>
+          <span>{t('Ближе к людям.')}</span>
         </h2>
         <Link to="/reports">
-          Перейти к обращениям
+          {t('Перейти к обращениям')}
           <MoveUpRight size={17} />
         </Link>
       </div>
@@ -21,22 +23,24 @@ export default function ProcessSection() {
         {[
           {
             n: '01',
-            title: 'Замечено.',
-            text: 'Гражданин отправляет геолокацию, фото и описание проблемы через Telegram.',
+            title: t('Замечено.'),
+            text: t('Гражданин отправляет геолокацию, фото и описание проблемы через Telegram.'),
             tone: 'yellow',
             icon: Radio,
           },
           {
             n: '02',
-            title: 'Проверено.',
-            text: 'Инспектор изучает сигнал на карте, фиксирует результат и назначает контрольный срок.',
+            title: t('Проверено.'),
+            text: t(
+              'Инспектор изучает сигнал на карте, фиксирует результат и назначает контрольный срок.',
+            ),
             tone: 'red',
             icon: ScanLine,
           },
           {
             n: '03',
-            title: 'Решено.',
-            text: 'Статус обращения меняется. Вся история работы остаётся в карточке.',
+            title: t('Решено.'),
+            text: t('Статус обращения меняется. Вся история работы остаётся в карточке.'),
             tone: 'green',
             icon: Check,
           },

@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/useI18n.js';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
@@ -30,6 +31,7 @@ import { filterMonitoringData, visibleFeatureCollection } from '../../lib/monito
 const STATUSES = ['NEW', 'INSPECTION', 'VIOLATION', 'IN_PROGRESS', 'RESOLVED'];
 const isDemo = dataMode === 'demo';
 export default function InspectorWorkspace({ view }) {
+  const { t, locale } = useI18n();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const tab =
@@ -134,39 +136,41 @@ export default function InspectorWorkspace({ view }) {
         <div className="section-heading">
           <div>
             <div className="section-kicker">
-              <span>01 /</span> РАБОЧЕЕ ПРОСТРАНСТВО
+              <span>01 /</span> {t('РАБОЧЕЕ ПРОСТРАНСТВО')}
             </div>
             <h1 id="workspace-title" className="workspace-title">
-              {view === 'map' ? 'Карта земель.' : 'Обращения.'}
+              {view === 'map' ? t('Карта земель.') : t('Обращения.')}
               <br />
-              <span>{view === 'map' ? 'Территория под контролем.' : 'Каждый сигнал важен.'}</span>
+              <span>
+                {view === 'map' ? t('Территория под контролем.') : t('Каждый сигнал важен.')}
+              </span>
             </h1>
           </div>
           <div className="workspace-context">
             <div className="demo-label">
               <span className="live-dot" />
-              {isDemo ? 'DEMO · ТУРКЕСТАН' : 'DJANGO API'}
+              {isDemo ? t('DEMO · ТУРКЕСТАН') : 'DJANGO API'}
             </div>
             <p>
               {isDemo ? (
                 <>
-                  Вымышленные участки и обращения.
+                  {t('Вымышленные участки и обращения.')}
                   <br />
-                  Данные не являются официальным кадастром.
+                  {t('Данные не являются официальным кадастром.')}
                 </>
               ) : (
                 <>
-                  Карта участков и обращения граждан.
+                  {t('Карта участков и обращения граждан.')}
                   <br />
-                  Обновление каждые 5 секунд.
+                  {t('Обновление каждые 5 секунд.')}
                 </>
               )}
             </p>
             {user && (
               <span className="user-label">
-                {user.username}
+                {isDemo ? t(user.username) : user.username}
                 {!isDemo && (
-                  <button aria-label="Выйти из аккаунта" onClick={signOut}>
+                  <button aria-label={t('Выйти из аккаунта')} onClick={signOut}>
                     <LogOut size={14} />
                   </button>
                 )}
@@ -177,15 +181,15 @@ export default function InspectorWorkspace({ view }) {
         {!sessionReady ? (
           <div className="state-box">
             <LoaderCircle className="spin" size={23} />
-            Подключаем рабочее пространство…
+            {t('Подключаем рабочее пространство…')}
           </div>
         ) : sessionError ? (
           <div className="state-box error-box" role="alert">
             <Radio size={26} />
-            <h3>Сервер недоступен</h3>
-            <p>{sessionError}</p>
+            <h3>{t('Сервер недоступен')}</h3>
+            <p>{t(sessionError)}</p>
             <button className="button" onClick={checkSession}>
-              Повторить подключение <RefreshCw size={15} />
+              {t('Повторить подключение')} <RefreshCw size={15} />
             </button>
           </div>
         ) : !user ? (
@@ -196,28 +200,28 @@ export default function InspectorWorkspace({ view }) {
               {[
                 {
                   key: 'total_plots',
-                  label: 'Участков в системе',
+                  label: t('Участков в системе'),
                   tone: 'neutral',
                   icon: <Layers3 size={17} />,
                   filter: 'ALL',
                 },
                 {
                   key: 'under_inspection',
-                  label: 'На проверке',
+                  label: t('На проверке'),
                   tone: 'yellow',
                   icon: <ScanLine size={17} />,
                   filter: 'INSPECTION',
                 },
                 {
                   key: 'active_violations',
-                  label: 'Активных нарушений',
+                  label: t('Активных нарушений'),
                   tone: 'red',
                   icon: <Radio size={17} />,
                   filter: 'VIOLATION',
                 },
                 {
                   key: 'resolved',
-                  label: 'Обращений закрыто',
+                  label: t('Обращений закрыто'),
                   tone: 'green',
                   icon: <Check size={18} />,
                   filter: 'RESOLVED',
@@ -240,11 +244,11 @@ export default function InspectorWorkspace({ view }) {
               ))}
             </div>
             <div className="monitor-toolbar">
-              <nav className="view-tabs" aria-label="Разделы мониторинга">
+              <nav className="view-tabs" aria-label={t('Разделы мониторинга')}>
                 {[
-                  { id: 'map', label: 'Карта', icon: Map },
-                  { id: 'reports', label: 'Обращения', icon: List },
-                  { id: 'analytics', label: 'Аналитика', icon: ChartNoAxesCombined },
+                  { id: 'map', label: t('Карта'), icon: Map },
+                  { id: 'reports', label: t('Обращения'), icon: List },
+                  { id: 'analytics', label: t('Аналитика'), icon: ChartNoAxesCombined },
                 ].map(({ id, label, icon: Icon }) => (
                   <Link
                     aria-current={tab === id ? 'page' : undefined}
@@ -259,7 +263,7 @@ export default function InspectorWorkspace({ view }) {
                     }
                   >
                     <Icon size={16} />
-                    <span>{label}</span>
+                    <span>{t(label)}</span>
                     {id === 'reports' && (
                       <small>{resources.reports.loaded ? data.reports.length : '—'}</small>
                     )}
@@ -269,14 +273,21 @@ export default function InspectorWorkspace({ view }) {
               <div className="sync-status">
                 <span className={resourceErrors.length ? 'offline-dot' : 'live-dot'} />
                 {resourceErrors.length
-                  ? 'Часть данных недоступна'
+                  ? t('Часть данных недоступна')
                   : updatedAt
-                    ? `Обновлено в ${updatedAt.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Qyzylorda' })}`
-                    : 'Получаем данные'}
+                    ? t('Обновлено в {value0}', {
+                        value0: updatedAt.toLocaleTimeString(locale, {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit',
+                          timeZone: 'Asia/Qyzylorda',
+                        }),
+                      })
+                    : t('Получаем данные')}
                 <button
                   className={refreshing ? 'spin' : ''}
                   onClick={refresh}
-                  aria-label="Обновить данные"
+                  aria-label={t('Обновить данные')}
                   disabled={refreshing}
                 >
                   <RefreshCw size={14} />
@@ -291,34 +302,34 @@ export default function InspectorWorkspace({ view }) {
                     type="search"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Номер обращения или кадастровый номер"
-                    aria-label="Поиск по номеру обращения или кадастровому номеру"
+                    placeholder={t('Номер обращения или кадастровый номер')}
+                    aria-label={t('Поиск по номеру обращения или кадастровому номеру')}
                   />
                   {query && (
-                    <button aria-label="Очистить поиск" onClick={() => setQuery('')}>
+                    <button aria-label={t('Очистить поиск')} onClick={() => setQuery('')}>
                       <X size={15} />
                     </button>
                   )}
                 </label>
                 <div className="filter-actions">
                   <label className="status-select">
-                    <span className="sr-only">Статус обращения</span>
+                    <span className="sr-only">{t('Статус обращения')}</span>
                     <select
-                      aria-label="Статус обращения"
+                      aria-label={t('Статус обращения')}
                       value={status}
                       onChange={(e) => setStatus(e.target.value)}
                     >
-                      <option value="ALL">Все статусы</option>
+                      <option value="ALL">{t('Все статусы')}</option>
                       {STATUSES.map((s) => (
                         <option key={s} value={s}>
-                          {STATUS_META[s]?.label}
+                          {t(STATUS_META[s]?.label)}
                         </option>
                       ))}
                     </select>
                   </label>
                   <button
                     className={`icon-button ${showFilters ? 'is-active' : ''}`}
-                    aria-label="Дополнительные фильтры"
+                    aria-label={t('Дополнительные фильтры')}
                     aria-expanded={showFilters}
                     onClick={() => setShowFilters(!showFilters)}
                   >
@@ -326,8 +337,8 @@ export default function InspectorWorkspace({ view }) {
                   </button>
                   <button
                     className="icon-button export-button"
-                    aria-label="Скачать видимые объекты GeoJSON"
-                    title="Скачать GeoJSON"
+                    aria-label={t('Скачать видимые объекты GeoJSON')}
+                    title={t('Скачать GeoJSON')}
                     onClick={downloadMap}
                     disabled={!resources.map.loaded}
                   >
@@ -343,7 +354,7 @@ export default function InspectorWorkspace({ view }) {
                       checked={overdueOnly}
                       onChange={(e) => setOverdueOnly(e.target.checked)}
                     />
-                    Только просроченные
+                    {t('Только просроченные')}
                   </label>
                   <label>
                     <input
@@ -351,7 +362,7 @@ export default function InspectorWorkspace({ view }) {
                       checked={showPlots}
                       onChange={(e) => setShowPlots(e.target.checked)}
                     />
-                    Участки на карте
+                    {t('Участки на карте')}
                   </label>
                   <label>
                     <input
@@ -359,7 +370,7 @@ export default function InspectorWorkspace({ view }) {
                       checked={showReports}
                       onChange={(e) => setShowReports(e.target.checked)}
                     />
-                    Обращения на карте
+                    {t('Обращения на карте')}
                   </label>
                   <button
                     onClick={() => {
@@ -370,7 +381,7 @@ export default function InspectorWorkspace({ view }) {
                       setShowReports(true);
                     }}
                   >
-                    Сбросить
+                    {t('Сбросить')}
                   </button>
                 </div>
               )}
@@ -378,13 +389,13 @@ export default function InspectorWorkspace({ view }) {
                 <div className="data-error" role="alert" key={key}>
                   <Radio size={17} />
                   <span>
-                    <strong>{RESOURCE_LABELS[key]}. </strong>
-                    {resource.loaded ? 'Показаны последние загруженные данные. ' : ''}
-                    {resource.error.message}
+                    <strong>{t(RESOURCE_LABELS[key])}. </strong>
+                    {resource.loaded ? t('Показаны последние загруженные данные. ') : ''}
+                    {t(resource.error.message)}
                     {resource.error.requestId ? ` · ${resource.error.requestId}` : ''}
                   </span>
                   <button disabled={resource.loading} onClick={() => refresh({ only: key })}>
-                    Повторить
+                    {t('Повторить')}
                   </button>
                 </div>
               ))}
@@ -393,10 +404,10 @@ export default function InspectorWorkspace({ view }) {
                 role="region"
                 aria-label={
                   tab === 'map'
-                    ? 'Карта земель'
+                    ? t('Карта земель')
                     : tab === 'analytics'
-                      ? 'Аналитика обращений'
-                      : 'Список обращений'
+                      ? t('Аналитика обращений')
+                      : t('Список обращений')
                 }
               >
                 {tab === 'map' ? (
@@ -423,7 +434,7 @@ export default function InspectorWorkspace({ view }) {
                 ) : !resources.reports.loaded ? (
                   <ResourceState
                     resource={resources.reports}
-                    label="Обращения"
+                    label={t('Обращения')}
                     onRetry={() => refresh({ only: 'reports' })}
                   />
                 ) : tab === 'reports' ? (
@@ -431,17 +442,19 @@ export default function InspectorWorkspace({ view }) {
                 ) : (
                   <div className="analytics-panel">
                     <div>
-                      <div className="section-kicker">СТАТУСЫ ОБРАЩЕНИЙ</div>
-                      <h3>От сигнала к результату</h3>
+                      <div className="section-kicker">{t('СТАТУСЫ ОБРАЩЕНИЙ')}</div>
+                      <h3>{t('От сигнала к результату')}</h3>
                       <p>
-                        Распределение {filtered.reports.length} обращений по выбранным фильтрам.
+                        {t('Распределение обращений по выбранным фильтрам: {count}.', {
+                          count: filtered.reports.length,
+                        })}
                       </p>
                       <div className="chart-bars">
                         {STATUSES.map((s) => {
                           const count = filtered.reports.filter((r) => r.status === s).length;
                           return (
                             <div className="chart-row" key={s}>
-                              <span>{STATUS_META[s].label}</span>
+                              <span>{t(STATUS_META[s].label)}</span>
                               <div>
                                 <i
                                   style={{
@@ -459,8 +472,8 @@ export default function InspectorWorkspace({ view }) {
                     <div className="analytics-callout">
                       <ScanLine size={30} />
                       <strong>{filtered.reports.filter((r) => r.is_overdue).length}</strong>
-                      <h4>Требуют внимания</h4>
-                      <p>Обращения с истёкшим контрольным сроком среди выбранных данных.</p>
+                      <h4>{t('Требуют внимания')}</h4>
+                      <p>{t('Обращения с истёкшим контрольным сроком среди выбранных данных.')}</p>
                       <button
                         onClick={() => {
                           setOverdueOnly(true);
@@ -468,7 +481,7 @@ export default function InspectorWorkspace({ view }) {
                           setShowFilters(true);
                         }}
                       >
-                        Посмотреть обращения
+                        {t('Посмотреть обращения')}
                         <ArrowUpRight size={16} />
                       </button>
                     </div>
@@ -478,13 +491,14 @@ export default function InspectorWorkspace({ view }) {
               <div className="data-footer">
                 <span>
                   <span className="live-dot" />
-                  {isDemo ? 'ДЕМО-ДАННЫЕ' : 'ДАННЫЕ API'}
-                  <span className="footer-separator">/</span>ОБНОВЛЕНИЕ КАЖДЫЕ 5 СЕК
+                  {isDemo ? t('ДЕМО-ДАННЫЕ') : t('ДАННЫЕ API')}
+                  <span className="footer-separator">/</span>
+                  {t('ОБНОВЛЕНИЕ КАЖДЫЕ 5 СЕК')}
                 </span>
                 {isDemo && (
                   <button disabled={adding} onClick={demoSignal}>
                     <Plus size={14} />
-                    {adding ? 'Добавляем…' : 'Добавить демо-сигнал'}
+                    {adding ? t('Добавляем…') : t('Добавить демо-сигнал')}
                   </button>
                 )}
               </div>
@@ -494,20 +508,20 @@ export default function InspectorWorkspace({ view }) {
       </section>
       <details className="help-details">
         <summary>
-          <CircleHelp size={17} />О демонстрационном пространстве
+          <CircleHelp size={17} />
+          {t('О демонстрационном пространстве')}
           <Plus size={17} />
         </summary>
         <div>
           <p>
-            В режиме DEMO участки, обращения и иллюстрации вымышлены. Изменения сохраняются только в
-            вашем браузере. «Добавить демо-сигнал» помогает проверить появление нового обращения на
-            карте.
+            {t(
+              'В режиме DEMO участки, обращения и иллюстрации вымышлены. Изменения сохраняются только в вашем браузере. «Добавить демо-сигнал» помогает проверить появление нового обращения на карте.',
+            )}
           </p>
           <p>
-            Рабочая панель поддерживает карту, поиск по кадастровому номеру, фильтры, историю и
-            смену статуса. Для живого пути из Telegram нужно подключить Django API и серверный
-            процесс бота. Участки с фактическими границами отображаются как полигоны; точки не
-            превращаются в границы.
+            {t(
+              'Рабочая панель поддерживает карту, поиск по кадастровому номеру, фильтры, историю и смену статуса. Для живого пути из Telegram нужно подключить Django API и серверный процесс бота. Участки с фактическими границами отображаются как полигоны; точки не превращаются в границы.',
+            )}
           </p>
         </div>
         {isDemo && user && (
@@ -524,7 +538,7 @@ export default function InspectorWorkspace({ view }) {
                 setStatus('ALL');
                 setOverdueOnly(false);
                 await refresh({ force: true });
-                setToast('Исходные демо-данные восстановлены');
+                setToast(t('Исходные демо-данные восстановлены'));
               } catch (err) {
                 setToast(err.message);
               } finally {
@@ -532,7 +546,7 @@ export default function InspectorWorkspace({ view }) {
               }
             }}
           >
-            Восстановить демо-данные <RefreshCw size={14} />
+            {t('Восстановить демо-данные')} <RefreshCw size={14} />
           </button>
         )}
       </details>
@@ -542,7 +556,7 @@ export default function InspectorWorkspace({ view }) {
           onClose={() => setSelection(null)}
           onSaved={async () => {
             await refresh({ force: true });
-            setToast('Изменения сохранены');
+            setToast(t('Изменения сохранены'));
           }}
           plots={data.plots}
         />
@@ -550,8 +564,8 @@ export default function InspectorWorkspace({ view }) {
       {toast && (
         <div className="toast" role="status">
           <Check size={17} />
-          {toast}
-          <button onClick={() => setToast('')} aria-label="Закрыть уведомление">
+          {t(toast)}
+          <button onClick={() => setToast('')} aria-label={t('Закрыть уведомление')}>
             <X size={15} />
           </button>
         </div>

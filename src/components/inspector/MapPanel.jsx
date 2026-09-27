@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/useI18n.js';
 import { Link } from 'react-router-dom';
 import { Radio, Search, Check, ArrowUpRight, ArrowRight } from '../icons.jsx';
 import LandMap from '../LandMap.jsx';
@@ -21,6 +22,7 @@ export default function MapPanel({
   status,
   overdueOnly,
 }) {
+  const { t } = useI18n();
   return (
     <div className="map-layout">
       <div className="map-frame">
@@ -38,8 +40,8 @@ export default function MapPanel({
             />
             <div className="map-location">
               <span className="live-dot" />
-              {isDemo ? 'Туркестанская область' : 'Карта мониторинга'}
-              <small>{isDemo ? 'ДЕМОНСТРАЦИОННАЯ ЗОНА' : 'ЗЕМЕЛЬНЫЕ УЧАСТКИ'}</small>
+              {isDemo ? t('Туркестанская область') : t('Карта мониторинга')}
+              <small>{isDemo ? t('ДЕМОНСТРАЦИОННАЯ ЗОНА') : t('ЗЕМЕЛЬНЫЕ УЧАСТКИ')}</small>
             </div>
             {!resources.map.error &&
               !filtered.map.reports.features.length &&
@@ -48,35 +50,35 @@ export default function MapPanel({
                   <Search size={22} />
                   <strong>
                     {query || status !== 'ALL' || overdueOnly
-                      ? 'Ничего не найдено'
-                      : 'Сигналов пока нет'}
+                      ? t('Ничего не найдено')
+                      : t('Сигналов пока нет')}
                   </strong>
                   <span>
                     {query || status !== 'ALL' || overdueOnly
-                      ? 'Попробуйте изменить фильтры'
-                      : 'Новые объекты появятся автоматически'}
+                      ? t('Попробуйте изменить фильтры')
+                      : t('Новые объекты появятся автоматически')}
                   </span>
                 </div>
               )}
             <div className="map-legend">
               <span>
                 <i className="green-dot" />
-                Без нарушений
+                {t('Без нарушений')}
               </span>
               <span>
                 <i className="yellow-dot" />
-                Проверка
+                {t('Проверка')}
               </span>
               <span>
                 <i className="red-dot" />
-                Нарушение
+                {t('Нарушение')}
               </span>
             </div>
           </>
         ) : (
           <ResourceState
             resource={resources.map}
-            label="Карта"
+            label={t('Карта')}
             onRetry={() => refresh({ only: 'map' })}
           />
         )}
@@ -85,7 +87,7 @@ export default function MapPanel({
         <div className="rail-heading">
           <div>
             <Radio size={16} />
-            <h3>Лента обращений</h3>
+            <h3>{t('Лента обращений')}</h3>
           </div>
           <span>{resources.reports.loaded ? filtered.reports.length : '—'}</span>
         </div>
@@ -93,7 +95,7 @@ export default function MapPanel({
           {!resources.reports.loaded ? (
             <ResourceState
               resource={resources.reports}
-              label="Обращения"
+              label={t('Обращения')}
               onRetry={() => refresh({ only: 'reports' })}
             />
           ) : (
@@ -108,7 +110,7 @@ export default function MapPanel({
                     <span>{report.tracking_number}</span>
                     <ArrowUpRight size={15} />
                   </div>
-                  <h4>{CATEGORY_LABELS[report.category]}</h4>
+                  <h4>{t(CATEGORY_LABELS[report.category])}</h4>
                   <p>{report.description}</p>
                   <div className="preview-bottom">
                     <Status status={report.status} />
@@ -121,10 +123,10 @@ export default function MapPanel({
                   <Check size={25} />
                   <p>
                     {resources.reports.error
-                      ? 'Не удалось обновить ленту'
+                      ? t('Не удалось обновить ленту')
                       : data.reports.length
-                        ? 'Нет обращений по выбранным фильтрам'
-                        : 'Сигналов пока нет'}
+                        ? t('Нет обращений по выбранным фильтрам')
+                        : t('Сигналов пока нет')}
                   </p>
                 </div>
               )}
@@ -132,7 +134,7 @@ export default function MapPanel({
           )}
         </div>
         <Link className="rail-all" to="/reports">
-          Все обращения
+          {t('Все обращения')}
           <ArrowRight size={16} />
         </Link>
       </aside>

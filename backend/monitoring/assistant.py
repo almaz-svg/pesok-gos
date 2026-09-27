@@ -15,8 +15,9 @@ from .serializers import StrictSerializer
 
 PAGES = {'/': 'Обзор', '/map': 'Карта земель', '/reports': 'Обращения и аналитика',
          '/register': 'Регистрация'}
+LANGUAGES = {'kk': 'казахском', 'ru': 'русском', 'en': 'английском'}
 GUIDE = """Ты — ИИ-помощник сайта «Песок Гос», проекта цифрового мониторинга земель.
-Отвечай по-русски, кратко и понятно, обычно до 150 слов. Используй обычный текст,
+Отвечай кратко и понятно, обычно до 150 слов. Используй обычный текст,
 без HTML и Markdown. Помогай разобраться в сайте, карте и процессе обращений.
 Факты о текущем продукте:
 - Обзор / объясняет проект. /map — карта, поиск по номеру обращения или кадастровому
@@ -30,8 +31,9 @@ GUIDE = """Ты — ИИ-помощник сайта «Песок Гос», пр
 требует доступа инспектора, выданного администратором.
 - /register пока проверяет форму: имя, email, пароль от 8 символов и подтверждение.
 Создание аккаунтов ещё не подключено. Не утверждай, что аккаунт создан.
-- Подача гражданами через Telegram запланирована. Реальный бот пока не подключён;
-не выдумывай его адрес, контакты или возможность отправки обращения через этот чат.
+- На сайте есть ссылка на Telegram-бота @zbjer_bot: https://t.me/zbjer_bot.
+Его доступность и обработка обращений этим чатом не проверяются. Не утверждай, что
+сообщение в этом чате отправляет обращение через бота или регистрирует его.
 У тебя нет доступа к базе, карточкам пользователя, геоданным, паролям или текущей
 статистике. Не придумывай статусы конкретных обращений, кадастровые и правовые факты.
 Не утверждай, что изменил, подал или зарегистрировал что-либо. Объясняй, где это
@@ -62,6 +64,7 @@ class Message(StrictSerializer):
 class ChatRequest(StrictSerializer):
     messages = Message(many=True, min_length=1, max_length=13)
     page = serializers.ChoiceField(choices=list(PAGES), default='/')
+    language = serializers.ChoiceField(choices=list(LANGUAGES), default='ru')
 
     def validate_messages(self, messages):
         if len(messages) % 2 != 1 or any(
@@ -86,12 +89,14 @@ class AssistantDailyThrottle(AssistantThrottle):
     scope = 'assistant_daily'
 
 
-def answer(messages, page):
+def answer(messages, page, language='ru'):
     try:
         response = requests.post(
             'https://api.openai.com/v1/responses',
             headers={'Authorization': f'Bearer {settings.OPENAI_API_KEY}', 'Content-Type': 'application/json'},
-            json={'model': settings.OPENAI_MODEL, 'instructions': GUIDE + '\nТекущий раздел: ' + PAGES[page],
+            json={'model': settings.OPENAI_MODEL, 'instructions': GUIDE +
+                  '\nТекущий раздел: ' + PAGES[page] +
+                  '\nОтвечай на ' + LANGUAGES[language] + ' языке. Переводи названия разделов и статусов.',
                   'input': messages, 'max_output_tokens': 800, 'store': False},
             timeout=(5, 25), allow_redirects=False,
         )

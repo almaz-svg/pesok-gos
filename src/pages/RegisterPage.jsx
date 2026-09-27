@@ -1,3 +1,4 @@
+import { useI18n } from '../i18n/useI18n.js';
 import { ArrowUpRight, Layers3, MapPinned } from '../components/icons.jsx';
 import { Link } from 'react-router-dom';
 import RegisterForm from '../components/auth/RegisterForm.jsx';
@@ -30,37 +31,38 @@ function Contours() {
 }
 
 export default function RegisterPage() {
+  const { t } = useI18n();
   const revealRef = useScrollReveal();
   return (
     <section className="register-page" ref={revealRef} aria-labelledby="register-title">
       <div className="register-story" data-reveal>
         <Link className="auth-back" to="/">
-          Вернуться к обзору <ArrowUpRight size={15} />
+          {t('Вернуться к обзору')} <ArrowUpRight size={15} />
         </Link>
         <div className="auth-story-copy">
           <span className="section-kicker">
-            <span className="live-dot" /> ОДНА ЗЕМЛЯ. ОБЩЕЕ БУДУЩЕЕ.
+            <span className="live-dot" /> {t('ОДНА ЗЕМЛЯ. ОБЩЕЕ БУДУЩЕЕ.')}
           </span>
           <h1 id="register-title">
-            Большие перемены.
+            {t('Большие перемены.')}
             <br />
-            <span>С вашего участия.</span>
+            <span>{t('С вашего участия.')}</span>
           </h1>
           <p>
-            Внимание к земле начинается с людей.
+            {t('Внимание к земле начинается с людей.')}
             <br />
-            Станьте частью цифрового мониторинга.
+            {t('Станьте частью цифрового мониторинга.')}
           </p>
         </div>
         <div className="auth-landscape">
           <Contours />
           <span className="auth-landscape-label">
-            <MapPinned size={14} /> КАЖДАЯ ТОЧКА ИМЕЕТ ЗНАЧЕНИЕ
+            <MapPinned size={14} /> {t('КАЖДАЯ ТОЧКА ИМЕЕТ ЗНАЧЕНИЕ')}
           </span>
         </div>
         <div className="auth-story-footer">
           <Layers3 size={20} />
-          <span>Технологии на стороне земли.</span>
+          <span>{t('Технологии на стороне земли.')}</span>
         </div>
       </div>
       <div className="register-form-column" data-reveal style={{ '--reveal-delay': '100ms' }}>

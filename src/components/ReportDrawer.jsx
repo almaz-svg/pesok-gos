@@ -1,3 +1,4 @@
+import { useI18n } from '../i18n/useI18n.js';
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import {
   ArrowDownLeft,
@@ -40,16 +41,18 @@ const errorMessage = (error) =>
   error?.message || 'Не удалось связаться с сервером. Проверьте подключение.';
 
 function Status({ value }) {
+  const { t } = useI18n();
   const meta = STATUS_META[value] || { label: value, tone: 'green' };
   return (
     <span className={`inspector-drawer__status is-${meta.tone}`}>
       <i />
-      {meta.label}
+      {t(meta.label)}
     </span>
   );
 }
 
 function Photo({ photo, number }) {
+  const { t } = useI18n();
   const [failed, setFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const url = photoUrl(photo.url);
@@ -59,7 +62,7 @@ function Photo({ photo, number }) {
       {failed || !url ? (
         <div className="inspector-drawer__photo-error">
           <ImageOff size={24} />
-          <span>Фото недоступно</span>
+          <span>{t('Фото недоступно')}</span>
           <button
             type="button"
             disabled={!url}
@@ -69,7 +72,7 @@ function Photo({ photo, number }) {
             }}
           >
             <RefreshCw size={13} />
-            Загрузить повторно
+            {t('Загрузить повторно')}
           </button>
         </div>
       ) : (
@@ -77,12 +80,12 @@ function Photo({ photo, number }) {
           href={retryUrl}
           target="_blank"
           rel="noreferrer"
-          aria-label={`Открыть фото обращения ${number} в новой вкладке`}
+          aria-label={t('Открыть фото обращения {value0} в новой вкладке', { value0: number })}
         >
           <img
             key={attempt}
             src={retryUrl}
-            alt={`Фотография места нарушения ${number}`}
+            alt={t('Фотография места нарушения {value0}', { value0: number })}
             onError={() => setFailed(true)}
           />
           <span>
@@ -96,6 +99,7 @@ function Photo({ photo, number }) {
 }
 
 function History({ events, plots }) {
+  const { t } = useI18n();
   function plotName(id) {
     return id
       ? plots.find((plot) => plot.id === id)?.cadastral_number || 'Земельный участок'
@@ -115,18 +119,21 @@ function History({ events, plots }) {
             <div>
               <div className="inspector-drawer__event-title">
                 {event.event === 'CREATED'
-                  ? 'Обращение зарегистрировано'
+                  ? t('Обращение зарегистрировано')
                   : event.before?.status !== event.after.status
-                    ? STATUS_META[event.after.status]?.label || event.after.status
-                    : 'Данные обращения обновлены'}
+                    ? t(STATUS_META[event.after.status]?.label || event.after.status)
+                    : t('Данные обращения обновлены')}
               </div>
               {event.before && event.before.deadline !== event.after.deadline && (
                 <p>
-                  Срок: {event.after.deadline ? formatDate(event.after.deadline) : 'не назначен'}
+                  {t('Срок:')}{' '}
+                  {event.after.deadline ? formatDate(event.after.deadline) : t('не назначен')}
                 </p>
               )}
               {event.before && event.before.plot_id !== event.after.plot_id && (
-                <p>Участок: {plotName(event.after.plot_id)}</p>
+                <p>
+                  {t('Участок:')} {t(plotName(event.after.plot_id))}
+                </p>
               )}
               {event.comment && <p className="inspector-drawer__event-comment">{event.comment}</p>}
               <span className="inspector-drawer__event-meta">
@@ -140,6 +147,7 @@ function History({ events, plots }) {
 }
 
 export default function ReportDrawer({ selection, onClose, onSaved, plots = EMPTY_PLOTS }) {
+  const { t } = useI18n();
   const [record, setRecord] = useState(null);
   const [availablePlots, setAvailablePlots] = useState(plots);
   const [loading, setLoading] = useState(false);
@@ -343,7 +351,10 @@ export default function ReportDrawer({ selection, onClose, onSaved, plots = EMPT
           setRecord(next);
           setBlocked({
             kind: 'uncertain',
-            message: `Получены данные сервера: «${STATUS_META[next.status]?.label || next.status}», версия ${next.version}. Примите актуальные данные перед дальнейшим редактированием.`,
+            message: t(
+              'Получены данные сервера: «{value0}», версия {value1}. Примите актуальные данные перед дальнейшим редактированием.',
+              { value0: t(STATUS_META[next.status]?.label || next.status), value1: next.version },
+            ),
           });
         } catch {
           if (currentSelection.current === key)
@@ -355,7 +366,7 @@ export default function ReportDrawer({ selection, onClose, onSaved, plots = EMPT
         }
       } else {
         setFormError(
-          `${errorMessage(error)}${error.requestId ? ` Код запроса: ${error.requestId}` : ''}`,
+          `${errorMessage(error)}${error.requestId ? t(' Код запроса: {value0}', { value0: error.requestId }) : ''}`,
         );
         setFieldErrors(error.fields || {});
       }
@@ -381,7 +392,9 @@ export default function ReportDrawer({ selection, onClose, onSaved, plots = EMPT
   const fieldError = (field) =>
     fieldErrors[field] ? (
       <span className="inspector-drawer__field-error" id={`${fieldId}-${field}-error`}>
-        {Array.isArray(fieldErrors[field]) ? fieldErrors[field].join(' ') : fieldErrors[field]}
+        {Array.isArray(fieldErrors[field])
+          ? fieldErrors[field].map((message) => t(message)).join(' ')
+          : t(fieldErrors[field])}
       </span>
     ) : null;
 
@@ -405,7 +418,7 @@ export default function ReportDrawer({ selection, onClose, onSaved, plots = EMPT
         <header className="inspector-drawer__header">
           <div>
             <span className="inspector-drawer__eyebrow">
-              {isReport ? 'ОБРАЩЕНИЕ ГРАЖДАНИНА' : 'ЗЕМЕЛЬНЫЙ УЧАСТОК'}
+              {isReport ? t('ОБРАЩЕНИЕ ГРАЖДАНИНА') : t('ЗЕМЕЛЬНЫЙ УЧАСТОК')}
             </span>
             <h2 id={titleId}>
               {record
@@ -413,8 +426,8 @@ export default function ReportDrawer({ selection, onClose, onSaved, plots = EMPT
                   ? record.tracking_number
                   : record.cadastral_number
                 : isReport
-                  ? 'Карточка обращения'
-                  : 'Карточка участка'}
+                  ? t('Карточка обращения')
+                  : t('Карточка участка')}
             </h2>
           </div>
           <button
@@ -423,7 +436,7 @@ export default function ReportDrawer({ selection, onClose, onSaved, plots = EMPT
             onClick={onClose}
             disabled={saving}
             type="button"
-            aria-label="Закрыть карточку"
+            aria-label={t('Закрыть карточку')}
           >
             <X size={21} />
           </button>
@@ -432,16 +445,16 @@ export default function ReportDrawer({ selection, onClose, onSaved, plots = EMPT
           {loading && (
             <div className="inspector-drawer__loading" role="status">
               <LoaderCircle className="inspector-drawer__spin" size={28} />
-              <span>Загружаем карточку…</span>
+              <span>{t('Загружаем карточку…')}</span>
             </div>
           )}
           {loadError && (
             <div className="inspector-drawer__error" role="alert">
               <TriangleAlert size={22} />
-              <p>{loadError}</p>
+              <p>{t(loadError)}</p>
               <button type="button" onClick={() => setReload((value) => value + 1)}>
                 <RefreshCw size={15} />
-                Повторить загрузку
+                {t('Повторить загрузку')}
               </button>
             </div>
           )}
@@ -456,13 +469,13 @@ export default function ReportDrawer({ selection, onClose, onSaved, plots = EMPT
               {isReport ? (
                 <>
                   <section className="inspector-drawer__section">
-                    <span className="inspector-drawer__eyebrow">СУТЬ ОБРАЩЕНИЯ</span>
+                    <span className="inspector-drawer__eyebrow">{t('СУТЬ ОБРАЩЕНИЯ')}</span>
                     <h3 className="inspector-drawer__category">
-                      {CATEGORY_LABELS[record.category] || record.category}
+                      {t(CATEGORY_LABELS[record.category] || record.category)}
                     </h3>
                     <p className="inspector-drawer__description">{record.description}</p>
                     <p className="inspector-drawer__helper">
-                      Категория зафиксирована при отправке обращения.
+                      {t('Категория зафиксирована при отправке обращения.')}
                     </p>
                     <div className="inspector-drawer__coordinates">
                       <MapPin size={14} />
@@ -471,7 +484,7 @@ export default function ReportDrawer({ selection, onClose, onSaved, plots = EMPT
                   </section>
                   <section className="inspector-drawer__section">
                     <div className="inspector-drawer__section-heading">
-                      <h3>Фото с места</h3>
+                      <h3>{t('Фото с места')}</h3>
                       <span>{record.photos.length}</span>
                     </div>
                     {record.photos.length ? (
@@ -486,7 +499,8 @@ export default function ReportDrawer({ selection, onClose, onSaved, plots = EMPT
                       </div>
                     ) : (
                       <div className="inspector-drawer__no-photo">
-                        <ImageOff size={19} />К обращению не прикреплены фотографии
+                        <ImageOff size={19} />
+                        {t('К обращению не прикреплены фотографии')}
                       </div>
                     )}
                   </section>
@@ -496,22 +510,22 @@ export default function ReportDrawer({ selection, onClose, onSaved, plots = EMPT
                     <CalendarDays size={18} />
                     <div>
                       <span>
-                        {record.is_overdue ? 'Срок устранения просрочен' : 'Срок устранения'}
+                        {record.is_overdue ? t('Срок устранения просрочен') : t('Срок устранения')}
                       </span>
                       <strong>
-                        {record.deadline ? formatDate(record.deadline) : 'Не назначен'}
+                        {record.deadline ? formatDate(record.deadline) : t('Не назначен')}
                       </strong>
                     </div>
                     {record.is_overdue && <TriangleAlert size={18} />}
                   </div>
                   <section className="inspector-drawer__section">
                     <div className="inspector-drawer__section-heading">
-                      <h3>Работа с обращением</h3>
+                      <h3>{t('Работа с обращением')}</h3>
                       <FileText size={16} />
                     </div>
                     <form onSubmit={save} className="inspector-drawer__form" noValidate>
                       <fieldset disabled={saving || Boolean(blocked)}>
-                        <label htmlFor={`${fieldId}-status`}>Статус обращения</label>
+                        <label htmlFor={`${fieldId}-status`}>{t('Статус обращения')}</label>
                         <select
                           id={`${fieldId}-status`}
                           value={draft.status}
@@ -523,13 +537,13 @@ export default function ReportDrawer({ selection, onClose, onSaved, plots = EMPT
                         >
                           {[record.status, ...(TRANSITIONS[record.status] || [])].map((status) => (
                             <option key={status} value={status}>
-                              {STATUS_META[status]?.label || status}
+                              {t(STATUS_META[status]?.label || status)}
                             </option>
                           ))}
                         </select>
                         {fieldError('status')}
                         <label htmlFor={`${fieldId}-deadline`}>
-                          Срок устранения{' '}
+                          {t('Срок устранения')}{' '}
                           {draft.status === 'IN_PROGRESS' && <span aria-hidden="true">*</span>}
                         </label>
                         <input
@@ -544,7 +558,7 @@ export default function ReportDrawer({ selection, onClose, onSaved, plots = EMPT
                           }
                         />
                         {fieldError('deadline')}
-                        <label htmlFor={`${fieldId}-plot_id`}>Привязка к участку</label>
+                        <label htmlFor={`${fieldId}-plot_id`}>{t('Привязка к участку')}</label>
                         <select
                           id={`${fieldId}-plot_id`}
                           value={draft.plot_id}
@@ -554,7 +568,7 @@ export default function ReportDrawer({ selection, onClose, onSaved, plots = EMPT
                             fieldErrors.plot_id ? `${fieldId}-plot_id-error` : undefined
                           }
                         >
-                          <option value="">Без привязки к участку</option>
+                          <option value="">{t('Без привязки к участку')}</option>
                           {record.plot &&
                             !availablePlots.some((plot) => plot.id === record.plot.id) && (
                               <option value={record.plot.id}>{record.plot.cadastral_number}</option>
@@ -568,8 +582,8 @@ export default function ReportDrawer({ selection, onClose, onSaved, plots = EMPT
                         {fieldError('plot_id')}
                         <label htmlFor={`${fieldId}-comment`}>
                           {draft.status === 'RESOLVED' && record.status !== 'RESOLVED'
-                            ? 'Причина закрытия *'
-                            : 'Комментарий инспектора'}
+                            ? t('Причина закрытия *')
+                            : t('Комментарий инспектора')}
                         </label>
                         <textarea
                           id={`${fieldId}-comment`}
@@ -577,8 +591,8 @@ export default function ReportDrawer({ selection, onClose, onSaved, plots = EMPT
                           maxLength={2000}
                           placeholder={
                             draft.status === 'RESOLVED'
-                              ? 'Укажите результат проверки или причину закрытия'
-                              : 'Результат проверки, назначенные действия…'
+                              ? t('Укажите результат проверки или причину закрытия')
+                              : t('Результат проверки, назначенные действия…')
                           }
                           value={draft.comment}
                           onChange={(event) => update('comment', event.target.value)}
@@ -592,22 +606,22 @@ export default function ReportDrawer({ selection, onClose, onSaved, plots = EMPT
                       {blocked && (
                         <div className="inspector-drawer__conflict" role="alert">
                           <TriangleAlert size={18} />
-                          <p>{blocked.message}</p>
+                          <p>{t(blocked.message)}</p>
                           <button type="button" disabled={saving} onClick={refreshConflict}>
                             <RefreshCw size={14} />
-                            Загрузить актуальные данные
+                            {t('Загрузить актуальные данные')}
                           </button>
                         </div>
                       )}
                       {formError && (
                         <div className="inspector-drawer__form-error" role="alert">
-                          {formError}
+                          {t(formError)}
                         </div>
                       )}
                       {notice && (
                         <div className="inspector-drawer__success" role="status">
                           <CheckCheck size={17} />
-                          <span>{notice}</span>
+                          <span>{t(notice)}</span>
                         </div>
                       )}
                       <button
@@ -620,17 +634,18 @@ export default function ReportDrawer({ selection, onClose, onSaved, plots = EMPT
                         ) : (
                           <Save size={16} />
                         )}
-                        {saving ? 'Сохраняем…' : 'Сохранить изменения'}
+                        {saving ? t('Сохраняем…') : t('Сохранить изменения')}
                         <ChevronRight size={17} />
                       </button>
                       <p className="inspector-drawer__helper inspector-drawer__version">
-                        Версия {record.version} · Обновлено {formatDateTime(record.updated_at)}
+                        {t('Версия')} {record.version} {t('· Обновлено')}{' '}
+                        {formatDateTime(record.updated_at)}
                       </p>
                     </form>
                   </section>
                   <section className="inspector-drawer__section">
                     <div className="inspector-drawer__section-heading">
-                      <h3>История обращения</h3>
+                      <h3>{t('История обращения')}</h3>
                       <Clock3 size={16} />
                     </div>
                     <History events={record.history} plots={availablePlots} />
@@ -641,7 +656,7 @@ export default function ReportDrawer({ selection, onClose, onSaved, plots = EMPT
                   <section className="inspector-drawer__section">
                     <h3 className="inspector-drawer__category">{record.purpose}</h3>
                     <p className="inspector-drawer__description">
-                      {record.address || 'Адрес не указан'}
+                      {record.address || t('Адрес не указан')}
                     </p>
                   </section>
                   <div className="inspector-drawer__plot-stats">
@@ -651,26 +666,27 @@ export default function ReportDrawer({ selection, onClose, onSaved, plots = EMPT
                         {new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 }).format(
                           record.area_ha,
                         )}
-                        <small> га</small>
+                        <small> {t('га')}</small>
                       </strong>
-                      <span>Площадь участка</span>
+                      <span>{t('Площадь участка')}</span>
                     </div>
                     <div>
                       <MessageSquare size={19} />
                       <strong>{record.active_reports_count}</strong>
-                      <span>Активных обращений</span>
+                      <span>{t('Активных обращений')}</span>
                     </div>
                   </div>
                   <section className="inspector-drawer__section">
-                    <span className="inspector-drawer__eyebrow">СТАТУС УЧАСТКА</span>
+                    <span className="inspector-drawer__eyebrow">{t('СТАТУС УЧАСТКА')}</span>
                     <p className="inspector-drawer__description">
-                      Статус рассчитывается по связанным обращениям и обновляется при работе
-                      инспектора с ними.
+                      {t(
+                        'Статус рассчитывается по связанным обращениям и обновляется при работе инспектора с ними.',
+                      )}
                     </p>
                     {!record.geometry && (
                       <div className="inspector-drawer__no-photo">
                         <MapPin size={18} />
-                        Границы участка пока не добавлены на карту.
+                        {t('Границы участка пока не добавлены на карту.')}
                       </div>
                     )}
                   </section>

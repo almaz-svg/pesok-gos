@@ -1,36 +1,40 @@
+import { useI18n } from '../../i18n/useI18n.js';
 import { useState } from 'react';
 import { Radio, RefreshCw, LoaderCircle, ArrowRight } from '../icons.jsx';
 import { login } from '../../lib/data-client.js';
 import { STATUS_META } from '../../lib/domain.js';
 export function ResourceState({ resource, label, onRetry }) {
+  const { t } = useI18n();
   return resource.error ? (
     <div className="state-box error-box" role="alert">
       <Radio size={25} />
-      <h3>{label}: данные недоступны</h3>
-      <p>{resource.error.message}</p>
+      <h3>{t('{label}: данные недоступны', { label: t(label) })}</h3>
+      <p>{t(resource.error.message)}</p>
       <button className="button" disabled={resource.loading} onClick={onRetry}>
-        Повторить загрузку <RefreshCw size={15} />
+        {t('Повторить загрузку')} <RefreshCw size={15} />
       </button>
     </div>
   ) : (
     <div className="state-box" role="status">
       <LoaderCircle className="spin" size={23} />
-      <p>{label}: загружаем данные…</p>
+      <p>{t('{label}: загружаем данные…', { label: t(label) })}</p>
     </div>
   );
 }
 
 export function Status({ status }) {
+  const { t } = useI18n();
   const meta = STATUS_META[status] || { label: status, tone: 'green' };
   return (
     <span className={`status status-${meta.tone}`}>
       <i />
-      {meta.label}
+      {t(meta.label)}
     </span>
   );
 }
 
 export function LoginForm({ onLogin }) {
+  const { t } = useI18n();
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   async function submit(event) {
@@ -49,25 +53,25 @@ export function LoginForm({ onLogin }) {
   }
   return (
     <div className="login-card">
-      <div className="section-kicker">ДОСТУП ИНСПЕКТОРА</div>
-      <h3>Войдите в рабочее пространство</h3>
-      <p>Используйте учётную запись, выданную администратором.</p>
+      <div className="section-kicker">{t('ДОСТУП ИНСПЕКТОРА')}</div>
+      <h3>{t('Войдите в рабочее пространство')}</h3>
+      <p>{t('Используйте учётную запись, выданную администратором.')}</p>
       <form onSubmit={submit}>
         <label>
-          Имя пользователя
+          {t('Имя пользователя')}
           <input name="username" autoComplete="username" required />
         </label>
         <label>
-          Пароль
+          {t('Пароль')}
           <input name="password" type="password" autoComplete="current-password" required />
         </label>
         {error && (
           <p className="form-error" role="alert">
-            {error}
+            {t(error)}
           </p>
         )}
         <button className="button button-lime" disabled={busy}>
-          {busy ? 'Входим…' : 'Войти'}
+          {busy ? t('Входим…') : t('Войти')}
           <ArrowRight size={17} />
         </button>
       </form>
